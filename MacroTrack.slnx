@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="MacroTrack.BasicApp/MacroTrack.BasicApp.csproj" Id="67400bd8-9a69-40f0-8fe7-ea745482388a" />
+  <Project Path="MacroTrack.Cli/MacroTrack.Cli.csproj" />
+  <Project Path="MacroTrack.Core/MacroTrack.Core.csproj" />
+  <Project Path="MacroTrack.Puppet/MacroTrack.Puppet.csproj" Id="3e3ae3dd-f06c-475c-a699-d126bef45acb" />
+</Solution>
