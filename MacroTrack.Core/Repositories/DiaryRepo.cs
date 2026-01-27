@@ -110,7 +110,7 @@ public class DiaryRepo
     }
 
     // Edit
-    public DiaryEntry? EditEntry(int id, string body) // was considering having this as DiaryEntry Entry.
+    public void EditEntry(int id, string body) // was considering having this as DiaryEntry Entry.
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
@@ -119,7 +119,6 @@ public class DiaryRepo
         cmd.Parameters.AddWithValue("$body", body);
         cmd.Parameters.AddWithValue("$id", id);
         cmd.ExecuteNonQuery();
-        return GetEntry(id);
     }
 
     // return last

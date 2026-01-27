@@ -1,5 +1,6 @@
 using MacroTrack.Core.Services;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.AppModels;
 using System.Windows.Forms.DataVisualization.Charting;
 using MacroTrack.BasicApp.Forms;
@@ -23,6 +24,8 @@ namespace MacroTrack.BasicApp
         public Form1(CoreServices services)
         {
             _services = services;
+            _services.MessageLogged += (_, msg) => Print($"{msg.Source} {msg.Message} { (msg.Exception is null ? "" : $"| {msg.Exception.Message}") } ");
+            //_services.MessageLogged += (_, __) => Print("Message Logged invoked");
             _services.RequestPrint += (sender, text) => Print(text);
             _services.RequestPrintInline += (sender, text) => PrintInline(text);
             InitializeComponent();
@@ -572,7 +575,16 @@ namespace MacroTrack.BasicApp
                 tbDEDiary.Text = string.Empty;
             }
 
-
+            try
+            {
+                DiaryEntry entry = _services.diaryService.AddEntry(tbDEDiary.Text);
+                Print($"Added Diary Entry: \n\n{entry.Body}");
+                tbDEDiary.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error adding diary entry: {ex.GetType().Name}: {ex.Message}");
+            }
         }
 
         private void btDEClear_Click(object sender, EventArgs e)
