@@ -1,3 +1,4 @@
+using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 
@@ -26,8 +27,9 @@ namespace MacroTrack.BasicApp
             DeleteOldLogs(20);
 
             var _logger = new MTLogger(logFile);
+            var _context = new CoreContext(_logger);
             
-            var _services = new CoreServices(connString, _logger);
+            var _services = new CoreServices(connString, _context);
 
             ApplicationConfiguration.Initialize();
             Application.Run(new Form1(_services));

@@ -1,25 +1,19 @@
 namespace MacroTrack.Core.Services;
 
+using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
-public class DiaryService
+public class DiaryService : ServiceBase
 {
     private readonly DiaryRepo _repo;
-    private readonly IMTLogger Logger;
 
-    public event EventHandler<string> RequestPrint;
-    public event EventHandler<string> RequestPrintInline;
-
-    public DiaryService(DiaryRepo repo, IMTLogger logger)
+    public DiaryService(DiaryRepo repo, CoreContext ctx) : base(ctx)
     {
         _repo = repo;
-        _repo.RequestPrint += (sender, text) => RepoPrint(sender!, text);
-        Logger = logger;
-        Log("DiaryService initialized");
     }
 
     public DiaryEntry AddEntry(string body)
@@ -85,23 +79,4 @@ public class DiaryService
         return DeleteEntry(_repo.ReturnLastId());
     }
 
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
-    }
-
-    private void RepoPrint(object sender, string text)
-    {
-        RequestPrint?.Invoke(sender, text);
-    }
-
-    private void PrintInline(string text)
-    {
-        RequestPrintInline?.Invoke(this, text);
-    }
-
-    private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
-    {
-        Logger.Log(this, caller, level, message, ex);
-    }
 }

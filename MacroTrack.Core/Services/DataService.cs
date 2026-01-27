@@ -6,25 +6,23 @@ using MacroTrack.Core.Models;
 using MacroTrack.Core.AppModels;
 
 using System.Runtime.CompilerServices;
+using MacroTrack.Core.Infrastructure;
 
-public class DataService
+public class DataService : ServiceBase
 {
     FoodLogRepo _foodLogRepo;
     GoalRepo _goalRepo;
     WeightLogRepo _weightLogRepo;
 
-    public event EventHandler<string> RequestPrint;
-    public event EventHandler<string> RequestPrintInline;
 
-    public DataService(FoodLogRepo foodLogRepo, GoalRepo goalRepo, WeightLogRepo weightLogRepo)
+    public DataService(FoodLogRepo foodLogRepo, GoalRepo goalRepo, WeightLogRepo weightLogRepo, CoreContext ctx) : base(ctx)
     {
         // RepoList here.
         _foodLogRepo = foodLogRepo;
-        _foodLogRepo.RequestPrint += (sender, text) => RepoPrint(sender!, text);
         _goalRepo = goalRepo;
-        _goalRepo.RequestPrint += (sender, text) => RepoPrint(sender!, text);
         _weightLogRepo = weightLogRepo;
-        _weightLogRepo.RequestPrint += (sender, text) => RepoPrint(sender!, text);
+
+        Log("DataService initialised");
     }
 
     // MacroSummary:
@@ -255,20 +253,5 @@ public class DataService
         };
         GoalSeries.Add(last);
         return GoalSeries;
-    }
-
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
-    }
-
-    private void RepoPrint(object sender, string text)
-    {
-        RequestPrint?.Invoke(sender, text);
-    }
-
-    private void PrintInline(string text)
-    {
-        RequestPrintInline?.Invoke(this, text);
     }
 }

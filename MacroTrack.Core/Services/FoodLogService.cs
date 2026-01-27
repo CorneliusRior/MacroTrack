@@ -1,24 +1,22 @@
 namespace MacroTrack.Core.Services;
 
 using MacroTrack.Core.AppModels;
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
-public class FoodLogService
+public class FoodLogService : ServiceBase
 {
     private readonly FoodLogRepo _repo;
     private readonly PresetRepo _presetRepo;
 
-    public event EventHandler<string> RequestPrint;
-    public event EventHandler<string> RequestPrintInline;
-
-    public FoodLogService(FoodLogRepo repo, PresetRepo presetRepo)
+    public FoodLogService(FoodLogRepo repo, PresetRepo presetRepo, CoreContext ctx) : base(ctx)
     {
         _repo = repo;
-        _repo.RequestPrint += (sender, text) => RepoPrint(sender!, text);
-        _presetRepo = presetRepo;
+        _presetRepo = presetRepo;;
     }
 
     // New 
@@ -130,20 +128,5 @@ public class FoodLogService
     public FoodEntry? DeleteLast()
     {
         return DeleteEntry(_repo.ReturnLastId());
-    }
-
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
-    }
-
-    private void RepoPrint(object sender, string text)
-    {
-        RequestPrint?.Invoke(sender, text);
-    }
-
-    private void PrintInline(string text)
-    {
-        RequestPrintInline?.Invoke(this, text);
     }
 }

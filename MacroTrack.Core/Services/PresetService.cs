@@ -1,21 +1,19 @@
 namespace MacroTrack.Core.Services;
 
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
-public class PresetService
+public class PresetService : ServiceBase
 {
     private readonly PresetRepo _repo;
 
-    public event EventHandler<string> RequestPrint;
-    public event EventHandler<string> RequestPrintInline;
-
-    public PresetService(PresetRepo repo)
+    public PresetService(PresetRepo repo, CoreContext ctx) : base(ctx)
     {
         _repo = repo;
-        _repo.RequestPrint += (sender, text) => RepoPrint(sender!, text);
     }
 
     // new
@@ -82,19 +80,5 @@ public class PresetService
         if (entry == null) throw new Exception("Core.Services.PresetService.DeleteEntry(): Cannot find entry");
         _repo.DeleteEntry(id);
         return entry;
-    }
-
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
-    }
-    private void RepoPrint(object sender, string text)
-    {
-        RequestPrint?.Invoke(sender, text);
-    }
-
-    private void PrintInline(string text)
-    {
-        RequestPrintInline?.Invoke(this, text);
     }
 }

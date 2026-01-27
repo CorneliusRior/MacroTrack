@@ -25,9 +25,6 @@ namespace MacroTrack.BasicApp
         {
             _services = services;
             _services.MessageLogged += (_, msg) => Print($"{msg.Source} {msg.Message} { (msg.Exception is null ? "" : $"| {msg.Exception.Message}") } ");
-            //_services.MessageLogged += (_, __) => Print("Message Logged invoked");
-            _services.RequestPrint += (sender, text) => Print(text);
-            _services.RequestPrintInline += (sender, text) => PrintInline(text);
             InitializeComponent();
             SetUpClock();
             cbBarTimeFrame.SelectedIndex = 0;

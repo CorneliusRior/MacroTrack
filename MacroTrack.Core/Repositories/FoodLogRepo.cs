@@ -1,15 +1,18 @@
 namespace MacroTrack.Core.Repositories;
 
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using Microsoft.Data.Sqlite;
 using System.Runtime.CompilerServices;
 
-public class FoodLogRepo
+public class FoodLogRepo : RepoBase
 {
     private readonly string _connectionString;
+    private readonly IMTLogger Logger;
     public event EventHandler<string> RequestPrint;
 
-    public FoodLogRepo(string connectionString)
+    public FoodLogRepo(string connectionString, CoreContext ctx) : base(ctx)
     {
         _connectionString = connectionString;
         EnsureDatabase();

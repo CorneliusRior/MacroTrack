@@ -1,3 +1,5 @@
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using Microsoft.Data.Sqlite;
 using System.ComponentModel.DataAnnotations;
@@ -5,16 +7,17 @@ using System.Runtime.CompilerServices;
 
 namespace MacroTrack.Core.Repositories;
 
-public class TaskRepo
+public class TaskRepo : RepoBase
 {
     private readonly string _connectionString;
-    public event EventHandler<string> RequestPrint;
+    private readonly IMTLogger Logger;
 
-    public TaskRepo(string connectionString)
+    public TaskRepo(string connectionString, CoreContext ctx) : base(ctx)
     {
         _connectionString = connectionString;
         EnsureDatabase();
     }
+
 
     private void EnsureDatabase()
     {
@@ -273,9 +276,4 @@ public class TaskRepo
         cmd.ExecuteNonQuery();
     }
 
-    // Printing:
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
-    }
 }

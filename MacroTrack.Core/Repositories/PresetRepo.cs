@@ -1,15 +1,17 @@
 namespace MacroTrack.Core.Repositories;
 
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using Microsoft.Data.Sqlite;
 using System.Runtime.CompilerServices;
 
-public class PresetRepo
+public class PresetRepo : RepoBase
 {
     private readonly string _connectionString;
-    public event EventHandler<string> RequestPrint;
+    private readonly IMTLogger Logger;
 
-    public PresetRepo(string connectionString)
+    public PresetRepo(string connectionString, CoreContext ctx) : base(ctx)
     {
         _connectionString = connectionString;
         EnsureDatabase();
@@ -214,11 +216,5 @@ public class PresetRepo
         using var cmd = new SqliteCommand(sql, connection);
         cmd.Parameters.AddWithValue("$id", id);
         cmd.ExecuteNonQuery();
-    }
-
-    // Printing:
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
     }
 }

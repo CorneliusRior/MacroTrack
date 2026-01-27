@@ -1,15 +1,15 @@
 namespace MacroTrack.Core.Repositories;
 
+using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Models;
 using Microsoft.Data.Sqlite;
 using System.Runtime.CompilerServices;
 
-public class WeightLogRepo
+public class WeightLogRepo : RepoBase
 {
     private readonly string _connectionString;
-    public event EventHandler<string> RequestPrint;
 
-    public WeightLogRepo(string connectionString)
+    public WeightLogRepo(string connectionString, CoreContext ctx) : base(ctx)
     {
         _connectionString = connectionString;
         EnsureDatabase();
@@ -128,11 +128,5 @@ public class WeightLogRepo
         using var cmd = new SqliteCommand(sql, connection);
         cmd.Parameters.AddWithValue("$id", id);
         cmd.ExecuteNonQuery();
-    }
-
-    // Printing:
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
     }
 }

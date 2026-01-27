@@ -3,18 +3,19 @@
 namespace MacroTrack.Core.Repositories;
 
 using MacroTrack.Core.AppModels;
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 
-public class GoalRepo
+public class GoalRepo : RepoBase
 {
     private readonly string _connectionString;
-    public event EventHandler<string> RequestPrint;
 
-    public GoalRepo(string connectionString)
+    public GoalRepo(string connectionString, CoreContext ctx) : base(ctx)
     {
         _connectionString = connectionString;
         EnsureDatabase();
@@ -432,11 +433,5 @@ public class GoalRepo
     {
         // There isn't really an easy way to get a datatable out here, we would need to make "record" classes, which is annoying and I really don't want to do that right now. If and when you want to do it you can do it here but not now. 
     } */
-
-    // Printing:
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
-    }
 
 }

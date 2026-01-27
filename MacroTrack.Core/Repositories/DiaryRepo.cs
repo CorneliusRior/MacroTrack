@@ -4,13 +4,14 @@ using Microsoft.Data.Sqlite;
 using MacroTrack.Core.Models;
 
 using System.Runtime.CompilerServices;
+using MacroTrack.Core.Logging;
+using MacroTrack.Core.Infrastructure;
 
-public class DiaryRepo
+public class DiaryRepo : RepoBase
 {
     private readonly string _connectionString;
-    public event EventHandler<string> RequestPrint;
 
-    public DiaryRepo(string connectionString)
+    public DiaryRepo(string connectionString, CoreContext ctx) : base(ctx)
     {
         _connectionString = connectionString;
         EnsureDatabase();
@@ -142,11 +143,5 @@ public class DiaryRepo
         using var cmd = new SqliteCommand(sql, connection);
         cmd.Parameters.AddWithValue("$id", id);
         cmd.ExecuteNonQuery();
-    }
-
-    // Printing:
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
     }
 }

@@ -1,22 +1,20 @@
 namespace  MacroTrack.Core.Services;
 
 using MacroTrack.Core.AppModels;
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
-public class GoalService
+public class GoalService : ServiceBase
 {
     private readonly GoalRepo _repo;
 
-    public event EventHandler<string> RequestPrint;
-    public event EventHandler<string> RequestPrintInline;
-
-    public GoalService(GoalRepo repo)
+    public GoalService(GoalRepo repo, CoreContext ctx) : base(ctx)
     {
         _repo = repo;
-        _repo.RequestPrint += (sender, text) => RepoPrint(sender!, text);
     }
 
     // New Goal
@@ -195,20 +193,5 @@ public class GoalService
             totals.Fat += g.Fat * daysActive;
         }
         return totals;
-    }
-
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
-    }
-
-    private void RepoPrint(object sender, string text)
-    {
-        RequestPrint?.Invoke(sender, text);
-    }
-
-    private void PrintInline(string text)
-    {
-        RequestPrintInline?.Invoke(this, text);
     }
 }

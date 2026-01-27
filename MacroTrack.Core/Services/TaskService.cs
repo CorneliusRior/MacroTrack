@@ -1,21 +1,19 @@
 namespace MacroTrack.Core.Services;
 
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
-public class TaskService
+public class TaskService : ServiceBase
 {
     private readonly TaskRepo _repo;
 
-    public event EventHandler<string> RequestPrint;
-    public event EventHandler<string> RequestPrintInline;
-
-    public TaskService(TaskRepo repo)
+    public TaskService(TaskRepo repo, CoreContext ctx) : base(ctx)
     {
         _repo = repo;
-        _repo.RequestPrint += (sender, text) => RepoPrint(sender!, text);
     }
 
     // Add
@@ -95,20 +93,5 @@ public class TaskService
     {
         _repo.DeactivateEntry(id);
         return GetTask(id, DateTime.Now);
-    }
-
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
-    }
-
-    private void RepoPrint(object sender, string text)
-    {
-        RequestPrint?.Invoke(sender, text);
-    }
-
-    private void PrintInline(string text)
-    {
-        RequestPrintInline?.Invoke(this, text);
     }
 }
