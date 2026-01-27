@@ -13,8 +13,8 @@ namespace MacroTrack.BasicApp
     public partial class FoodEntryCard : UserControl
     {
         public int Id { get; private set; }
-        public event EventHandler<int> RequestEdit;
-        public event EventHandler<int> RequestDelete;
+        public event EventHandler<int>? RequestEdit;
+        public event EventHandler<int>? RequestDelete;
         public FoodEntryCard()
         {
             InitializeComponent();

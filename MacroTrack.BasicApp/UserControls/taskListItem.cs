@@ -17,9 +17,9 @@ namespace MacroTrack.BasicApp
         public int Id { get; private set; }
         public bool Completed { get; private set; }
         private bool _loading = true;
-        public event EventHandler<int> RequestSetCompleted;
-        public event EventHandler<int> RequestSetIncomplete;
-        public event EventHandler<string> RequestPrint;
+        public event EventHandler<int>? RequestSetCompleted;
+        public event EventHandler<int>? RequestSetIncomplete;
+        public event EventHandler<string>? RequestPrint;
         public taskListItem()
         {
             InitializeComponent();

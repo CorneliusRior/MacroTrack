@@ -32,16 +32,15 @@ public class DataService : ServiceBase
         MacroTotals remaining = GetRemaining(target, actual);
         var presentGoal = _goalRepo.GetPresentGoal(DateOnly.FromDateTime(startTime));
         var goalName = presentGoal != null ? _goalRepo.GetGoal(presentGoal.GoalId)?.GoalName ?? "No Goal" : "No Goal";
-        return new MacroSummary
-        {
-            NoGoal = presentGoal == null ? true : false,
-            From = startTime,
-            To = endTime,
-            GoalName = goalName,
-            Target = target,
-            Actual = actual,
-            Remaining = remaining
-        };
+        return new MacroSummary(        
+            NoGoal: presentGoal == null ? true : false,
+            From: startTime,
+            To: endTime,
+            GoalName: goalName,
+            Target: target,
+            Actual: actual,
+            Remaining: remaining
+        );
     }
 
     public MacroTotals GetTarget(DateTime startTime, DateTime endTime)
@@ -49,13 +48,11 @@ public class DataService : ServiceBase
         // get the end time:
         var goalHistory = _goalRepo.GetGoalHistoryInterval(startTime, endTime);
         Log($"{goalHistory.Count} goals counted during this period.");
-        var totals = new MacroTotals
-        {
-            Calories = 0,
-            Protein = 0,
-            Carbs = 0,
-            Fat = 0
-        };
+        
+        double cal = 0;
+        double pro = 0;
+        double car = 0;
+        double fat = 0;
 
         // see how many days each goal was active for, and add that to the totals.
         DateOnly startDate = DateOnly.FromDateTime(startTime);
@@ -80,11 +77,18 @@ public class DataService : ServiceBase
                 if (ga.ActivatedAt < startDate) daysActive = effectiveDeactivation.DayNumber - startDate.DayNumber;
                 else daysActive = effectiveDeactivation.DayNumber - ga.ActivatedAt.DayNumber;
             }
-            totals.Calories += g.Calories * daysActive;
-            totals.Protein += g.Protein * daysActive;
-            totals.Carbs += g.Carbs * daysActive;
-            totals.Fat += g.Fat * daysActive;
+            cal += g.Calories * daysActive;
+            pro += g.Protein * daysActive;
+            car += g.Carbs * daysActive;
+            fat += g.Fat * daysActive;
         }
+
+        var totals = new MacroTotals(
+            Calories: cal,
+            Protein: pro,
+            Carbs: car,
+            Fat: fat
+        );
         return totals;
     }
 
@@ -102,24 +106,22 @@ public class DataService : ServiceBase
             carbs += food.Carbs;
             fat += food.Fat;
         }
-        return new MacroTotals
-        {
-            Calories = calories,
-            Protein = protein,
-            Carbs = carbs,
-            Fat = fat
-        };
+        return new MacroTotals(        
+            Calories: calories,
+            Protein: protein,
+            Carbs: carbs,
+            Fat: fat
+        );
     }
 
     public MacroTotals GetRemaining(MacroTotals target, MacroTotals actual)
     {
-        return new MacroTotals
-        {
-            Calories = target.Calories - actual.Calories,
-            Protein = target.Protein - actual.Protein,
-            Carbs = target.Carbs - actual.Carbs,
-            Fat = target.Fat - actual.Fat
-        };
+        return new MacroTotals(
+            Calories: target.Calories - actual.Calories,
+            Protein: target.Protein - actual.Protein,
+            Carbs: target.Carbs - actual.Carbs,
+            Fat: target.Fat - actual.Fat
+        );
     }
 
     // Weight:

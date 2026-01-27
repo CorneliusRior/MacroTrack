@@ -15,9 +15,9 @@ namespace MacroTrack.BasicApp.UserControls
     public partial class DiaryCard : UserControl
     {
         private DiaryEntry _entry;
-        public event EventHandler<int> RequestEdit;
-        public event EventHandler<int> RequestDelete;
-        public event EventHandler<DateTime> RequestViewDay;
+        public event EventHandler<int>? RequestEdit;
+        public event EventHandler<int>? RequestDelete;
+        public event EventHandler<DateTime>? RequestViewDay;
         private bool _VDEnabled = true;
 
         public DiaryCard(DiaryEntry entry)

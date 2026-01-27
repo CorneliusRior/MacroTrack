@@ -19,7 +19,7 @@ namespace MacroTrack.Core.Repositories
             Log($"{this.GetType().Name} Initialised");
         }
 
-        protected void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        protected void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
         {
             Logger.Log(this, caller, level, message, ex);
         }

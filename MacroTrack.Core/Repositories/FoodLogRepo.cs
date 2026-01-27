@@ -91,7 +91,7 @@ public class FoodLogRepo : RepoBase
     }
 
     // Load all
-    public List<FoodEntry>? GetAll()
+    public List<FoodEntry> GetAll()
     {
         var FoodList = new List<FoodEntry>();
         using var connection = new SqliteConnection(_connectionString);
@@ -121,12 +121,11 @@ public class FoodLogRepo : RepoBase
             );
         }
         
-        if (FoodList.Count == 0) return null;
         return FoodList;
     }
 
     // Load all entries for a specific category:
-    public List<FoodEntry>? GetAllCategory(string? category)
+    public List<FoodEntry> GetAllCategory(string? category)
     {
         var foodList = new List<FoodEntry>();
         using var connection = new SqliteConnection(_connectionString);
@@ -169,7 +168,6 @@ public class FoodLogRepo : RepoBase
             ));
         }
 
-        if (foodList.Count == 0) return null;
         return foodList;
     }
 
@@ -248,7 +246,6 @@ public class FoodLogRepo : RepoBase
 
         return results;
     }
-
 
     // Update
     public void EditEntry(int id, FoodEntry entry)

@@ -145,7 +145,7 @@ public class FoodCommand : ICommand
 
     private string ListCat(IReadOnlyList<string> args)
     {
-        string searchKey;
+        string? searchKey;
         if (args.Count == 0) searchKey = null;
         else searchKey = args[0];
         try {return PrintList(_service.GetAllCategory(searchKey));}
