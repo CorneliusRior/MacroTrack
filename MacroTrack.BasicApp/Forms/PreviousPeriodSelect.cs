@@ -1,9 +1,12 @@
-﻿using System;
+﻿using MacroTrack.Core.Logging;
+using MacroTrack.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,15 +15,33 @@ namespace MacroTrack.BasicApp.Forms
 {
     public partial class PreviousPeriodSelect : Form
     {
-        public event EventHandler<string> RequestPrint;
-        public event EventHandler<string> RequestPrintInline;
-        public event EventHandler<(DateTime, DateTime)> RequestPreviousPeriod;
+        private IMTLogger _logger;
+
+        public event EventHandler<(DateTime, DateTime)>? RequestPreviousPeriod;
         public bool CloseOnView = false; // this can be set true if we want the window to close once we click "view".
 
-        public PreviousPeriodSelect()
+        public event EventHandler<string>? RequestPrint;
+        public event EventHandler<string>? RequestPrintInline;
+
+        public PreviousPeriodSelect(CoreServices services)
         {
             InitializeComponent();
+            _logger = services.Logger;
             SetToDefault();
+        }
+
+        protected void Print(string text)
+        {
+            RequestPrint?.Invoke(this, text);
+        }
+
+        protected void PrintInline(string text)
+        {
+            RequestPrintInline?.Invoke(this, text);
+        }
+        private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            _logger.Log(this, caller, level, message, ex);
         }
 
         // Make sure all of the dateTimePickers have the right time, instead of giving the current time of when I put those controls in:
@@ -150,18 +171,5 @@ namespace MacroTrack.BasicApp.Forms
         {
             Close();
         }
-
-
-        // Print functions:
-        private void Print(string text)
-        {
-            RequestPrint?.Invoke(this, text);
-        }
-
-        private void PrintInline(string text)
-        {
-            RequestPrint?.Invoke(this, text);
-        }
-
     }
 }

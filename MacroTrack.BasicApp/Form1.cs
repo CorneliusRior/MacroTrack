@@ -2,6 +2,7 @@ using MacroTrack.Core.Services;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.AppModels;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms.DataVisualization.Charting;
 using MacroTrack.BasicApp.Forms;
 
@@ -31,8 +32,11 @@ namespace MacroTrack.BasicApp
         }
 
 
-        private void RefreshUI()
-        {
+        private void RefreshUI([CallerMemberName] string caller = "")
+        {            
+            Print($"RefreshUI called by { caller }");
+            if (_isRefreshing) return;
+            Print("Continuing...");
             _isRefreshing = true;
             UpdateSummary();
             UpdateWeightGraph(); // Putting it here due to empty existing "start of chart update" comments. We can rearranfe these if you like, idm.
@@ -140,7 +144,7 @@ namespace MacroTrack.BasicApp
         private void UpdateSummary()
         {
             DateTime SummaryStartTime;
-            MacroSummary Summary = _services.dataService.GetMacroSummary(DateTime.Now.Date, DateTime.Now.Date.AddDays(1));
+            MacroSummary Summary = new MacroSummary();
             if (_timeFrame == 0)
             {
                 SummaryStartTime = DateTime.Now.Date;
@@ -876,7 +880,7 @@ namespace MacroTrack.BasicApp
 
         private void btBannerSetGoal_Click(object sender, EventArgs e)
         {
-            var f = new SetGoal(_services.goalService);
+            var f = new SetGoal(_services);
             f.RequestRefresh += (_, _) => RefreshUI();
             f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
             f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
@@ -885,7 +889,7 @@ namespace MacroTrack.BasicApp
 
         private void btBannerPreviousPerioriod_Click(object sender, EventArgs e)
         {
-            var f = new PreviousPeriodSelect();
+            var f = new PreviousPeriodSelect(_services);
             f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
             f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
             f.RequestPreviousPeriod += (sender, times) => PreviousPeriod(times.Item1, times.Item2);

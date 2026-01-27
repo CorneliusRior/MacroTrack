@@ -10,7 +10,6 @@ namespace MacroTrack.Core.Repositories;
 public class TaskRepo : RepoBase
 {
     private readonly string _connectionString;
-    private readonly IMTLogger Logger;
 
     public TaskRepo(string connectionString, CoreContext ctx) : base(ctx)
     {

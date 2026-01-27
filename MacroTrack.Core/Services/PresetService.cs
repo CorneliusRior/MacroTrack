@@ -42,7 +42,7 @@ public class PresetService : ServiceBase
     }
 
     // Get all in category
-    public List<Preset> GetAllCategory(string category)
+    public List<Preset> GetAllCategory(string? category)
     {
         var entryList = _repo.GetAllCategory(category);
         if (entryList == null) throw new Exception("Core.services.PresetService.GetAllCategory(): No entries returned.");

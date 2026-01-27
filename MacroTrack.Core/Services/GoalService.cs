@@ -34,7 +34,14 @@ public class GoalService : ServiceBase
     // Get Goal from a "GoalActivation"
     public Goal G(GoalActivation activation) // maybe should rename this idk/
     {
-        return _repo.GetGoal(activation.GoalId);
+        var goal = _repo.GetGoal(activation.GoalId);
+        if (goal == null)
+        {
+            var ex = new Exception("Null return");
+            Log($"Error getting goal [{activation.GoalId}], probably doesn't exist.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        return goal;
     }
 
     // Load 1

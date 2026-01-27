@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 public class PresetRepo : RepoBase
 {
     private readonly string _connectionString;
-    private readonly IMTLogger Logger;
 
     public PresetRepo(string connectionString, CoreContext ctx) : base(ctx)
     {
@@ -133,7 +132,6 @@ public class PresetRepo : RepoBase
             presetList.Add(new Preset(reader.GetInt32(0), reader.GetString(1), reader.GetDouble(2), reader.GetDouble(3), reader.GetDouble(4), reader.GetDouble(5), weight, unit, cat, notes));
         }
 
-        if (presetList.Count == 0) return null;
         return presetList;
     }
 

@@ -17,15 +17,13 @@ namespace MacroTrack.BasicApp
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
 
-            var root = FindSolutionRoot();
+            //var root = FindSolutionRoot();
             
             var dbPath = FindDBPath();
             var connString = $"Data Source={dbPath}";
-
             var logPath = FindLogPath();
             string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
             DeleteOldLogs(20);
-
             var _logger = new MTLogger(logFile);
             var _context = new CoreContext(_logger);
             
@@ -35,6 +33,7 @@ namespace MacroTrack.BasicApp
             Application.Run(new Form1(_services));
         }
 
+        /*
         static string FindSolutionRoot()
         {
             var dir = new DirectoryInfo(AppContext.BaseDirectory);
@@ -42,6 +41,7 @@ namespace MacroTrack.BasicApp
             if (dir == null) throw new DirectoryNotFoundException("No");
             return dir.FullName;
         }
+        */
 
         static string FindAppDataDir()
         {

@@ -1,11 +1,13 @@
-﻿using MacroTrack.Core.Services;
+﻿using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,35 +16,38 @@ namespace MacroTrack.BasicApp.Forms
 {
     public partial class NewGoal : Form
     {
-        private readonly CoreServices _services;
-        public event EventHandler<string> RequestPrint;
-        public event EventHandler<string> RequestPrintInline;
+        private CoreServices Services;
+        private IMTLogger _logger;
+        public event EventHandler<string>? RequestPrint;
+        public event EventHandler<string>? RequestPrintInline;
 
-        private decimal Calories = 2000;
-        //private decimal MaxProP; // Max___P is "Max___Possible" 
+        private decimal Calories = 2000;        
         private bool _updatingSliders;
+
         public NewGoal(CoreServices services)
         {
             InitializeComponent();
-            _services = services;
+            Services = services;
+            _logger = Services.Logger;
             SetToDefault();
 
             sliderProtein.ValueChanged += MacroSlider_ValueChanged;
             sliderCarbs.ValueChanged += MacroSlider_ValueChanged;
             sliderFat.ValueChanged += MacroSlider_ValueChanged;
         }
-
-        private void Print(string text)
+        protected void Print(string text)
         {
             RequestPrint?.Invoke(this, text);
         }
 
-        private void PrintInline(string text)
+        protected void PrintInline(string text)
         {
-            RequestPrint?.Invoke(this, text);
+            RequestPrintInline?.Invoke(this, text);
         }
-
-
+        private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            _logger.Log(this, caller, level, message, ex);
+        }
 
         // Default (onload basically)
         public void SetToDefault()
@@ -297,7 +302,7 @@ namespace MacroTrack.BasicApp.Forms
 
             bool _error = false;
             string errorString = $"Warning: a goal by the name of \"{name}\" already exists.";
-            List<Goal> GoalList = _services.goalService.GetAllGoals();
+            List<Goal> GoalList = Services.goalService.GetAllGoals();
             foreach (Goal g in GoalList)
             {
                 if (g.GoalName == name) 
@@ -314,7 +319,7 @@ namespace MacroTrack.BasicApp.Forms
 
             try 
             { 
-                Goal goal = _services.goalService.AddGoal(name, totalCalories, protein, carbs, fat, type, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
+                Goal goal = Services.goalService.AddGoal(name, totalCalories, protein, carbs, fat, type, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
                 Print($"Added goal: ID = [{goal.Id}] GoalName = '{goal.GoalName}', Calories = '{goal.Calories}', Protein = '{goal.Protein}', Carbs = '{goal.Carbs}', fat: '{goal.Fat}', type = '{goal.GoalType}', notes: '{goal.Notes}'");
                 Close();
             }

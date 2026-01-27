@@ -9,7 +9,7 @@ namespace MacroTrack.Core.Services;
 public sealed class CoreServices
 {
     public IMTLogger Logger { get; }
-    public event EventHandler<LogMessage> MessageLogged;
+    public event EventHandler<LogMessage>? MessageLogged;
 
     public DiaryRepo diaryRepo { get; }
     public FoodLogRepo foodLogRepo { get; }

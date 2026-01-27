@@ -1,21 +1,28 @@
-﻿using System.IO;
+﻿using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 using MacroTrack.Core.Services;
 using MacroTrack.Puppet;
+using System.IO;
 
 Console.WriteLine("MacroTrack 8.0: Console Interface (using Puppet).");
-var root = FindSolutionRoot();
-var dbPath = Path.Combine(root, "Data", "MacroTrack.debug.db");
+var dbPath = FindDBPath();
 var connString = $"Data Source={dbPath}";
+var logPath = FindLogPath();
+string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+DeleteOldLogs(20);
+var _logger = new MTLogger(logFile);
+var _context = new CoreContext(_logger);
 
-var _services = new CoreServices(connString);
+var _services = new CoreServices(connString, _context);
+
 var _puppet = new Puppet(_services);
 
 while (true)
 {
     Console.Write("> ");
-    string input = Console.ReadLine().Trim();
+    string input = Console.ReadLine()!.Trim();
     switch(input)
     {
         case "exit":
@@ -28,6 +35,7 @@ while (true)
     }
 }
 
+/*
 static string FindSolutionRoot()
 {
     var dir = new DirectoryInfo(AppContext.BaseDirectory);
@@ -35,4 +43,37 @@ static string FindSolutionRoot()
     if (dir == null) throw new DirectoryNotFoundException("No");
     return dir.FullName;
 }
+*/
 
+static string FindAppDataDir()
+{
+    var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    return Path.Combine(baseDir, "MacroTrack");
+}
+
+static string FindDBPath()
+{
+    var dir = Path.Combine(FindAppDataDir(), "data");
+    Directory.CreateDirectory(dir);
+    string fileName;
+#if DEBUG
+    fileName = "MacroTrack.debug.db";
+#else
+            fileName = "MacroTrack.db";
+#endif
+    return Path.Combine(dir, fileName);
+}
+
+static string FindLogPath()
+{
+    var dir = Path.Combine(FindAppDataDir(), "logs");
+    Directory.CreateDirectory(dir);
+    return dir;
+}
+
+static void DeleteOldLogs(int amount)
+{
+    var dir = FindLogPath();
+    var files = new DirectoryInfo(dir).GetFiles("MTLog_*.txt").OrderByDescending(f => f.CreationTime).ToList();
+    foreach (var f in files.Skip(amount)) f.Delete();
+}

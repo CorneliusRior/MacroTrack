@@ -9,8 +9,6 @@ using System.Runtime.CompilerServices;
 public class FoodLogRepo : RepoBase
 {
     private readonly string _connectionString;
-    private readonly IMTLogger Logger;
-    public event EventHandler<string> RequestPrint;
 
     public FoodLogRepo(string connectionString, CoreContext ctx) : base(ctx)
     {
@@ -294,11 +292,5 @@ public class FoodLogRepo : RepoBase
         using var cmd = new SqliteCommand(sql, connection);
         cmd.Parameters.AddWithValue("$id", id);
         cmd.ExecuteNonQuery();
-    }
-
-    // Printing:
-    private void Print(string text, [CallerMemberName] string caller = "")
-    {
-        RequestPrint?.Invoke(this, $"{caller}(): {text}");
     }
 }

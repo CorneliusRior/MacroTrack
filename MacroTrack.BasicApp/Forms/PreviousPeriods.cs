@@ -1,5 +1,6 @@
 ﻿using MacroTrack.BasicApp.UserControls;
 using MacroTrack.Core.AppModels;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using System;
@@ -9,6 +10,7 @@ using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,20 +22,38 @@ namespace MacroTrack.BasicApp.Forms
     {
         private DateTime StartDate;
         private DateTime EndDate;
-        private CoreServices _services;
-        public event EventHandler<int> RequestEdit;
-        public event EventHandler<int> RequestDelete;
-        public event EventHandler RequestRefresh;
-        public event EventHandler<string> RequestPrint;
-        public event EventHandler<string> RequestPrintInline;
-        public PreviousPeriods(DateTime startDate, DateTime endDate, CoreServices services)
+        private CoreServices Services;
+        private IMTLogger _logger;
+        public event EventHandler<int>? RequestEdit;
+        public event EventHandler<int>? RequestDelete;
+        public event EventHandler? RequestRefresh;
+
+        public event EventHandler<string>? RequestPrint;
+        public event EventHandler<string>? RequestPrintInline;
+
+        public PreviousPeriods(DateTime startDate, DateTime endDate, CoreServices services) 
         {
+            InitializeComponent();
+            Services = services;
+            _logger = services.Logger;
             StartDate = startDate;
             EndDate = endDate;
-            _services = services;
-            InitializeComponent();
             this.KeyPreview = true;
             Populate();
+        }
+
+        protected void Print(string text)
+        {
+            RequestPrint?.Invoke(this, text);
+        }
+
+        protected void PrintInline(string text)
+        {
+            RequestPrintInline?.Invoke(this, text);
+        }
+        private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            _logger.Log(this, caller, level, message, ex);
         }
 
         private void Populate()
@@ -58,7 +78,7 @@ namespace MacroTrack.BasicApp.Forms
         // Visual data, bars, summary, charts:
         private void UpdateSummary()
         {
-            MacroSummary Summary = _services.dataService.GetMacroSummary(StartDate, EndDate);
+            MacroSummary Summary = Services.dataService.GetMacroSummary(StartDate, EndDate);
 
             labelBarBannerGoal.Text = Summary.GoalName;
 
@@ -274,7 +294,7 @@ namespace MacroTrack.BasicApp.Forms
             };
 
             // Give it data
-            List<WeightEntry> pts = _services.dataService.GetWeightEntries(GraphStartDate, GraphEndDate).OrderBy(pts => pts.Time).ToList();
+            List<WeightEntry> pts = Services.dataService.GetWeightEntries(GraphStartDate, GraphEndDate).OrderBy(pts => pts.Time).ToList();
             foreach (WeightEntry p in pts) w.Points.AddXY(p.Time, p.Weight);
 
             // Add
@@ -284,7 +304,7 @@ namespace MacroTrack.BasicApp.Forms
 
         private void UpdateWeightLabel()
         {
-            List<WeightEntry> WeightEntries = _services.dataService.GetWeightEntries(StartDate, EndDate).OrderBy(pts => pts.Time).ToList();
+            List<WeightEntry> WeightEntries = Services.dataService.GetWeightEntries(StartDate, EndDate).OrderBy(pts => pts.Time).ToList();
             if (WeightEntries.Count == 0) labelWeight.Text = "No entries for this period";
             else 
             {
@@ -353,11 +373,11 @@ namespace MacroTrack.BasicApp.Forms
             };
 
             // Give them data:
-            List<GoalSeriesPoint> goalCal = _services.dataService.GetGoalSeries(GraphStartDate, GraphEndDate);
+            List<GoalSeriesPoint> goalCal = Services.dataService.GetGoalSeries(GraphStartDate, GraphEndDate);
             foreach (GoalSeriesPoint p in goalCal) g.Points.AddXY(p.Date, p.Calories);
             //foreach (GoalSeriesPoint p in goalCat) Print($"Point: [{p.Id}]: {p.Date} Cal: {p.Calories}");
 
-            List<CalSeriesPoint> actualCal = _services.dataService.GetCalSeries(GraphStartDate, GraphEndDate);
+            List<CalSeriesPoint> actualCal = Services.dataService.GetCalSeries(GraphStartDate, GraphEndDate);
             foreach (CalSeriesPoint p in actualCal) c.Points.AddXY(p.Date, p.Calories);
             //foreach (CalSeriesPoint p in actualCal) Print($"Point: [{p.Id}]: {p.Date} Cal: {p.Calories}");
 
@@ -371,7 +391,7 @@ namespace MacroTrack.BasicApp.Forms
         private void UpdateHistory()
         {
             flpHistory.SuspendLayout();
-            List<FoodEntry>? entries = _services.foodLogService.FromTimes(StartDate, EndDate);
+            List<FoodEntry>? entries = Services.foodLogService.FromTimes(StartDate, EndDate);
             entries.Reverse();
             flpHistory.Controls.Clear();
 
@@ -437,7 +457,7 @@ namespace MacroTrack.BasicApp.Forms
         private void UpdateDiary()
         {
             flpDiary.SuspendLayout();
-            List<DiaryEntry> Diary = _services.diaryService.FromTimes(StartDate, EndDate);
+            List<DiaryEntry> Diary = Services.diaryService.FromTimes(StartDate, EndDate);
             flpDiary.Controls.Clear();
 
             try
@@ -479,7 +499,7 @@ namespace MacroTrack.BasicApp.Forms
         private void EditDiaryEntry(int id)
         {
             DiaryEntry? entry;
-            try { entry = _services.diaryService.GetEntry(id); }
+            try { entry = Services.diaryService.GetEntry(id); }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error getting entry {id}, probably doesn't exist: {ex.Message}");
@@ -491,7 +511,7 @@ namespace MacroTrack.BasicApp.Forms
                 return;
             }
 
-            using var dlg = new EditDiary(entry);
+            using var dlg = new EditDiary(Services, entry);
             dlg.RequestEdit += (_, edits) => DiaryEditHandler(edits);
             if (dlg.ShowDialog() == DialogResult.OK) UpdateDiary();
         }
@@ -500,7 +520,7 @@ namespace MacroTrack.BasicApp.Forms
         {
             try
             {
-                _services.diaryService.EditEntry(edits.Id, edits.body, edits.notes);
+                Services.diaryService.EditEntry(edits.Id, edits.body, edits.notes);
                 UpdateDiary();
             }
             catch (Exception ex) { MessageBox.Show($"Error editing entry: {ex.Message}"); }
@@ -509,7 +529,7 @@ namespace MacroTrack.BasicApp.Forms
 
         private void DeleteDiaryEntry(int id)
         {
-            _services.diaryService.DeleteEntry(id);
+            Services.diaryService.DeleteEntry(id);
             UpdateDiary();
         }
 
@@ -540,7 +560,7 @@ namespace MacroTrack.BasicApp.Forms
             // We had a bit of difficulty with this for a while: RefreshUI would be counted as a "Check change", so this was ran resursively until every one of the tasks was set as incomplete. We fixed this by adding a _loading bool in taskListItem.cs, which solved everything very quickly, but in looking for the precise location of the issue I found that it's a bit inefficient to have each of the tasks update every single time, so I wrote out a method called "UpdateOneTask(int id)", which would have worked, only we don't have a TaskRepo method of getting the streak in that case. If you want to make one, copying the "get all streak", you can, and then put it here, but for the time being I have deleted the method. Much of the slowdown might have come from all of the "Print" statements I'll get rid of now.
 
             flpTasks.SuspendLayout();
-            List<DailyTask> TaskList = _services.taskService.GetAllStreaks(StartDate, filterInactive: true);
+            List<DailyTask> TaskList = Services.taskService.GetAllStreaks(StartDate, filterInactive: true);
             flpTasks.Controls.Clear();
 
             try
@@ -571,14 +591,14 @@ namespace MacroTrack.BasicApp.Forms
 
         private void TaskSetComplete(int id)
         {
-            _services.taskService.SetComplete(id, StartDate);
+            Services.taskService.SetComplete(id, StartDate);
             RequestRefresh?.Invoke(this, EventArgs.Empty);
             UpdateTasks();
         }
 
         private void TaskSetIncomplete(int id)
         {
-            _services.taskService.SetIncomplete(id, StartDate);
+            Services.taskService.SetIncomplete(id, StartDate);
             RequestRefresh?.Invoke(this, EventArgs.Empty);
             UpdateTasks();
         }
@@ -640,16 +660,6 @@ namespace MacroTrack.BasicApp.Forms
                 Next();
             }
             return base.ProcessCmdKey(ref msg, keyData);
-        }
-
-        private void Print(string text)
-        {
-            RequestPrint?.Invoke(this, text);
-        }
-
-        private void PrintInline(string text)
-        {
-            RequestPrint?.Invoke(this, text);
         }
     }
 }

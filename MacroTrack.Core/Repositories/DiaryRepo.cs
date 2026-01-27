@@ -111,7 +111,7 @@ public class DiaryRepo : RepoBase
     }
 
     // Edit
-    public void EditEntry(int id, string body) // was considering having this as DiaryEntry Entry.
+    public void EditEntry(int id, string body)
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();

@@ -1,4 +1,6 @@
-﻿using MacroTrack.Core.Models;
+﻿using MacroTrack.BasicApp.Forms;
+using MacroTrack.Core.Logging;
+using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -6,6 +8,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,19 +18,38 @@ namespace MacroTrack.BasicApp.Forms
 {
     public partial class SetGoal : Form
     {
-        private readonly GoalService _service;
+        private CoreServices Services;
+        private IMTLogger _logger;
+        public event EventHandler<string>? RequestPrint;
+        public event EventHandler<string>? RequestPrintInline;
+
         private List<Goal> GoalReg;
         private bool _loading = true;
-        public event EventHandler RequestRefresh;
-        public event EventHandler<string> RequestPrint;
-        public event EventHandler<string> RequestPrintInline;
-        public SetGoal(GoalService service)
+        public event EventHandler? RequestRefresh;
+
+        public SetGoal(CoreServices services)
         {
-            _service = service;
-            InitializeComponent();            
+            InitializeComponent();
+            Services = services;
+            _logger = Services.Logger;
             Populate();
+            GoalReg = Services.goalService.GetAllGoals();
             dtpStart_ValueChanged(this, EventArgs.Empty);
             buttonCancel.Focus();
+        }
+
+        protected void Print(string text)
+        {
+            RequestPrint?.Invoke(this, text);
+        }
+
+        protected void PrintInline(string text)
+        {
+            RequestPrintInline?.Invoke(this, text);
+        }
+        private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            _logger.Log(this, caller, level, message, ex);
         }
 
         private void Populate()
@@ -84,7 +106,6 @@ namespace MacroTrack.BasicApp.Forms
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
             
-            GoalReg = _service.GetAllGoals();
             dgvGoals.DataSource = GoalReg;
 
             UpdatePieChart(true);
@@ -202,7 +223,7 @@ namespace MacroTrack.BasicApp.Forms
                 string MessageString = $"Set goal to {g.GoalName} ({g.Calories}) from:\n";
                 DateTime FromDate = dtpStart.Value;
 
-                GoalActivation? NextGoal = _service.GetNextGoal(DateOnly.FromDateTime(FromDate));
+                GoalActivation? NextGoal = Services.goalService.GetNextGoal(DateOnly.FromDateTime(FromDate));
                 if (NextGoal != null)
                 {
                     DateTime ToDate = NextGoal.ActivatedAt.ToDateTime(TimeOnly.MinValue);
@@ -220,7 +241,7 @@ namespace MacroTrack.BasicApp.Forms
 
                 if (confirm == DialogResult.Yes)
                 {
-                    _service.ActivateGoal(g.Id, DateOnly.FromDateTime(dtpStart.Value));
+                    Services.goalService.ActivateGoal(g.Id, DateOnly.FromDateTime(dtpStart.Value));
                     Print(MessageString);
                     RequestRefresh?.Invoke(this, e);
                     Close(); // Alternatively, it could stay open, so that you can set up multiple.
@@ -237,7 +258,7 @@ namespace MacroTrack.BasicApp.Forms
         {
             // Essentially, update header.
             DateTime FromDate = dtpStart.Value;
-            GoalActivation? NextGoal = _service.GetNextGoal(DateOnly.FromDateTime(FromDate));
+            GoalActivation? NextGoal = Services.goalService.GetNextGoal(DateOnly.FromDateTime(FromDate));
             if (NextGoal != null)
             {
                 DateTime ToDate = NextGoal.ActivatedAt.ToDateTime(TimeOnly.MinValue);
@@ -247,16 +268,6 @@ namespace MacroTrack.BasicApp.Forms
             {
                 labelHeader.Text = $"Set Goal for {FromDate.ToString("d")}";
             }
-        }
-
-        private void Print(string text)
-        {
-            RequestPrint?.Invoke(this, text);
-        }
-
-        private void PrintInline(string text)
-        {
-            RequestPrint?.Invoke(this, text);
         }
     }
 }

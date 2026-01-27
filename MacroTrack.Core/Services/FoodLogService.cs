@@ -45,8 +45,13 @@ public class FoodLogService : ServiceBase
     public FoodEntry GetEntry(int id)
     {
         var entry = _repo.GetEntry(id);
-        if (entry == null) throw new Exception("Core.Services.FoodLogService.GetEntry(): null entry, wrong ID probably.");
-        return _repo.GetEntry(id);
+        if (entry == null)
+        {
+            var ex = new Exception("Returned null.");
+            Log("Error getting entry. wrong ID probably.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        else return entry;
     }
 
     // Load all

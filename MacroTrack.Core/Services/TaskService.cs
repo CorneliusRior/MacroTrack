@@ -17,7 +17,7 @@ public class TaskService : ServiceBase
     }
 
     // Add
-    public DailyTask AddTask(string name, string description = null)
+    public DailyTask AddTask(string name, string? description = null)
     {
         DailyTask newTask;
         if (string.IsNullOrEmpty(description))

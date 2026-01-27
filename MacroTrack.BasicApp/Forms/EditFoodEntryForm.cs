@@ -1,11 +1,14 @@
-﻿using MacroTrack.Core.Services;
+﻿using MacroTrack.BasicApp.Forms;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,24 +17,41 @@ namespace MacroTrack.BasicApp
 {
     public partial class EditFoodEntryForm : Form
     {
-        private readonly CoreServices _services;
+        private CoreServices Services;
+        private IMTLogger _logger;
+        public event EventHandler<string>? RequestPrint;
+        public event EventHandler<string>? RequestPrintInline;
+
         private readonly int _id;
         private double LastMult;
         private FoodEntry entry;
-        public event EventHandler<string> RequestPrint;
-        public event EventHandler<string> RequestPrintInline;
+
         public EditFoodEntryForm(CoreServices services, int id)
         {
             InitializeComponent();
-            _services = services;
+            Services = services;
+            _logger = Services.Logger;
             _id = id;
+            entry = Services.foodLogService.GetEntry(_id);
+        }
+
+        protected void Print(string text)
+        {
+            RequestPrint?.Invoke(this, text);
+        }
+
+        protected void PrintInline(string text)
+        {
+            RequestPrintInline?.Invoke(this, text);
+        }
+        private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            _logger.Log(this, caller, level, message, ex);
         }
 
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
-
-            entry = _services.foodLogService.GetEntry(_id);
+            base.OnLoad(e);            
 
             labelTitle.Text = $"Editing entry ID #{entry.Id} - {entry.Time.ToString("u")}";
             dtpFood.Value = entry.Time;
@@ -88,7 +108,7 @@ namespace MacroTrack.BasicApp
             }
             string notes = string.IsNullOrWhiteSpace(tbNotes.Text) ? string.Empty : tbNotes.Text;
 
-            _services.foodLogService.EditEntry(_id, dtpFood.Value, tbName.Text, (double)spinMult.Value, calories, protein, carbs, fat, null, notes);
+            Services.foodLogService.EditEntry(_id, dtpFood.Value, tbName.Text, (double)spinMult.Value, calories, protein, carbs, fat, null, notes);
             Print($"Edited entry #{_id}");
             DialogResult = DialogResult.OK;
             Close();
@@ -125,17 +145,6 @@ namespace MacroTrack.BasicApp
                 if (double.TryParse(tbFat.Text, out double fat) && fat != 0) tbFat.Text = ((fat / LastMult) * mult).ToString("0.##");
                 LastMult = mult;
             }
-
-        }
-
-        private void Print(string text)
-        {
-            RequestPrint?.Invoke(this, text);
-        }
-
-        private void PrintInline(string text)
-        {
-            RequestPrint?.Invoke(this, text);
         }
     }
 }

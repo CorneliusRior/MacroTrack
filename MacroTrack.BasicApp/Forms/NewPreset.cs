@@ -1,11 +1,13 @@
-﻿using MacroTrack.Core.Services;
+﻿using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,18 +16,21 @@ namespace MacroTrack.BasicApp.Forms
 {
     public partial class NewPreset : Form
     {
-        private readonly CoreServices _services;
-        public event EventHandler<string> RequestPrint;
-        public event EventHandler<string> RequestPrintInline;
+        private CoreServices Services;
+        private IMTLogger _logger;
+        public event EventHandler<string>? RequestPrint;
+        public event EventHandler<string>? RequestPrintInline;
+
         public NewPreset(CoreServices services)
         {
             InitializeComponent();
-            _services = services;
+            Services = services;
+            _logger = services.Logger;
 
             cbUnit.SelectedIndex = 0;
             cbCategory.SelectedIndex = -1;
 
-            List<string> CatList = _services.presetService.GetCategoryList();
+            List<string> CatList = Services.presetService.GetCategoryList();
             CatList.Order();
             cbCategory.BeginUpdate(); // I feel like doing all of this is a bit overkill, we odn't need to do live updates after all, do we?
             try
@@ -39,6 +44,19 @@ namespace MacroTrack.BasicApp.Forms
             {
                 cbCategory.EndUpdate();
             }
+        }
+        protected void Print(string text)
+        {
+            RequestPrint?.Invoke(this, text);
+        }
+
+        protected void PrintInline(string text)
+        {
+            RequestPrintInline?.Invoke(this, text);
+        }
+        private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            _logger.Log(this, caller, level, message, ex);
         }
 
         private void btCancel_Click(object sender, EventArgs e)
@@ -109,7 +127,7 @@ namespace MacroTrack.BasicApp.Forms
             {
                 try
                 { 
-                    _services.presetService.AddEntry(name, cal, pro, car, fat, mass, unit, category, notes);
+                    Services.presetService.AddEntry(name, cal, pro, car, fat, mass, unit, category, notes);
                     Print($"Added preset \"{name}\".");
                     DialogResult = DialogResult.OK;
                     Close();
@@ -130,16 +148,6 @@ namespace MacroTrack.BasicApp.Forms
             if (e.KeyChar == '.' && !tb.Text.Contains('.')) return;
             if (e.KeyChar == '-' && !tb.Text.Contains("-")) return;
             e.Handled = true;
-        }
-
-        private void Print(string text)
-        {
-            RequestPrint?.Invoke(this, text);
-        }
-
-        private void PrintInline(string text)
-        {
-            RequestPrint?.Invoke(this, text);
         }
     }
 }

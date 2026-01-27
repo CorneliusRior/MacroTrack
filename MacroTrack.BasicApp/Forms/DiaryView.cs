@@ -1,13 +1,15 @@
-﻿using MacroTrack.BasicApp.UserControls;
-using MacroTrack.Core.Services;
+﻿using MacroTrack.BasicApp.Forms;
+using MacroTrack.BasicApp.UserControls;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
-using MacroTrack.BasicApp.Forms;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,18 +18,22 @@ namespace MacroTrack.BasicApp
 {
     public partial class DiaryView : Form
     {
-        private readonly CoreServices _services;
+        private CoreServices Services;
+        private IMTLogger _logger;
+        public event EventHandler<string>? RequestPrint;
+        public event EventHandler<string>? RequestPrintInline;
+
         private DateTime StartDate;
         private bool ShowAll = false;
-        public event EventHandler<DateTime> RequestViewDay;
-        public event EventHandler<string> RequestPrint;
-        public event EventHandler<string> RequestPrintInline;
+        public event EventHandler<DateTime>? RequestViewDay;
+
         private readonly System.Windows.Forms.Timer _resizeTimer = new() { Interval = 100 };
 
-        public DiaryView(CoreServices services)
+        public DiaryView(CoreServices services) 
         {
             InitializeComponent();
-            _services = services;
+            Services = services;
+            _logger = services.Logger;
             cbTimeFrame.SelectedIndex = 1;
 
             _resizeTimer.Tick += (_, __) =>
@@ -41,12 +47,24 @@ namespace MacroTrack.BasicApp
                 _resizeTimer.Stop();
                 _resizeTimer.Start();
             };
+        }
+        protected void Print(string text)
+        {
+            RequestPrint?.Invoke(this, text);
+        }
 
-
+        protected void PrintInline(string text)
+        {
+            RequestPrintInline?.Invoke(this, text);
+        }
+        private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            _logger.Log(this, caller, level, message, ex);
         }
 
         private void cbTimeFrame_SelectedIndexChanged(object sender, EventArgs e)
         {
+            Log($"Index changed to {cbTimeFrame.SelectedIndex}");
             if (cbTimeFrame.SelectedIndex == 0) StartDate = DateTime.Now.Date.AddDays(-7);
             if (cbTimeFrame.SelectedIndex == 1) StartDate = DateTime.Now.Date.AddDays(-31);
             if (cbTimeFrame.SelectedIndex == 2) StartDate = DateTime.Now.Date.AddDays(-365);
@@ -60,8 +78,8 @@ namespace MacroTrack.BasicApp
         {
             List<DiaryEntry> Diary = new List<DiaryEntry>();
 
-            if (ShowAll) Diary = _services.diaryService.GetAll();
-            else Diary = _services.diaryService.FromTimes(StartDate, DateTime.Now);
+            if (ShowAll) Diary = Services.diaryService.GetAll();
+            else Diary = Services.diaryService.FromTimes(StartDate, DateTime.Now);
             Diary.Reverse();
             flpMain.Controls.Clear();
 
@@ -76,48 +94,53 @@ namespace MacroTrack.BasicApp
 
                 card.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             }
+            Log($"Loaded {Diary.Count} entries.");
 
             flpBodyAdjust();
         }
 
         private void EditEntry(int id)
         {
-            DiaryEntry? entry;
-            try { entry = _services.diaryService.GetEntry(id); }
+            DiaryEntry entry;
+            try { entry = Services.diaryService.GetEntry(id); }
             catch (Exception ex) 
             {
-                MessageBox.Show($"Error getting entry {id}, probably doesn't exist: {ex.Message}");
-                return;
-            }
-            if (entry == null)
-            {
-                MessageBox.Show($"Error getting entry {id}: null return, probably doesn't exist");
+                Log($"Error getting entry #{id}, probably doesn't exist", LogLevel.Warning, ex);
+                MessageBox.Show($"Error getting entry #{id}, probably doesn't exist: {ex.Message}");
                 return;
             }
 
-            using var dlg = new EditDiary(entry);
+            using var dlg = new EditDiary(Services, entry);
             dlg.RequestEdit += (_, edits) => EditHandler(edits);
             if (dlg.ShowDialog() == DialogResult.OK) LoadEntries(); 
         }
 
         private void EditHandler((int Id, string body, string notes) edits)
         {
-            try 
+            try
             {
-                DiaryEntry before = _services.diaryService.GetEntry(edits.Id)!;
-                DiaryEntry after = _services.diaryService.EditEntry(edits.Id, edits.body, edits.notes);
+                DiaryEntry before = Services.diaryService.GetEntry(edits.Id)!;
+                DiaryEntry after = Services.diaryService.EditEntry(edits.Id, edits.body, edits.notes);
                 Print($"Edited entry #{edits.Id}:\n\nFrom:\n\"{before.Body}\"\n\nTo:\n\"{after.Body}\"");
+                Log($"Edited entry #{edits.Id}");
                 return;
             }
-            catch (Exception ex) { MessageBox.Show($"Error editing entry: {ex.Message}"); }
+            catch (Exception ex) 
+            { 
+                MessageBox.Show($"Error editing entry: {ex.Message}"); 
+            }
+
+
             // After this, dialogue box will close and it will refresh anyway, according to the system here it will have been successful. I would like it if it didn't close the window but I don't know how to do that and don't want to bother. Anyway it does kind of make sense to do it this way: like the only reason this error could happen really is if you opened the edit dialogue, then deleted the entry in another program, then clicked "edit": at which point you might like it if it updated to show you that the entry isn't there anymore. If you would like to have it such that it makes a new diary entry, you can do this:
             // _services.diaryService.AddEntry(edits.body + edits.notes);
-            
+
+            // Looking back on this again - given that we'll be giving every form Service due to logs, maybe we don't need to structure it this way? Whatever, it's BasicApp, this is fine.
+
         }
 
         private void DeleteEntry(int id)
         {
-            _services.diaryService.DeleteEntry(id);
+            Services.diaryService.DeleteEntry(id);
             LoadEntries();
         }
 
@@ -150,17 +173,5 @@ namespace MacroTrack.BasicApp
         {
             //flpBodyAdjust();   
         }
-
-        private void Print(string text)
-        {
-            RequestPrint?.Invoke(this, text);
-        }
-
-        private void PrintInline(string text)
-        {
-            RequestPrint?.Invoke(this, text);
-        }
     }
-
-
 }

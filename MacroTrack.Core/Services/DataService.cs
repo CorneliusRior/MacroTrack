@@ -21,17 +21,15 @@ public class DataService : ServiceBase
         _foodLogRepo = foodLogRepo;
         _goalRepo = goalRepo;
         _weightLogRepo = weightLogRepo;
-
-        Log("DataService initialised");
     }
 
     // MacroSummary:
     public MacroSummary GetMacroSummary(DateTime startTime, DateTime endTime)
     {
-        // We will write it from scratch here instead of calling other services.
-        var target = GetTarget(startTime, endTime);
-        var actual = GetActual(startTime, endTime);
-        var remaining = GetRemaining(startTime, endTime);
+        Log($"Generating MacroSummary for period: {startTime} to {endTime}");
+        MacroTotals target = GetTarget(startTime, endTime);
+        MacroTotals actual = GetActual(startTime, endTime);
+        MacroTotals remaining = GetRemaining(target, actual);
         var presentGoal = _goalRepo.GetPresentGoal(DateOnly.FromDateTime(startTime));
         var goalName = presentGoal != null ? _goalRepo.GetGoal(presentGoal.GoalId)?.GoalName ?? "No Goal" : "No Goal";
         return new MacroSummary
@@ -50,6 +48,7 @@ public class DataService : ServiceBase
     {
         // get the end time:
         var goalHistory = _goalRepo.GetGoalHistoryInterval(startTime, endTime);
+        Log($"{goalHistory.Count} goals counted during this period.");
         var totals = new MacroTotals
         {
             Calories = 0,
@@ -112,10 +111,8 @@ public class DataService : ServiceBase
         };
     }
 
-    public MacroTotals GetRemaining(DateTime startTime, DateTime endTime)
+    public MacroTotals GetRemaining(MacroTotals target, MacroTotals actual)
     {
-        var target = GetTarget(startTime, endTime);
-        var actual = GetActual(startTime, endTime);
         return new MacroTotals
         {
             Calories = target.Calories - actual.Calories,
@@ -128,6 +125,7 @@ public class DataService : ServiceBase
     // Weight:
     public List<WeightEntry> GetWeightEntries(DateTime startTime, DateTime endTime)
     {
+        Log($"Fetching WeightEntry data from period: {startTime} to {endTime}");
         return _weightLogRepo.FromTimes(startTime, endTime); // identical to the one in WeightLogService really, but feels like good practice to have it here.
     }
 
@@ -136,6 +134,7 @@ public class DataService : ServiceBase
     // Get Calorie series
     public List<CalSeriesPoint> GetCalSeries(DateTime startTime, DateTime endTime)
     {
+        Log($"Fetching Calories series for period: {startTime} to {endTime}");
         endTime = endTime.AddDays(1); // So that we can get all the entries until midnight.
         List<(DateTime, double)> CalSeriesList = _foodLogRepo.DailySumRange("Calories", startTime, endTime);
         List<CalSeriesPoint> CalSeries = new List<CalSeriesPoint>();
