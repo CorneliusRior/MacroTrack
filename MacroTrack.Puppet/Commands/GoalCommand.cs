@@ -250,14 +250,14 @@ public class GoalCommand : ICommand
         string Carbs = Truncate(goal.Carbs.ToString(), lengthMacro);
         string Fat = Truncate(goal.Fat.ToString(), lengthMacro);
 
-        string MinCal = goal.MinCal == null? Truncate("-", lengthCalories) : Truncate(goal.MinCal.ToString(), lengthCalories);
-        string MaxCal = goal.MaxCal == null? Truncate("-", lengthCalories) : Truncate(goal.MaxCal.ToString(), lengthCalories);
-        string MinPro = goal.MinPro == null? Truncate("-", lengthMacro) : Truncate(goal.MinPro.ToString(), lengthMacro);
-        string MaxPro = goal.MaxPro == null? Truncate("-", lengthMacro) : Truncate(goal.MaxPro.ToString(), lengthMacro);
-        string MinCar = goal.MinCar == null? Truncate("-", lengthMacro) : Truncate(goal.MinCar.ToString(), lengthMacro);
-        string MaxCar = goal.MaxCar == null? Truncate("-", lengthMacro) : Truncate(goal.MaxCar.ToString(), lengthMacro);
-        string MinFat = goal.MinFat == null? Truncate("-", lengthMacro) : Truncate(goal.MinFat.ToString(), lengthMacro);
-        string MaxFat = goal.MaxFat == null? Truncate("-", lengthMacro) : Truncate(goal.MaxFat.ToString(), lengthMacro);
+        string MinCal = goal.MinCal == null? Truncate("-", lengthCalories) : Truncate(goal.MinCal.ToString()!, lengthCalories);
+        string MaxCal = goal.MaxCal == null? Truncate("-", lengthCalories) : Truncate(goal.MaxCal.ToString()!, lengthCalories);
+        string MinPro = goal.MinPro == null? Truncate("-", lengthMacro) : Truncate(goal.MinPro.ToString()!, lengthMacro);
+        string MaxPro = goal.MaxPro == null? Truncate("-", lengthMacro) : Truncate(goal.MaxPro.ToString()!, lengthMacro);
+        string MinCar = goal.MinCar == null? Truncate("-", lengthMacro) : Truncate(goal.MinCar.ToString()!, lengthMacro);
+        string MaxCar = goal.MaxCar == null? Truncate("-", lengthMacro) : Truncate(goal.MaxCar.ToString()!, lengthMacro);
+        string MinFat = goal.MinFat == null? Truncate("-", lengthMacro) : Truncate(goal.MinFat.ToString()!, lengthMacro);
+        string MaxFat = goal.MaxFat == null? Truncate("-", lengthMacro) : Truncate(goal.MaxFat.ToString()!, lengthMacro);
         string Notes = goal.Notes == null? Truncate("-", lengthNotes) : Truncate(goal.Notes, lengthNotes);
 
         string entryString = $"{Id, -lengthID}{GoalName, -lengthName}{GoalType, -lengthType}    {Calories, -lengthCalories} | {Protein, -lengthMacro} | {Carbs, -lengthMacro} | {Fat, -lengthMacro} | {MinCal, lengthCalories}:{MaxCal, -lengthCalories} | {MinPro, lengthMacro}:{MaxPro, -lengthMacro} | {MinCar, lengthMacro}:{MaxCar, -lengthMacro} | {MinFat, lengthMacro}:{MaxFat, -lengthMacro} | {Notes, -lengthNotes}";

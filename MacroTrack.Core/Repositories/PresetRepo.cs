@@ -150,16 +150,6 @@ public class PresetRepo : RepoBase
         return categories;
     }
 
-    /* In the method above, we replaced this:
-     
-     while (reader.Read())
-        {
-            if (reader.IsDBNull(0)) categories.Add("(No category)");
-            else categories.Add(reader.GetString(0));
-        }
-
-     */
-
     // Load all names
     public List<string> GetAllNames()
     {

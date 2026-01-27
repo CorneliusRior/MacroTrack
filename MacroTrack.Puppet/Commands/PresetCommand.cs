@@ -112,7 +112,7 @@ public class PresetCommand : ICommand
         try 
         {
             var editedEntry = _service.EditEntry(id, presetName, calories, protein, carbs, fat, weight, unit, category, notes);
-            return $"Preset:\n{PrintEntry(oldEntry)}\n\nEdited to:\n{PrintEntry(editedEntry)}";
+            return $"Preset:\n{PrintEntry(oldEntry!)}\n\nEdited to:\n{PrintEntry(editedEntry)}";
         }
         catch (Exception ex) {return $"Puppet.Commands.PresetCommand.Edit(): Error editing preset: {ex.Message}";}
     }

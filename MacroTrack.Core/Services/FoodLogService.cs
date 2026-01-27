@@ -62,6 +62,7 @@ public class FoodLogService : ServiceBase
     // Load 1
     public FoodEntry GetEntry(int id)
     {
+        Log($"Request entry #{id}");
         var entry = _repo.GetEntry(id);
         if (entry == null)
         {
@@ -153,6 +154,7 @@ public class FoodLogService : ServiceBase
             throw ex;
         }
         _repo.DeleteEntry(id);
+        Log($"Deleted entry #{id}");
         return entry;
     }
 
@@ -167,6 +169,7 @@ public class FoodLogService : ServiceBase
             throw ex;
         }
         _repo.DeleteEntry(_repo.ReturnLastId());
+        Log($"Deleted entry #{entry.Id}");
         return entry;
     }
 }

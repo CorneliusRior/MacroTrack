@@ -54,7 +54,7 @@ public class TaskCommand : ICommand
         if (args.Count == 0) return "Not enough arguments, usage: task activate [ID]";
         if (!int.TryParse(args[0], out int id)) return $"Cannot parse ID '{args[0]}', must be a number (integer). Usage: task activate [ID]";
         try {return $" Set active task: {PrintEntry(_service.Activate(id))}";}
-        catch (Exception ex) {return $"Puppets.Commands.TaskCommand.Activate(): Error activating task: probably wrong ID or task doesn't exist.";}
+        catch (Exception ex) {return $"Puppets.Commands.TaskCommand.Activate(): Error activating task: probably wrong ID or task doesn't exist. {ex.Message}";}
     }
 
     private string Check(IReadOnlyList<string> args)
@@ -85,7 +85,7 @@ public class TaskCommand : ICommand
         if (args.Count == 0) return "Not enough arguments, usage: task activate [ID]";
         if (!int.TryParse(args[0], out int id)) return $"Cannot parse ID '{args[0]}', must be a number (integer). Usage: task activate [ID]";
         try {return $" Set active task: {PrintEntry(_service.Deactivate(id))}";}
-        catch (Exception ex) {return $"Puppets.Commands.TaskCommand.Deactivate(): Error deactivating task: probably wrong ID or task doesn't exist.";}
+        catch (Exception ex) {return $"Puppets.Commands.TaskCommand.Deactivate(): Error deactivating task: probably wrong ID or task doesn't exist. {ex.Message}";}
     }
 
     private string List(IReadOnlyList<string> args)
