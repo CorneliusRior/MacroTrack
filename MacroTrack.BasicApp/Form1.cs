@@ -580,6 +580,8 @@ namespace MacroTrack.BasicApp
 
         private void spinFEMult_ValueChanged(object sender, EventArgs e)
         {
+            if (_isRefreshing) return;
+
             double LastMult = FEMult;
             FEMult = (double)spinFEMult.Value;
 
@@ -636,7 +638,8 @@ namespace MacroTrack.BasicApp
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 Print($"Added entry, we don't have anything called \"Get last ID\", so you'll just have to trust me for now :)");
-                RefreshUI();
+                UpdatePresetList();
+                UpdatePresetCatList();
             }
         }
 
@@ -686,7 +689,7 @@ namespace MacroTrack.BasicApp
                 {
                     Print($"Added entry: ({entry.Time}) \"{entry.ItemName}\" (x{entry.Amount:0.00}): {entry.Calories}Kcal, {entry.Protein}g protein, {entry.Carbs}g carbs, {entry.Fat}g fat, Notes: {entry.Notes}");
                     FEClear();
-                    RefreshUI();
+                    UpdateFood();
                 }
             }
         }
@@ -698,6 +701,8 @@ namespace MacroTrack.BasicApp
 
         private void FEClear()
         {
+            _isRefreshing = true;
+
             cbFEItem.Text = string.Empty;
             spinFEMult.Value = 1;
             cbFEFilter.SelectedIndex = 0;
@@ -706,6 +711,8 @@ namespace MacroTrack.BasicApp
             tbFECar.Text = string.Empty;
             tbFEFat.Text = string.Empty;
             tbFENotes.Text = string.Empty;
+
+            _isRefreshing = false;
         }
 
         // Food history:
@@ -716,10 +723,7 @@ namespace MacroTrack.BasicApp
             using var dlg = new EditFoodEntryForm(_services, id);
             dlg.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
             dlg.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                RefreshUI();
-            }
+            if (dlg.ShowDialog(this) == DialogResult.OK) UpdateFood();
         }
 
         private void DeleteFoodEntry(int id)
@@ -728,16 +732,23 @@ namespace MacroTrack.BasicApp
             if (entry != null)
             {
                 Print($"Deleted entry [{entry.Id}] ({entry.Time}) \"{entry.ItemName}\" (x{entry.Amount:0.00}): {entry.Calories}Kcal, {entry.Protein}g protein, {entry.Carbs}g carbs, {entry.Fat}g fat, Notes: {entry.Notes}");
-                RefreshUI();
+                UpdateFood();
             }
             else
             {
                 Print($"Error deleting entry ID '{id}': Probably does not exist.");
             }
-
         }
 
-
+        private void UpdateFood()
+        {
+            // Previously this called "Refresh UI", now does less. Add anything I missed.
+            _isRefreshing = true;
+            UpdateSummary();
+            UpdateCalGraph();
+            UpdateHistory();
+            _isRefreshing = false;
+        }
 
         // Weight entry:       
         private void btWECurrentTime_Click(object sender, EventArgs e)
@@ -859,7 +870,9 @@ namespace MacroTrack.BasicApp
             if (!string.IsNullOrWhiteSpace(tbDTNew.Text))
             {
                 _services.taskService.AddTask(tbDTNew.Text);
-                RefreshUI();
+                _isRefreshing = true;
+                UpdateTasks();
+                _isRefreshing = false;
             }
         }
 
@@ -867,15 +880,20 @@ namespace MacroTrack.BasicApp
         {
             _services.taskService.SetComplete(id);
             Print($"Set task [{id}] complete");
-            RefreshUI();
+            _isRefreshing = true;
+            UpdateTasks();
+            _isRefreshing = false;
         }
 
         private void TaskSetIncomplete(int id)
         {
             _services.taskService.SetIncomplete(id);
             Print($"Set task [{id}] incomplete");
-            RefreshUI();
+            _isRefreshing = true;
+            UpdateTasks();
+            _isRefreshing = false;
         }
+        
 
         // Input formatting:
         private void tbNumeric_KeyPress(object sender, KeyPressEventArgs e)
@@ -911,7 +929,10 @@ namespace MacroTrack.BasicApp
         // Resizing:
         private void macroBar_SizeChanged(object sender, EventArgs e)
         {
+            if (_isRefreshing) return;
+            _isRefreshing = true;
             UpdateSummary();
+            _isRefreshing = false;
         }
 
         private void flpHistory_Resize(object sender, EventArgs e)
