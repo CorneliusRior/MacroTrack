@@ -36,68 +36,15 @@ namespace MacroTrack.BasicApp
 
         private void RefreshUI([CallerMemberName] string caller = "")
         {            
-            Print($"RefreshUI called by { caller }");
+            Log($"RefreshUI called by {caller}, {(_isRefreshing ? "ignoring" : "refreshing")}.", LogLevel.Info);
             if (_isRefreshing) return;
-            Print("Continuing...");
             _isRefreshing = true;
+
             UpdateSummary();
-            UpdateWeightGraph(); // Putting it here due to empty existing "start of chart update" comments. We can rearranfe these if you like, idm.
+            UpdateWeightGraph();
             UpdateCalGraph();
-
-            // Start of history cards:
-            flpHistory.SuspendLayout();
-            List<FoodEntry>? entries = _services.foodLogService.FromTimes(DateTime.Now.Date.AddDays(-3), DateTime.Now.Date.AddDays(1));
-            entries.Reverse();
-
-            try
-            {
-                flpHistory.Controls.Clear();
-
-
-                foreach (FoodEntry e in entries)
-                {
-                    FoodEntryCard card = new FoodEntryCard();
-                    card.SetData(e.Id, e.Time, e.ItemName, e.Amount, e.Calories, e.Protein, e.Carbs, e.Fat, e.Notes);
-
-                    card.RequestEdit += (_, id) => EditFoodEntry(id);
-                    card.RequestDelete += (_, id) => DeleteFoodEntry(id);
-
-                    flpHistory.Controls.Add(card);
-                }
-            }
-            finally
-            {
-                flpHistory.ResumeLayout(true);
-            }
-
-            flpHistoryWidthAdjust();
-            // End history cards
-
-            // Start of task
-            flpDT.SuspendLayout();
-            List<DailyTask> TaskList = _services.taskService.GetAllStreaks(DateTime.Now, filterInactive: true);
-
-            try
-            {
-                flpDT.Controls.Clear();
-                foreach (DailyTask task in TaskList)
-                {
-                    taskListItem item = new taskListItem();
-                    item.SetData(task.Id, task.Completed, task.Name, task.Streak);
-
-                    item.RequestSetCompleted += (_, id) => TaskSetComplete(id);
-                    item.RequestSetIncomplete += (_, id) => TaskSetIncomplete(id);
-                    item.RequestPrint += (_, text) => Print($"Taskitem says: \"{text}\"");
-
-                    flpDT.Controls.Add(item);
-                }
-            }
-            finally
-            {
-                flpDT.ResumeLayout(true);
-            }
-
-            flpDTWidthAdjust();
+            UpdateHistory();
+            UpdateTasks();
             // End of tasks
 
             // Preset ComboBox list            
@@ -336,16 +283,64 @@ namespace MacroTrack.BasicApp
             lineChartCal.Series.Add(c);
         }
 
-        private void macroBar_SizeChanged(object sender, EventArgs e)
+        private void UpdateHistory()
         {
-            UpdateSummary();
+            flpHistory.SuspendLayout();
+            List<FoodEntry>? entries = _services.foodLogService.FromTimes(DateTime.Now.Date.AddDays(-3), DateTime.Now.Date.AddDays(1));
+            entries.Reverse();
+
+            try
+            {
+                flpHistory.Controls.Clear();
+
+
+                foreach (FoodEntry e in entries)
+                {
+                    FoodEntryCard card = new FoodEntryCard();
+                    card.SetData(e.Id, e.Time, e.ItemName, e.Amount, e.Calories, e.Protein, e.Carbs, e.Fat, e.Notes);
+
+                    card.RequestEdit += (_, id) => EditFoodEntry(id);
+                    card.RequestDelete += (_, id) => DeleteFoodEntry(id);
+
+                    flpHistory.Controls.Add(card);
+                }
+            }
+            finally
+            {
+                flpHistory.ResumeLayout(true);
+            }
+
+            flpHistoryWidthAdjust();
         }
 
-        private void btRefresh_Click(object sender, EventArgs e)
+        private void UpdateTasks()
         {
-            RefreshUI();
-        }
+            flpDT.SuspendLayout();
+            List<DailyTask> TaskList = _services.taskService.GetAllStreaks(DateTime.Now, filterInactive: true);
 
+            try
+            {
+                flpDT.Controls.Clear();
+                foreach (DailyTask task in TaskList)
+                {
+                    taskListItem item = new taskListItem();
+                    item.SetData(task.Id, task.Completed, task.Name, task.Streak);
+
+                    item.RequestSetCompleted += (_, id) => TaskSetComplete(id);
+                    item.RequestSetIncomplete += (_, id) => TaskSetIncomplete(id);
+                    item.RequestPrint += (_, text) => Print($"Taskitem says: \"{text}\"");
+
+                    flpDT.Controls.Add(item);
+                }
+            }
+            finally
+            {
+                flpDT.ResumeLayout(true);
+            }
+
+            flpDTWidthAdjust();
+        }
+        
         private void UpdatePresetList(List<Preset> set)
         {
             cbFEItem.BeginUpdate();
@@ -380,6 +375,16 @@ namespace MacroTrack.BasicApp
             }
         }
 
+        private void macroBar_SizeChanged(object sender, EventArgs e)
+        {
+            UpdateSummary();
+        }
+
+        private void btRefresh_Click(object sender, EventArgs e)
+        {
+            RefreshUI();
+        }
+        
         private void cbFEItem_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (cbFEItem.SelectedItem is not Preset p) return;
