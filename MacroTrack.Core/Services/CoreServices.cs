@@ -3,6 +3,7 @@ using MacroTrack.Core.Logging;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Settings;
 
 namespace MacroTrack.Core.Services;
 
@@ -13,6 +14,8 @@ public sealed class CoreServices
 {
     public IMTLogger Logger { get; }
     public event EventHandler<LogMessage>? MessageLogged;
+
+    public SettingsService SettingsService { get; }
 
     public DiaryRepo diaryRepo { get; }
     public FoodLogRepo foodLogRepo { get; }
@@ -30,10 +33,12 @@ public sealed class CoreServices
     public WeightLogService weightLogService { get; }
 
 
-    public CoreServices(string conn, CoreContext ctx)
+    public CoreServices(string conn, CoreContext ctx, SettingsService settingsService)
     {
         Logger = ctx.Logger;
         Logger.MessageLogged += (sender, msg) => MessageLogged?.Invoke(sender, msg);
+
+        SettingsService = settingsService;
 
         diaryRepo = new DiaryRepo(conn, ctx);
         foodLogRepo = new FoodLogRepo(conn, ctx);

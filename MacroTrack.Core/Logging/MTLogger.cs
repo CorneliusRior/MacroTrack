@@ -25,7 +25,7 @@ namespace MacroTrack.Core.Logging
 
         public void Log(object sourceObj, string caller, LogLevel level, string message, Exception? ex = null)
         {
-            string source = $"{sourceObj}.{caller}():";
+            string source = $"{sourceObj.GetType().FullName}.{caller}():";
             LogMessage msg = new LogMessage(
                 Timestamp: DateTime.Now,
                 Level: level,

@@ -159,6 +159,7 @@
             btBannerPreviousPerioriod = new Button();
             btBannerSetGoal = new Button();
             buttonBannerNewGoal = new Button();
+            buttonBannerSettings = new Button();
             panelHistory = new Panel();
             flpHistory = new FlowLayoutPanel();
             panelHistoryHeader = new Panel();
@@ -1717,9 +1718,10 @@
             flpBannerButtons.Controls.Add(btBannerPreviousPerioriod);
             flpBannerButtons.Controls.Add(btBannerSetGoal);
             flpBannerButtons.Controls.Add(buttonBannerNewGoal);
-            flpBannerButtons.Location = new Point(846, 21);
+            flpBannerButtons.Controls.Add(buttonBannerSettings);
+            flpBannerButtons.Location = new Point(800, 21);
             flpBannerButtons.Name = "flpBannerButtons";
-            flpBannerButtons.Size = new Size(474, 41);
+            flpBannerButtons.Size = new Size(566, 41);
             flpBannerButtons.TabIndex = 1;
             flpBannerButtons.TabStop = true;
             flpBannerButtons.WrapContents = false;
@@ -1770,6 +1772,18 @@
             buttonBannerNewGoal.Text = "New Goal";
             buttonBannerNewGoal.UseVisualStyleBackColor = true;
             buttonBannerNewGoal.Click += buttonBannerNewGoal_Click;
+            // 
+            // buttonBannerSettings
+            // 
+            buttonBannerSettings.AutoSize = true;
+            buttonBannerSettings.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            buttonBannerSettings.Location = new Point(477, 3);
+            buttonBannerSettings.Name = "buttonBannerSettings";
+            buttonBannerSettings.Size = new Size(86, 35);
+            buttonBannerSettings.TabIndex = 4;
+            buttonBannerSettings.Text = "Settings";
+            buttonBannerSettings.UseVisualStyleBackColor = true;
+            buttonBannerSettings.Click += buttonBannerSettings_Click;
             // 
             // panelHistory
             // 
@@ -2069,5 +2083,6 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart lineChartWeight;
         private System.Windows.Forms.DataVisualization.Charting.Chart lineChartCal;
         private Button buttonBannerNewGoal;
+        private Button buttonBannerSettings;
     }
 }

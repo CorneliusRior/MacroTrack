@@ -1,6 +1,7 @@
 using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
+using MacroTrack.Core.Settings;
 
 namespace MacroTrack.BasicApp
 {
@@ -18,16 +19,22 @@ namespace MacroTrack.BasicApp
             // see https://aka.ms/applicationconfiguration.
 
             //var root = FindSolutionRoot();
-            
+            var settingsPath = FindSettingsPath();
+            var settingsService = new SettingsService(settingsPath);
+
             var dbPath = FindDBPath();
             var connString = $"Data Source={dbPath}";
+
             var logPath = FindLogPath();
             string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
             DeleteOldLogs(20);
+
             var _logger = new MTLogger(logFile);
+            _logger.UILevel = settingsService.Settings.LogUILevel;
+            _logger.FileLevel = settingsService.Settings.LogFileLevel;
+
             var _context = new CoreContext(_logger);
-            
-            var _services = new CoreServices(connString, _context);
+            var _services = new CoreServices(connString, _context, settingsService);
 
             ApplicationConfiguration.Initialize();
             Application.Run(new Form1(_services));
@@ -74,6 +81,13 @@ namespace MacroTrack.BasicApp
             var dir = FindLogPath();
             var files = new DirectoryInfo(dir).GetFiles("MTLog_*.txt").OrderByDescending(f => f.CreationTime).ToList();
             foreach (var f in files.Skip(amount)) f.Delete();
+        }
+
+        static string FindSettingsPath()
+        {
+            var dir = Path.Combine(FindAppDataDir(), "config");
+            Directory.CreateDirectory(dir);
+            return Path.Combine(dir, "settings.json");
         }
     }
 }

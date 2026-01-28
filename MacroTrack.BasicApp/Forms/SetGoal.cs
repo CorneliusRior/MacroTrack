@@ -47,6 +47,7 @@ namespace MacroTrack.BasicApp.Forms
         {
             RequestPrintInline?.Invoke(this, text);
         }
+
         private void Log(string message, LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
         {
             _logger.Log(this, caller, level, message, ex);

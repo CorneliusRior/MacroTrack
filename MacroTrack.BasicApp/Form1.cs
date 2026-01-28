@@ -23,7 +23,7 @@ namespace MacroTrack.BasicApp
         {
             _services = services;
             _logger = services.Logger;
-            _services.MessageLogged += (_, msg) => Print($"{msg.Source} {msg.Message} { (msg.Exception is null ? "" : $"| {msg.Exception.Message}") } ");
+            _services.MessageLogged += (_, msg) => Print($"{msg.Source} {msg.Message} {(msg.Exception is null ? "" : $"| {msg.Exception.Message}")} ");
             InitializeComponent();
             SetUpClock();
             cbBarTimeFrame.SelectedIndex = 0;
@@ -65,6 +65,11 @@ namespace MacroTrack.BasicApp
             Log($"RefreshUI called by {caller}, {(_isRefreshing ? "ignoring" : "refreshing")}.", LogLevel.Info);
             if (_isRefreshing) return;
             _isRefreshing = true;
+
+            
+            weightMode = _services.SettingsService.Settings.WeightMode;
+            labelWEUnit.Text = weightMode == 0 ? "kg" : weightMode == 1 ? "lbs" : "st";
+            tbWeight_TextChanged(this, EventArgs.Empty);
 
             UpdateSummary();
             UpdateWeightGraph();
@@ -449,7 +454,7 @@ namespace MacroTrack.BasicApp
 
             flpDTWidthAdjust();
         }
-        
+
         private void UpdatePresetList(List<Preset>? input = null)
         {
             // Get data
@@ -458,7 +463,7 @@ namespace MacroTrack.BasicApp
             if (input == null) set = _services.presetService.GetAll();
             else set = input;
 
-                cbFEItem.BeginUpdate();
+            cbFEItem.BeginUpdate();
             try
             {
                 cbFEItem.DataSource = null;
@@ -554,6 +559,14 @@ namespace MacroTrack.BasicApp
             f.Show();
         }
 
+        private void buttonBannerSettings_Click(object sender, EventArgs e)
+        {
+            var f = new Settings(_services);
+            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
+            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
+            f.RequestRefresh += (_, _) => RefreshUI();
+            f.Show();
+        }
 
         // Food entry:
         private void btFECurrentTime_Click(object sender, EventArgs e)
@@ -693,7 +706,7 @@ namespace MacroTrack.BasicApp
                 }
             }
         }
-        
+
         private void btFEClear_Click(object sender, EventArgs e)
         {
             FEClear();
@@ -763,7 +776,6 @@ namespace MacroTrack.BasicApp
                You might also notice that we do division for some conversions instead of multiplying them by other large specific decimals, this is to keep consistency.*/
 
 
-
             if (weightMode == 0)
             {
                 if (!double.TryParse(tbWeight.Text, out double weight) || string.IsNullOrWhiteSpace(tbWeight.Text))
@@ -800,7 +812,7 @@ namespace MacroTrack.BasicApp
                 else
                 {
                     double lbs = weight * 14;
-                    double kg = lbs * 2.2046226218;
+                    double kg = lbs / 2.2046226218;
                     labelWEUnitConvert.Text = $"({lbs:0.0} lbs, {kg:0.0} kg)";
                 }
             }
@@ -815,6 +827,8 @@ namespace MacroTrack.BasicApp
             }
             else
             {
+                if (weightMode >= 2) weight = weight * 14;
+                if (weightMode >= 1) weight = weight / 2.2046226218;
                 _services.weightLogService.AddEntry(dtpWeight.Value, weight);
                 Print($"Added weight entry: {weight}" + (weightMode == 0 ? "kg" : weightMode == 1 ? "lbs" : "st"));
                 tbWeight.Text = string.Empty;
@@ -893,7 +907,7 @@ namespace MacroTrack.BasicApp
             UpdateTasks();
             _isRefreshing = false;
         }
-        
+
 
         // Input formatting:
         private void tbNumeric_KeyPress(object sender, KeyPressEventArgs e)
@@ -960,5 +974,7 @@ namespace MacroTrack.BasicApp
                 c.Width = flpDT.Width - 40;
             }
         }
+
+        
     }
 }

@@ -3,6 +3,7 @@ using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 using MacroTrack.Core.Services;
+using MacroTrack.Core.Settings;
 using MacroTrack.Puppet;
 using System.IO;
 
@@ -14,8 +15,10 @@ string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss
 DeleteOldLogs(20);
 var _logger = new MTLogger(logFile);
 var _context = new CoreContext(_logger);
+var settingsPath = FindSettingsPath();
+var settingsService = new SettingsService(settingsPath);
 
-var _services = new CoreServices(connString, _context);
+var _services = new CoreServices(connString, _context, settingsService);
 
 var _puppet = new Puppet(_services);
 
@@ -76,4 +79,11 @@ static void DeleteOldLogs(int amount)
     var dir = FindLogPath();
     var files = new DirectoryInfo(dir).GetFiles("MTLog_*.txt").OrderByDescending(f => f.CreationTime).ToList();
     foreach (var f in files.Skip(amount)) f.Delete();
+}
+
+static string FindSettingsPath()
+{
+    var dir = Path.Combine(FindAppDataDir(), "config");
+    Directory.CreateDirectory(dir);
+    return Path.Combine(dir, "settings.json");
 }
