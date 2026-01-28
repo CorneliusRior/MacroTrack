@@ -248,33 +248,7 @@ public class GoalRepo : RepoBase
         cmd.ExecuteNonQuery();
     }
     
-    // Find next goal from date (useful for setting deactivation date)
-    public GoalActivation? GetNextGoal(DateOnly presentDate)
-    {
-        using var connection = new SqliteConnection(_connectionString);
-        connection.Open();
-        string sql = @"
-            SELECT * FROM GoalHistory 
-            WHERE ActivatedAt > $presentDate 
-            ORDER BY ActivatedAt ASC
-            LIMIT 1
-        "; // ActivatedAt > $presentDate, not >=, because >= will return activations from the present date, which there necessarily will be if we're making a new one today: instead of returning null due to there being none AFTER this new one.
-        using var cmd = new SqliteCommand(sql, connection);
-        cmd.Parameters.AddWithValue("$presentDate", presentDate.ToString("yyyy-MM-dd"));
-        using var reader = cmd.ExecuteReader();
-        if (!reader.Read()) return null;
-        int Id = reader.GetInt32(0);
-        int GoalId = reader.GetInt32(1);
-        DateOnly ActivatedAt = DateOnly.Parse(reader.GetString(2));
-        if (reader.IsDBNull(3))
-        {
-            return new GoalActivation(Id, GoalId, ActivatedAt);
-        }
-        else
-        {
-            return new GoalActivation(Id, GoalId, ActivatedAt, DateOnly.Parse(reader.GetString(3)));
-        }
-    }
+    
 
     // Deactivate Goal (delete goal activation: We never had this goal!)
     public void DeleteGoalActivation(int id)
@@ -352,6 +326,34 @@ public class GoalRepo : RepoBase
             return new GoalActivation(Id, GoalId, ActivatedAt, DateOnly.Parse(reader.GetString(3)));
         }
         // alternatively this could just return GetGoal(Id) for actual goal, but we will do it this way so that we can also get information about how long the goal has been in place. 
+    }
+
+    // Find next goal from date (useful for setting deactivation date)
+    public GoalActivation? GetNextGoal(DateOnly presentDate)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        string sql = @"
+            SELECT * FROM GoalHistory 
+            WHERE ActivatedAt > $presentDate 
+            ORDER BY ActivatedAt ASC
+            LIMIT 1
+        "; // ActivatedAt > $presentDate, not >=, because >= will return activations from the present date, which there necessarily will be if we're making a new one today: instead of returning null due to there being none AFTER this new one.
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue("$presentDate", presentDate.ToString("yyyy-MM-dd"));
+        using var reader = cmd.ExecuteReader();
+        if (!reader.Read()) return null;
+        int Id = reader.GetInt32(0);
+        int GoalId = reader.GetInt32(1);
+        DateOnly ActivatedAt = DateOnly.Parse(reader.GetString(2));
+        if (reader.IsDBNull(3))
+        {
+            return new GoalActivation(Id, GoalId, ActivatedAt);
+        }
+        else
+        {
+            return new GoalActivation(Id, GoalId, ActivatedAt, DateOnly.Parse(reader.GetString(3)));
+        }
     }
 
     public List<GoalActivation> GetGoalHistoryInterval(DateTime startTime, DateTime endTime)

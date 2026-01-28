@@ -42,19 +42,8 @@ public class GoalCommand : ICommand
             case "getcurrent": return GetCurrent(args.Skip(1).ToList());
             case "history": return History(args.Skip(1).ToList());
             case "list": return ListRegistry(args.Skip(1).ToList());
-            case "pizza": return Pizza(args.Skip(1).ToList());
             default: return $"Unknown argument 'goal {args[0]}', type 'help goal'.";
         }
-    }
-
-    private string Pizza(IReadOnlyList<string> args)
-    {
-        try 
-        {
-            _service.EnsureDeactivationEntries();
-            return $"Pizza: EnsureDeactivationEntries() has output, so here is a slice of pizza: (>)";
-        }
-        catch (Exception ex) {return $"Puppet.Commands.GoalCommand.Pizza(): Error ensuring deactivation entries: {ex.Message}";}
     }
 
     private string Activate(IReadOnlyList<string> args)

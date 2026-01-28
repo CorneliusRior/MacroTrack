@@ -5,14 +5,14 @@ using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
-
+using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Service for interacting with Goal data and repo, add, retrieve, delete goals and goalactivation, find present goal, next goal, and get data.
 /// </summary>
 /// <remarks>
-/// Not fully updated for logging.
+/// Updated for logging.
 /// </remarks>
 public class GoalService : ServiceBase
 {
@@ -27,12 +27,17 @@ public class GoalService : ServiceBase
     public Goal AddGoal(string name, double calories, double protein, double carbs, double fat, string? type = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar = null, double? maxCar = null, double? minFat = null, double? maxFat = null)
     {
         try 
-        {
-            var goal = new Goal(name, calories, protein, carbs, fat, notes, type, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
-            _repo.AddGoal(goal);
-            return GetGoal(_repo.ReturnLastId());
+        {            
+            _repo.AddGoal(new Goal(name, calories, protein, carbs, fat, notes, type, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat));
+            var added = GetGoal(_repo.ReturnLastId());
+            Log($"Added goal id #{added.Id}", LogLevel.Info);
+            return added;
         }
-        catch (Exception ex) {throw new Exception($"Core.Services.GoalService.AddGoal(): Error creating goal: {ex.Message}");}
+        catch (Exception ex) 
+        {
+            Log($"Error adding goal. Incorrect formatting or returned null?", LogLevel.Warning, ex);
+            throw;
+        }
         
         
     }
@@ -54,29 +59,38 @@ public class GoalService : ServiceBase
     public Goal GetGoal(int id)
     {
         var goal = _repo.GetGoal(id);
-        if (goal == null) throw new Exception($"Core.Services.GoalService.GetGoal(): Error getting goal, returned as null. Goal probably doesn't exist, or wrong ID: [{id}].");
+        if (goal == null)
+        {
+            var ex = new Exception($"Returned as null.");
+            Log($"Error getting Goal #{id}, goal of this ID probably doesn't exist", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log($"Requested Goal #{id}");
         return goal;
     }
 
     // Load all (list)
     public List<Goal> GetAllGoals()
     {
-        var goals = _repo.GetAllGoals();
-        if (goals == null) throw new Exception("Core.Services.GoalService.GetAllGoals(): Error getting goals, returned as null. No goals found.");
-        return goals;
+        Log();
+        return _repo.GetAllGoals();
     }
 
     // Edit 
     public Goal EditGoal(int id, string name, double calories, double protein, double carbs, double fat, string? type = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar = null, double? maxCar = null, double? minFat = null, double? maxFat = null)
     {
+        Log($"Called on Goal #{id}");
+        // Make sure ID still exists, given that it is an "update" command, it doesn't really matter, so we don't really need to have an exception for it, just a warning.
+        if (_repo.GetGoal(id) == null) Log($"Warning: No goal with ID '{id}' could be found. No edit will be made.", LogLevel.Warning);
         var goal = new Goal(id, name, calories, protein, carbs, fat, notes, type, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
-        _repo.EditGoal(id, goal);
+        _repo.EditGoal(id, goal);       
         return GetGoal(id);
     }
 
     // Delete
     public Goal DeleteGoal(int id)
     {
+        Log($"Request delete Goal id #{id}");
         var goal = GetGoal(id);
         _repo.DeleteGoal(id);
         return goal;
@@ -87,45 +101,30 @@ public class GoalService : ServiceBase
     {
         try 
         {
-            var goal = GetGoal(id);
+            Goal? goal = _repo.GetGoal(id);
+            if (goal == null) throw new Exception($"_repo.GetGoal({id}) returned as null: Goal probably doesn't exist");
             var parsedDate = date ?? DateOnly.FromDateTime(DateTime.Now);
             var goalActivation = new GoalActivation(goal.Id, parsedDate);
 
             // see if there is an active goal already, if so, set it to deactivate on that date.
             var presentGoal = GetPresentGoal(parsedDate);
-            if (presentGoal != null)
-            {
-                _repo.Deactivate(presentGoal.Id, parsedDate);
-            }
+            if (presentGoal != null) _repo.Deactivate(presentGoal.Id, parsedDate);
                     
             _repo.ActivateGoal(goalActivation);
 
             // See if there are any goals set as active after this date, if so, give our new goal activation a deactivation date.
             var nextGoal = _repo.GetNextGoal(parsedDate);
-            if (nextGoal != null)
-            {
-                _repo.Deactivate(_repo.ReturnLastActivationId(), nextGoal.ActivatedAt);
-            }
+            if (nextGoal != null) _repo.Deactivate(_repo.ReturnLastActivationId(), nextGoal.ActivatedAt);
 
             var result = _repo.GetPresentGoal(parsedDate);
-            if (result == null) throw new Exception("Core.Services.GoalService.ActivateGoal(): Error retrieving activated goal after insertion.");
+            if (result == null) { throw new Exception("GoalActivation returned as null"); }
+            Log($"Activated Goal #{id} at time '{parsedDate}'");
             return result;
         }
-        catch (Exception ex) {throw new Exception($"Core.Services.GoalService.ActivateGoal(): Error getting GoalActivation, probably wrong ID: {ex.Message}");}
-    }
-
-    // Ensure Deactivation entries: This is mostly a temporary function to fix the current "debug" database, hopefully we won't ever actually need it.
-    public void EnsureDeactivationEntries()
-    {
-        var goalHistory = _repo.GetGoalHistory();
-        for (int i = 0; i < goalHistory.Count - 1; i++)
+        catch (Exception ex) 
         {
-            var ga = goalHistory[i];
-            if (i != goalHistory.Count - 1)
-            {
-                var deactivationDate = goalHistory[i + 1].ActivatedAt;
-                _repo.Deactivate(ga.Id, deactivationDate);
-            }
+            Log($"Error activating Goal #{id} at '{(date.HasValue ? "Null (now)" : date)}'", LogLevel.Warning, ex);
+            throw;
         }
     }
 
@@ -133,8 +132,13 @@ public class GoalService : ServiceBase
     public GoalActivation DeleteGoalActivation(int id)
     {
         // Does goal exist?
-        var entry = GetGoalActivation(id);
-        if (entry == null) throw new Exception($"Core.Services.GoalService.DeleteGoalActivation(): Error getting GoalActivation, probably doesn't exist.");
+        var entry = _repo.GetGoalActivation(id);
+        if (entry == null)
+        {
+            var ex = new Exception("Returned as null");
+            Log($"Error deleting GoalActivation, entry {id} probably doesn't exist.", LogLevel.Warning, ex);
+            throw ex;
+        }
         _repo.DeleteGoalActivation(id);
         return entry;
     }
@@ -142,12 +146,12 @@ public class GoalService : ServiceBase
     public GoalActivation? GetGoalActivation(int id)
     {
         return _repo.GetGoalActivation(id);
-        // if it returns as null, then it doesn't exist (probably)
     }
 
     // Get present active goal
     public GoalActivation? GetPresentGoal(DateOnly? date = null)
     {
+        Log();
         var parsedDate = date ?? DateOnly.FromDateTime(DateTime.Now);
         return _repo.GetPresentGoal(parsedDate);
     }
@@ -155,6 +159,7 @@ public class GoalService : ServiceBase
     // Get next goal
     public GoalActivation? GetNextGoal(DateOnly? date = null)
     {
+        Log();
         var parsedDate = date ?? DateOnly.FromDateTime(DateTime.Now);
         return _repo.GetNextGoal(parsedDate);
     }
@@ -162,11 +167,13 @@ public class GoalService : ServiceBase
     // Get active goal history
     public List<GoalActivation> GetGoalHistory()
     {
+        Log();
         return _repo.GetGoalHistory();
     }
 
     public MacroTotals GetMacroGoals(DateTime startTime, int timeFrame)
     {
+        Log($"Requested from '{startTime}' for '{timeFrame}' days");
         // get the end time:
         var endTime = startTime.AddDays(timeFrame);
         var goalHistory = _repo.GetGoalHistoryInterval(startTime, endTime);
