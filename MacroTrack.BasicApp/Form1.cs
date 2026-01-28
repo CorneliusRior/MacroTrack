@@ -15,12 +15,8 @@ namespace MacroTrack.BasicApp
         private readonly IMTLogger _logger;
         private bool _isRefreshing;
         private int _timeFrame;
-
         private int weightMode = 0; // this can be set as 0: Kg (metric), 1: lbs (imperial), 2: st
-        private double FEMult = 1; // might be something more elegant we can do but who cares?
-        private List<Preset> _presets = new();
-        private List<string> _presetCatList = new();
-
+        private double FEMult = 1; // might be something more elegant we can do?
         private readonly System.Windows.Forms.Timer _clockTimer = new();
 
         public Form1(CoreServices services)
@@ -34,35 +30,7 @@ namespace MacroTrack.BasicApp
         }
 
 
-        private void RefreshUI([CallerMemberName] string caller = "")
-        {            
-            Log($"RefreshUI called by {caller}, {(_isRefreshing ? "ignoring" : "refreshing")}.", LogLevel.Info);
-            if (_isRefreshing) return;
-            _isRefreshing = true;
-
-            UpdateSummary();
-            UpdateWeightGraph();
-            UpdateCalGraph();
-            UpdateHistory();
-            UpdateTasks();
-            // End of tasks
-
-            // Preset ComboBox list            
-            _presetCatList.Clear();
-            _presetCatList.AddRange(["(No Filter)", "(No Category)"]);
-            var CatList = _services.presetService.GetCategoryList();
-            CatList.Sort();
-            _presetCatList.AddRange(CatList);
-            UpdatePresetCatList(_presetCatList);
-
-            _presets.Clear();
-            _presets = _services.presetService.GetAll();
-            UpdatePresetList(_presets);
-
-            _isRefreshing = false;
-
-        }
-
+        // Print/Log:
         private void Print(string text)
         {
             text = text.Replace("\n", Environment.NewLine);
@@ -79,6 +47,8 @@ namespace MacroTrack.BasicApp
             _logger.Log(this, caller, level, message, ex);
         }
 
+
+        //Clock:
         private void SetUpClock()
         {
             _clockTimer.Interval = 1000;
@@ -88,11 +58,23 @@ namespace MacroTrack.BasicApp
             labelTime.Text = DateTime.Now.ToString("F");
         }
 
-        private void cbBarTimeFrame_SelectedIndexChanged(object sender, EventArgs e)
+
+        // Refresh methods:
+        private void RefreshUI([CallerMemberName] string caller = "")
         {
-            //Print($"cbBarTimeFrame changed, selected index is: {cbBarTimeFrame.SelectedIndex}");
-            _timeFrame = cbBarTimeFrame.SelectedIndex;
-            RefreshUI();
+            Log($"RefreshUI called by {caller}, {(_isRefreshing ? "ignoring" : "refreshing")}.", LogLevel.Info);
+            if (_isRefreshing) return;
+            _isRefreshing = true;
+
+            UpdateSummary();
+            UpdateWeightGraph();
+            UpdateCalGraph();
+            UpdateHistory();
+            UpdateTasks();
+            UpdatePresetCatList();
+            UpdatePresetList();
+
+            _isRefreshing = false;
         }
 
         private void UpdateSummary()
@@ -181,6 +163,133 @@ namespace MacroTrack.BasicApp
             // we put these here because they use summary and were in RefreshUI earlier.
             MakePieGoal(Summary.NoGoal, Summary.Target.Calories, Summary.Target.Protein, Summary.Target.Carbs, Summary.Target.Fat);
             MakePieActual(Summary.Actual.Calories, Summary.Actual.Protein, Summary.Actual.Carbs, Summary.Actual.Fat);
+        }
+
+        private void MakePieGoal(bool noGoal, double cal, double pro, double car, double fat)
+        {
+            // Clear everything and add the chart
+            pieChartGoal.Series.Clear();
+            pieChartGoal.ChartAreas.Clear();
+            pieChartGoal.Legends.Clear();
+            pieChartGoal.Titles.Clear();
+            pieChartGoal.Annotations.Clear();
+
+            pieChartGoal.ChartAreas.Add(new ChartArea("Main"));
+
+            // Format Chart area
+            var ca = pieChartGoal.ChartAreas["Main"];
+            ca.Position.Auto = false;
+            ca.Position = new ElementPosition(0, 0, 100, 100);
+            ca.InnerPlotPosition.Auto = true;
+
+            // Define series
+            var s = new Series("Macros")
+            {
+                ChartType = SeriesChartType.Pie,
+                IsValueShownAsLabel = noGoal ? false : true,
+                LabelFormat = "0"
+            };
+
+            // Add data, only if they're over 0, so no empty sections, grey if no goal.
+            if (car > 0) s.Points.AddXY("Carbs", car);
+            if (fat > 0) s.Points.AddXY("Fat", fat);
+            if (pro > 0) s.Points.AddXY("Protein", pro);
+            if (noGoal)
+            {
+                var none = s.Points.AddXY("None", 1);
+                s.Points[none].Color = Color.Gray;
+            }
+
+            // Title
+            pieChartGoal.Titles.Add("Goal");
+
+            // Inside annotation, "Calories: ####"
+            var a = new TextAnnotation
+            {
+                Text = noGoal ? "No Goal" : $"Calories:\n{cal.ToString("0")}",
+                AnchorX = 50,
+                AnchorY = 50,
+                Alignment = ContentAlignment.MiddleCenter,
+                AnchorAlignment = ContentAlignment.MiddleCenter,
+                ClipToChartArea = "Main",
+                IsSizeAlwaysRelative = true,
+            };
+            pieChartGoal.Annotations.Add(a);
+            s.SmartLabelStyle.Enabled = false;
+            s["PieLabelStyle"] = "Inside";
+            s.Font = new Font("SegoeUI", 8, FontStyle.Bold);
+
+            // Some more formatting
+            s["DoughnutRadius"] = "50";
+            s.ChartType = SeriesChartType.Doughnut;
+            s.Label = noGoal ? " " : "#VALX:\n#PERCENT{P0}";
+
+            // Add it
+            pieChartGoal.Series.Add(s);
+        }
+
+        private void MakePieActual(double cal, double pro, double car, double fat)
+        {
+            // For a more well commented version, see "PreviousPeriods.cs"
+            // Clear everything and add the chart
+            pieChartActual.Series.Clear();
+            pieChartActual.ChartAreas.Clear();
+            pieChartActual.Legends.Clear();
+            pieChartActual.Titles.Clear();
+            pieChartActual.Annotations.Clear();
+
+            pieChartActual.ChartAreas.Add(new ChartArea("Main"));
+
+            // this is the only kind of data formatting we're going here
+            bool empty = false;
+            if (car <= 0 && fat <= 0 && pro <= 0) empty = true;
+
+            // I would call this "format chart", but everything here is formatting the chart.
+            var ca = pieChartActual.ChartAreas["Main"];
+            ca.Position.Auto = false;
+            ca.Position = new ElementPosition(0, 0, 100, 100);
+            ca.InnerPlotPosition.Auto = true;
+
+            var s = new Series("Macros")
+            {
+                ChartType = SeriesChartType.Pie,
+                IsValueShownAsLabel = true,
+                LabelFormat = "0"
+            };
+
+            // Ensure they are non-zero before adding, grey if nothing.
+            if (car > 0) s.Points.AddXY("Carbs", car);
+            if (fat > 0) s.Points.AddXY("Fat", fat);
+            if (pro > 0) s.Points.AddXY("Protein", pro);
+            if (empty)
+            {
+                var none = s.Points.AddXY("None", 1);
+                s.Points[none].Color = Color.Gray;
+            }
+
+            pieChartActual.Titles.Add("Actual");
+
+            var a = new TextAnnotation
+            {
+                // In the goal one, we have this replaced with "No Goal" if there's none. We could do something similar here, but 0 Calories seems fine.
+                Text = $"Calories:\n{cal.ToString("0")}",
+                AnchorX = 50,
+                AnchorY = 50,
+                Alignment = ContentAlignment.MiddleCenter,
+                AnchorAlignment = ContentAlignment.MiddleCenter,
+                ClipToChartArea = "Main",
+                IsSizeAlwaysRelative = true,
+            };
+            pieChartActual.Annotations.Add(a);
+            s.SmartLabelStyle.Enabled = false;
+            s["PieLabelStyle"] = "Inside";
+            s.Font = new Font("SegoeUI", 8, FontStyle.Bold);
+
+            s["DoughnutRadius"] = "50";
+            s.ChartType = SeriesChartType.Doughnut;
+            s.Label = empty ? " " : "#VALX:\n#PERCENT{P0}";
+
+            pieChartActual.Series.Add(s);
         }
 
         private void UpdateWeightGraph()
@@ -341,9 +450,15 @@ namespace MacroTrack.BasicApp
             flpDTWidthAdjust();
         }
         
-        private void UpdatePresetList(List<Preset> set)
+        private void UpdatePresetList(List<Preset>? input = null)
         {
-            cbFEItem.BeginUpdate();
+            // Get data
+            List<Preset> set = new();
+
+            if (input == null) set = _services.presetService.GetAll();
+            else set = input;
+
+                cbFEItem.BeginUpdate();
             try
             {
                 cbFEItem.DataSource = null;
@@ -360,14 +475,20 @@ namespace MacroTrack.BasicApp
             }
         }
 
-        private void UpdatePresetCatList(List<string> set)
+        private void UpdatePresetCatList()
         {
+            List<string> set = new();
+            set.AddRange(["(No Filter)", "(No Category)"]);
+
+            var catList = _services.presetService.GetCategoryList();
+            catList.Sort();
+            set.AddRange(catList);
+
             cbFEFilter.BeginUpdate();
             try
             {
                 cbFEFilter.DataSource = null;
                 cbFEFilter.DataSource = set;
-
             }
             finally
             {
@@ -375,16 +496,76 @@ namespace MacroTrack.BasicApp
             }
         }
 
-        private void macroBar_SizeChanged(object sender, EventArgs e)
+        private void cbBarTimeFrame_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateSummary();
+            //Print($"cbBarTimeFrame changed, selected index is: {cbBarTimeFrame.SelectedIndex}");
+            _timeFrame = cbBarTimeFrame.SelectedIndex;
+            RefreshUI();
         }
 
         private void btRefresh_Click(object sender, EventArgs e)
         {
             RefreshUI();
         }
-        
+
+
+        // Banner buttons:
+        private void btBannerYesterday_Click(object sender, EventArgs e)
+        {
+            DateTime yesterday = DateTime.Today.AddDays(-1);
+            PreviousPeriod(yesterday, yesterday.AddDays(1));
+        }
+
+        private void btBannerPreviousPerioriod_Click(object sender, EventArgs e)
+        {
+            var f = new PreviousPeriodSelect(_services);
+            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
+            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
+            f.RequestPreviousPeriod += (sender, times) => PreviousPeriod(times.Item1, times.Item2);
+            f.Show();
+        }
+
+        private void PreviousPeriod(DateTime startDate, DateTime endDate)
+        {
+            // Not implemented fully yet but this will eventually be a screen where you can view previous periods, from a single day to everything I guess. It will use DateTime because that's less finnicky than DateOnly in my experience, and maybe we would like to see stuff like, what did we eat from 6pm this day to 6am that day and stuff like that who knows?
+            var f = new PreviousPeriods(startDate, endDate, _services);
+            f.RequestEdit += (_, id) => EditFoodEntry(id);
+            f.RequestDelete += (_, id) => DeleteFoodEntry(id);
+            f.RequestRefresh += (_, _) => RefreshUI();
+            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
+            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
+            f.Show();
+        }
+
+        private void btBannerSetGoal_Click(object sender, EventArgs e)
+        {
+            var f = new SetGoal(_services);
+            f.RequestRefresh += (_, _) => RefreshUI();
+            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
+            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
+            f.Show();
+        }
+
+        private void buttonBannerNewGoal_Click(object sender, EventArgs e)
+        {
+            var f = new NewGoal(_services);
+            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
+            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
+            f.Show();
+        }
+
+
+        // Food entry:
+        private void btFECurrentTime_Click(object sender, EventArgs e)
+        {
+            dtpFood.Value = DateTime.Now;
+        }
+
+        private void cbFEItem_KeyDown(object sender, KeyEventArgs e)
+        {
+
+        }
+
         private void cbFEItem_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (cbFEItem.SelectedItem is not Preset p) return;
@@ -395,29 +576,6 @@ namespace MacroTrack.BasicApp
             tbFEFat.Text = p.Fat.ToString();
 
             spinFEMult.Value = 1;
-        }
-
-        private void cbFEFilter_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            if (cbFEFilter.SelectedIndex == 0)
-            {
-                _presets = _services.presetService.GetAll();
-            }
-            else if (cbFEFilter.SelectedIndex == 1)
-            {
-                _presets = _services.presetService.GetAllCategory(null);
-            }
-            else
-            {
-                _presets = _services.presetService.GetAllCategory(_presetCatList[cbFEFilter.SelectedIndex]);
-            }
-
-            UpdatePresetList(_presets);
-        }
-
-        private void cbFEItem_KeyDown(object sender, KeyEventArgs e)
-        {
-
         }
 
         private void spinFEMult_ValueChanged(object sender, EventArgs e)
@@ -451,7 +609,39 @@ namespace MacroTrack.BasicApp
             if (double.TryParse(tbFEFat.Text, out double fat) && fat != 0) tbFEFat.Text = ((fat / LastMult) * FEMult).ToString("0.##");
         }
 
+        private void cbFEFilter_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            if (_isRefreshing) return;
+            if (cbFEFilter.SelectedIndex == 0)
+            {
+                UpdatePresetList();
+            }
+            else if (cbFEFilter.SelectedIndex == 1)
+            {
+                UpdatePresetList(_services.presetService.GetAllCategory(null));
+            }
+            else
+            {
+                //_presets = _services.presetService.GetAllCategory(_presetCatList[cbFEFilter.SelectedIndex]);
+                UpdatePresetList(_services.presetService.GetAllCategory(cbFEFilter.SelectedText));
+            }
+        }
+
+        private void btFENewPreset_Click(object sender, EventArgs e)
+        {
+            using var dlg = new NewPreset(_services);
+            dlg.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
+            dlg.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
+
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                Print($"Added entry, we don't have anything called \"Get last ID\", so you'll just have to trust me for now :)");
+                RefreshUI();
+            }
+        }
+
         private void btFEAdd_Click(object sender, EventArgs e)
+
         {
             bool inputError = false;
             string errorString = "";
@@ -498,10 +688,27 @@ namespace MacroTrack.BasicApp
                     FEClear();
                     RefreshUI();
                 }
-
             }
         }
+        
+        private void btFEClear_Click(object sender, EventArgs e)
+        {
+            FEClear();
+        }
 
+        private void FEClear()
+        {
+            cbFEItem.Text = string.Empty;
+            spinFEMult.Value = 1;
+            cbFEFilter.SelectedIndex = 0;
+            tbFECal.Text = string.Empty;
+            tbFEPro.Text = string.Empty;
+            tbFECar.Text = string.Empty;
+            tbFEFat.Text = string.Empty;
+            tbFENotes.Text = string.Empty;
+        }
+
+        // Food history:
         private void EditFoodEntry(int id)
         {
             try { _services.foodLogService.GetEntry(id); }
@@ -530,145 +737,12 @@ namespace MacroTrack.BasicApp
 
         }
 
-        private void btFEClear_Click(object sender, EventArgs e)
-        {
-            FEClear();
-        }
 
-        private void FEClear()
-        {
-            cbFEItem.Text = string.Empty;
-            spinFEMult.Value = 1;
-            cbFEFilter.SelectedIndex = 0;
-            tbFECal.Text = string.Empty;
-            tbFEPro.Text = string.Empty;
-            tbFECar.Text = string.Empty;
-            tbFEFat.Text = string.Empty;
-            tbFENotes.Text = string.Empty;
-        }
 
-        private void btFECurrentTime_Click(object sender, EventArgs e)
-        {
-            dtpFood.Value = DateTime.Now;
-        }
-
-        private void btFENewPreset_Click(object sender, EventArgs e)
-        {
-            using var dlg = new NewPreset(_services);
-            dlg.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
-            dlg.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
-
-            if (dlg.ShowDialog(this) == DialogResult.OK)
-            {
-                Print($"Added entry, we don't have anything called \"Get last ID\", so you'll just have to trust me for now :)");
-                RefreshUI();
-            }
-        }
-
+        // Weight entry:       
         private void btWECurrentTime_Click(object sender, EventArgs e)
         {
             dtpWeight.Value = DateTime.Now;
-        }
-
-        private void btWEAdd_Click(object sender, EventArgs e)
-        {
-            if (!double.TryParse(tbWeight.Text, out var weight))
-            {
-                MessageBox.Show($"Error adding weight:\nCould not parse '{tbWeight.Text}' as double: must be a number");
-            }
-            else
-            {
-                _services.weightLogService.AddEntry(dtpWeight.Value, weight);
-                Print($"Added weight entry: {weight}" + (weightMode == 0 ? "kg" : weightMode == 1 ? "lbs" : "st"));
-                tbWeight.Text = string.Empty;
-            }
-            UpdateWeightGraph();
-        }
-
-        private void btDEAdd_Click(object sender, EventArgs e)
-        {
-            if (_services.diaryService.AddEntry(tbDEDiary.Text) == null)
-            {
-                MessageBox.Show("Error adding diary entry, idk.");
-            }
-            else
-            {
-                Print($"Added Diary Entry: \n\n{tbDEDiary.Text}");
-                tbDEDiary.Text = string.Empty;
-            }
-
-            try
-            {
-                DiaryEntry entry = _services.diaryService.AddEntry(tbDEDiary.Text);
-                Print($"Added Diary Entry: \n\n{entry.Body}");
-                tbDEDiary.Text = string.Empty;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error adding diary entry: {ex.GetType().Name}: {ex.Message}");
-            }
-        }
-
-        private void btDEClear_Click(object sender, EventArgs e)
-        {
-            tbDEDiary.Text = string.Empty;
-        }
-
-        private void btDEViewDiary_Click(object sender, EventArgs e)
-        {
-            Print("Open diary...");
-            var f = new DiaryView(_services);
-            f.RequestViewDay += (_, date) => PreviousPeriod(date.Date, date.Date.AddDays(1));
-            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
-            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
-            f.Show();
-        }
-      
-        private void btBannerYesterday_Click(object sender, EventArgs e)
-        {
-            DateTime yesterday = DateTime.Today.AddDays(-1);
-            PreviousPeriod(yesterday, yesterday.AddDays(1));
-        }
-
-        private void PreviousPeriod(DateTime startDate, DateTime endDate)
-        {
-            // Not implemented fully yet but this will eventually be a screen where you can view previous periods, from a single day to everything I guess. It will use DateTime because that's less finnicky than DateOnly in my experience, and maybe we would like to see stuff like, what did we eat from 6pm this day to 6am that day and stuff like that who knows?
-            var f = new PreviousPeriods(startDate, endDate, _services);
-            f.RequestEdit += (_, id) => EditFoodEntry(id);
-            f.RequestDelete += (_, id) => DeleteFoodEntry(id);
-            f.RequestRefresh += (_, _) => RefreshUI();
-            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
-            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
-            f.Show();
-        }
-
-        private void tbNumeric_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            var tb = (TextBox)sender;
-            if (Char.IsControl(e.KeyChar)) return;
-            if (Char.IsDigit(e.KeyChar)) return;
-            if (e.KeyChar == '.' && !tb.Text.Contains('.')) return;
-            if (e.KeyChar == '-' && !tb.Text.Contains("-")) return;
-            e.Handled = true;
-        }
-
-        private void spinNumeric_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            var sb = (NumericUpDown)sender;
-            if (Char.IsControl(e.KeyChar)) return;
-            if (Char.IsDigit(e.KeyChar)) return;
-            if (e.KeyChar == '.') return;
-            if (e.KeyChar == '-' && sb.Value >= 0)
-            {
-                sb.Value *= -1;
-                e.Handled = true;
-            }
-            if (e.KeyChar == '+' && sb.Value <= 0)
-            {
-                sb.Value *= -1;
-                e.Handled = true;
-            }
-            e.Handled = true;
         }
 
         private void tbWeight_TextChanged(object sender, EventArgs e)
@@ -722,6 +796,124 @@ namespace MacroTrack.BasicApp
             // else I guess nothing happens.
         }
 
+        private void btWEAdd_Click(object sender, EventArgs e)
+        {
+            if (!double.TryParse(tbWeight.Text, out var weight))
+            {
+                MessageBox.Show($"Error adding weight:\nCould not parse '{tbWeight.Text}' as double: must be a number");
+            }
+            else
+            {
+                _services.weightLogService.AddEntry(dtpWeight.Value, weight);
+                Print($"Added weight entry: {weight}" + (weightMode == 0 ? "kg" : weightMode == 1 ? "lbs" : "st"));
+                tbWeight.Text = string.Empty;
+            }
+            UpdateWeightGraph();
+        }
+
+
+        // Dairy:
+        private void btDEAdd_Click(object sender, EventArgs e)
+        {
+            if (_services.diaryService.AddEntry(tbDEDiary.Text) == null)
+            {
+                MessageBox.Show("Error adding diary entry, idk.");
+            }
+            else
+            {
+                Print($"Added Diary Entry: \n\n{tbDEDiary.Text}");
+                tbDEDiary.Text = string.Empty;
+            }
+
+            try
+            {
+                DiaryEntry entry = _services.diaryService.AddEntry(tbDEDiary.Text);
+                Print($"Added Diary Entry: \n\n{entry.Body}");
+                tbDEDiary.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error adding diary entry: {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        private void btDEClear_Click(object sender, EventArgs e)
+        {
+            tbDEDiary.Text = string.Empty;
+        }
+
+        private void btDEViewDiary_Click(object sender, EventArgs e)
+        {
+            Print("Open diary...");
+            var f = new DiaryView(_services);
+            f.RequestViewDay += (_, date) => PreviousPeriod(date.Date, date.Date.AddDays(1));
+            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
+            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
+            f.Show();
+        }
+
+
+        // Tasks:
+        private void btDTAdd_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(tbDTNew.Text))
+            {
+                _services.taskService.AddTask(tbDTNew.Text);
+                RefreshUI();
+            }
+        }
+
+        private void TaskSetComplete(int id)
+        {
+            _services.taskService.SetComplete(id);
+            Print($"Set task [{id}] complete");
+            RefreshUI();
+        }
+
+        private void TaskSetIncomplete(int id)
+        {
+            _services.taskService.SetIncomplete(id);
+            Print($"Set task [{id}] incomplete");
+            RefreshUI();
+        }
+
+        // Input formatting:
+        private void tbNumeric_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            var tb = (TextBox)sender;
+            if (Char.IsControl(e.KeyChar)) return;
+            if (Char.IsDigit(e.KeyChar)) return;
+            if (e.KeyChar == '.' && !tb.Text.Contains('.')) return;
+            if (e.KeyChar == '-' && !tb.Text.Contains("-")) return;
+            e.Handled = true;
+        }
+
+        private void spinNumeric_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            var sb = (NumericUpDown)sender;
+            if (Char.IsControl(e.KeyChar)) return;
+            if (Char.IsDigit(e.KeyChar)) return;
+            if (e.KeyChar == '.') return;
+            if (e.KeyChar == '-' && sb.Value >= 0)
+            {
+                sb.Value *= -1;
+                e.Handled = true;
+            }
+            if (e.KeyChar == '+' && sb.Value <= 0)
+            {
+                sb.Value *= -1;
+                e.Handled = true;
+            }
+            e.Handled = true;
+        }
+
+
+        // Resizing:
+        private void macroBar_SizeChanged(object sender, EventArgs e)
+        {
+            UpdateSummary();
+        }
+
         private void flpHistory_Resize(object sender, EventArgs e)
         {
             flpHistoryWidthAdjust();
@@ -746,183 +938,6 @@ namespace MacroTrack.BasicApp
             {
                 c.Width = flpDT.Width - 40;
             }
-        }
-
-        private void TaskSetComplete(int id)
-        {
-            _services.taskService.SetComplete(id);
-            Print($"Set task [{id}] complete");
-            RefreshUI();
-        }
-
-        private void TaskSetIncomplete(int id)
-        {
-            _services.taskService.SetIncomplete(id);
-            Print($"Set task [{id}] incomplete");
-            RefreshUI();
-        }
-
-        private void btDTAdd_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrWhiteSpace(tbDTNew.Text))
-            {
-                _services.taskService.AddTask(tbDTNew.Text);
-                RefreshUI();
-            }
-        }
-
-        //I know I should be doing graphing stuff outside of this but I am beyond caring for the time being:
-        private void MakePieGoal(bool noGoal, double cal, double pro, double car, double fat)
-        {
-            // Clear everything and add the chart
-            pieChartGoal.Series.Clear();
-            pieChartGoal.ChartAreas.Clear();
-            pieChartGoal.Legends.Clear();
-            pieChartGoal.Titles.Clear();
-            pieChartGoal.Annotations.Clear();
-
-            pieChartGoal.ChartAreas.Add(new ChartArea("Main"));
-
-            // Format Chart area
-            var ca = pieChartGoal.ChartAreas["Main"];
-            ca.Position.Auto = false;
-            ca.Position = new ElementPosition(0, 0, 100, 100);
-            ca.InnerPlotPosition.Auto = true;
-
-            // Define series
-            var s = new Series("Macros")
-            {
-                ChartType = SeriesChartType.Pie,
-                IsValueShownAsLabel = noGoal ? false : true,
-                LabelFormat = "0"
-            };
-
-            // Add data, only if they're over 0, so no empty sections, grey if no goal.
-            if (car > 0) s.Points.AddXY("Carbs", car);
-            if (fat > 0) s.Points.AddXY("Fat", fat);
-            if (pro > 0) s.Points.AddXY("Protein", pro);
-            if (noGoal)
-            {
-                var none = s.Points.AddXY("None", 1);
-                s.Points[none].Color = Color.Gray;
-            }
-
-            // Title
-            pieChartGoal.Titles.Add("Goal");
-
-            // Inside annotation, "Calories: ####"
-            var a = new TextAnnotation
-            {
-                Text = noGoal ? "No Goal" : $"Calories:\n{cal.ToString("0")}",
-                AnchorX = 50,
-                AnchorY = 50,
-                Alignment = ContentAlignment.MiddleCenter,
-                AnchorAlignment = ContentAlignment.MiddleCenter,
-                ClipToChartArea = "Main",
-                IsSizeAlwaysRelative = true,
-            };
-            pieChartGoal.Annotations.Add(a);
-            s.SmartLabelStyle.Enabled = false;
-            s["PieLabelStyle"] = "Inside";
-            s.Font = new Font("SegoeUI", 8, FontStyle.Bold);
-
-            // Some more formatting
-            s["DoughnutRadius"] = "50";
-            s.ChartType = SeriesChartType.Doughnut;
-            s.Label = noGoal ? " " : "#VALX:\n#PERCENT{P0}";
-
-            // Add it
-            pieChartGoal.Series.Add(s);
-        }
-
-        private void MakePieActual(double cal, double pro, double car, double fat)
-        {
-            // For a more well commented version, see "PreviousPeriods.cs"
-            // Clear everything and add the chart
-            pieChartActual.Series.Clear();
-            pieChartActual.ChartAreas.Clear();
-            pieChartActual.Legends.Clear();
-            pieChartActual.Titles.Clear();
-            pieChartActual.Annotations.Clear();
-
-            pieChartActual.ChartAreas.Add(new ChartArea("Main"));
-
-            // this is the only kind of data formatting we're going here
-            bool empty = false;
-            if (car <= 0 && fat <= 0 && pro <= 0) empty = true;
-
-            // I would call this "format chart", but everything here is formatting the chart.
-            var ca = pieChartActual.ChartAreas["Main"];
-            ca.Position.Auto = false;
-            ca.Position = new ElementPosition(0, 0, 100, 100);
-            ca.InnerPlotPosition.Auto = true;
-
-            var s = new Series("Macros")
-            {
-                ChartType = SeriesChartType.Pie,
-                IsValueShownAsLabel = true,
-                LabelFormat = "0"
-            };
-
-            // Ensure they are non-zero before adding, grey if nothing.
-            if (car > 0) s.Points.AddXY("Carbs", car);
-            if (fat > 0) s.Points.AddXY("Fat", fat);
-            if (pro > 0) s.Points.AddXY("Protein", pro);
-            if (empty)
-            {
-                var none = s.Points.AddXY("None", 1);
-                s.Points[none].Color = Color.Gray;
-            }
-
-            pieChartActual.Titles.Add("Actual");
-
-            var a = new TextAnnotation
-            {
-                // In the goal one, we have this replaced with "No Goal" if there's none. We could do something similar here, but 0 Calories seems fine.
-                Text = $"Calories:\n{cal.ToString("0")}",
-                AnchorX = 50,
-                AnchorY = 50,
-                Alignment = ContentAlignment.MiddleCenter,
-                AnchorAlignment = ContentAlignment.MiddleCenter,
-                ClipToChartArea = "Main",
-                IsSizeAlwaysRelative = true,
-            };
-            pieChartActual.Annotations.Add(a);
-            s.SmartLabelStyle.Enabled = false;
-            s["PieLabelStyle"] = "Inside";
-            s.Font = new Font("SegoeUI", 8, FontStyle.Bold);
-
-            s["DoughnutRadius"] = "50";
-            s.ChartType = SeriesChartType.Doughnut;
-            s.Label = empty ? " " : "#VALX:\n#PERCENT{P0}";
-
-            pieChartActual.Series.Add(s);
-        }
-
-        private void btBannerSetGoal_Click(object sender, EventArgs e)
-        {
-            var f = new SetGoal(_services);
-            f.RequestRefresh += (_, _) => RefreshUI();
-            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
-            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
-            f.Show();
-        }
-
-        private void btBannerPreviousPerioriod_Click(object sender, EventArgs e)
-        {
-            var f = new PreviousPeriodSelect(_services);
-            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
-            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
-            f.RequestPreviousPeriod += (sender, times) => PreviousPeriod(times.Item1, times.Item2);
-            f.Show();
-        }
-
-        private void buttonBannerNewGoal_Click(object sender, EventArgs e)
-        {
-            var f = new NewGoal(_services);
-            f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
-            f.RequestPrintInline += (sender, text) => PrintInline($"{((Control)sender!).Name}: {text}");
-            f.Show();
         }
     }
 }
