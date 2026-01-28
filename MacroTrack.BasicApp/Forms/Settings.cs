@@ -45,12 +45,12 @@ namespace MacroTrack.BasicApp.Forms
 
         private void Log(string message = "Called.", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
         {
-            _logger.Log(this, nameof(caller), level, message, ex);
+            _logger.Log(this, caller, level, message, ex);
         }
 
         private void SetByAppSettings(AppSettings settings)
         {
-            Log();
+            Log($"_isloading = '{_isLoading}'");
             if (_isLoading == true) return;
             _isLoading = true;
             Log("Entered");
@@ -78,6 +78,7 @@ namespace MacroTrack.BasicApp.Forms
                 Log("Error, must be either 'Debug', 'Info', 'Warning', or 'Error', or BasicApp is outdated. Reverting to default", LogLevel.Warning, ex);
                 SetLogFileLevel(_default.LogUILevel);
             }
+            _isLoading = false;
         }
 
         private void SetDefault()

@@ -840,14 +840,10 @@ namespace MacroTrack.BasicApp
         // Dairy:
         private void btDEAdd_Click(object sender, EventArgs e)
         {
-            if (_services.diaryService.AddEntry(tbDEDiary.Text) == null)
+            if (tbDEDiary.Text == string.Empty)
             {
-                MessageBox.Show("Error adding diary entry, idk.");
-            }
-            else
-            {
-                Print($"Added Diary Entry: \n\n{tbDEDiary.Text}");
-                tbDEDiary.Text = string.Empty;
+                MessageBox.Show("Empty entry, nothing happened");
+                return;
             }
 
             try
