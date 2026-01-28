@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 /// </summary>
 /// <remarks>
 /// The first of the various services made if memory serves.
-/// Not Updated for logging.
+/// Updated for logging.
 /// </remarks>
 public class WeightLogService : ServiceBase
 {
@@ -28,40 +28,71 @@ public class WeightLogService : ServiceBase
     {
         _repo.AddEntry(new WeightEntry(time, weight));
         var addedEntry = _repo.GetEntry(_repo.ReturnLastId());
-        if (addedEntry == null) throw new Exception("Core.Services.WeightLogService.AddEntry(): Error adding entry. returned as null. Not saved or not read.");
+        if (addedEntry == null)
+        {
+            var ex = new Exception("Returned as null.");
+            Log("Error adding entry.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log();
         return addedEntry;
     }
 
     // Load
     public WeightEntry? GetEntry(int id)
     {
-        return _repo.GetEntry(id);
+        var entry = _repo.GetEntry(id);
+        if (entry == null)
+        {
+            var ex = new Exception("Returned as null.");
+            Log("Error getting entry, wrong ID probably", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log($"Requested entry #{id}");
+        return entry;
     }
 
     // Load all
     public List<WeightEntry> GetAll()
     {
+        Log();
         return _repo.GetAll();
     }
 
     // Load selection
     public List<WeightEntry> FromTimes(DateTime startTime, DateTime endTime)
     {
+        Log($"Times '{startTime}' to '{endTime}'");
         return _repo.FromTimes(startTime, endTime);        
     }
 
     // Delete
     public WeightEntry DeleteEntry(int id)
     {
-        var DeletedEntry = _repo.GetEntry(id);
-        if (DeletedEntry == null) throw new Exception("Core.Services.WeightLogService.DeleteEntry(): Entry not found");
+        var entry = _repo.GetEntry(id);
+        if (entry == null)
+        {
+            var ex = new Exception("Returned as null.");
+            Log("Error deleting entry, wrong ID probably", LogLevel.Warning, ex);
+            throw ex;
+        }        
         _repo.DeleteEntry(id);
-        return DeletedEntry;
+        Log($"Deleted entry #{id}");
+        return entry;
     }
 
     // Delete last
     public WeightEntry DeleteLast()
     {
-        return DeleteEntry(_repo.ReturnLastId());
+        var entry = _repo.GetEntry(_repo.ReturnLastId());
+        if (entry == null)
+        {
+            var ex = new Exception("Returned as null.");
+            Log("Error deleting entry, wrong ID probably", LogLevel.Warning, ex);
+            throw ex;
+        }
+        _repo.DeleteEntry(entry.Id);
+        Log($"Deleted entry #{entry.Id}");
+        return entry;
     }
 }

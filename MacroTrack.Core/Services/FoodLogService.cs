@@ -33,7 +33,7 @@ public class FoodLogService : ServiceBase
         var added = _repo.GetEntry(_repo.ReturnLastId());
         if (added == null)
         {
-            var ex = new Exception("Cannot find entry.");
+            var ex = new Exception("Returned as null.");
             Log("Error adding entry, wrong ID probably", LogLevel.Warning, ex);
             throw ex;
         }

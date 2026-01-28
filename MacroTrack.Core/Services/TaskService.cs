@@ -6,12 +6,13 @@ using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 /// <summary>
 /// Service for interacting with Daily Task data and repo, TaskCompletion, TaskLog and TaskRegistry. Add, retrieve, delete, set completion, activate or deactive &c.
 /// </summary>
 /// <remarks>
-/// Not updated for loggin.
+/// Updated for logging.
 /// </remarks>
 public class TaskService : ServiceBase
 {
@@ -30,9 +31,16 @@ public class TaskService : ServiceBase
             newTask = new DailyTask(name);
         else
             newTask = new DailyTask(name, description);
+
         _repo.AddTask(newTask);
         var addedTask = _repo.GetTask(_repo.ReturnLastId(), DateTime.Now);
-        if (addedTask == null) throw new Exception("Core.Services.TaskService.AddTask(): Error adding entry, returned as null. Not saved or not read.");
+        if (addedTask == null)
+        {
+            var ex = new Exception("Core.Services.TaskService.AddTask(): Error adding entry, returned as null. Not saved or not read.");
+            Log("Error adding task", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log($"Added Task #{addedTask.Id}");
         return addedTask;
     }
 
@@ -40,7 +48,13 @@ public class TaskService : ServiceBase
     public DailyTask GetTask(int id, DateTime? date = null)
     {
         var entry = _repo.GetTask(id, date ?? DateTime.Now);
-        if (entry == null) throw new Exception($"Core.Services.TaskService.GetTask(): Error getting entry, returned as null. Entry probably doesn't exist, or wrong ID: [{id}].");
+        if (entry == null)
+        {
+            var ex = new Exception($"Returned as null.");
+            Log($"Error retrieving Task #{id}, probably doesn't exist");
+            throw ex;
+        }
+        Log($"Requested Task #{id}");
         return entry;
     }
 
@@ -50,6 +64,7 @@ public class TaskService : ServiceBase
         List<DailyTask> taskList = _repo.GetAll(date ?? DateTime.Now);
         if (filterActive == true) { taskList.RemoveAll(t => t.IsActive); }
         if (filterInactive == true) { taskList.RemoveAll(t => !t.IsActive); }
+        Log($"Requested TaskList for '{(date is null ? "Null (now)" : date)}', filterActive = '{filterActive}', filterInactive = '{filterInactive}'");
         return taskList;
     }
 
@@ -59,6 +74,7 @@ public class TaskService : ServiceBase
         List<DailyTask> taskList = _repo.GetAllStreaks(date ?? DateTime.Now);
         if (filterActive == true) { taskList.RemoveAll(t => t.IsActive); }
         if (filterInactive == true) { taskList.RemoveAll(t => !t.IsActive); }
+        Log($"Requested TaskList for DateTime '{(date is null ? "Null (now)" : date)}', filterActive = '{filterActive}', filterInactive = '{filterInactive}'");
         return taskList;
     }
 
@@ -68,6 +84,7 @@ public class TaskService : ServiceBase
         var taskList = _repo.GetRegistry();
         if (filterActive == true) {taskList.RemoveAll(t => t.IsActive);}
         if (filterInactive == true) {taskList.RemoveAll(t => !t.IsActive);}
+        Log($"Requested TaskRegistry, filterActive = '{filterActive}', filterInactive = '{filterInactive}'");
         return taskList;
     }
 
@@ -75,7 +92,14 @@ public class TaskService : ServiceBase
     public DailyTask SetComplete(int id, DateTime? date = null)
     {
         _repo.SetComplete(id, date ?? DateTime.Now);
-        var entry = GetTask(id, date);
+        var entry = _repo.GetTask(id, date ?? DateTime.Now);
+        if (entry == null)
+        {
+            var ex = new Exception($"Returned as null.");
+            Log($"Error setting Task #{id} complete, probably doesn't exist, no edits made.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log($"Set Task #{id} Complete for DateTime '{(date is null ? "Null (now)" : date)}'");
         return entry;
     }
 
@@ -83,21 +107,44 @@ public class TaskService : ServiceBase
     public DailyTask SetIncomplete(int id, DateTime? date = null)
     {
         _repo.SetIncomplete(id, date ?? DateTime.Now);
-        var entry = GetTask(id, date);
+        var entry = _repo.GetTask(id, date ?? DateTime.Now);
+        if (entry == null)
+        {
+            var ex = new Exception($"Returned as null.");
+            Log($"Error setting Task #{id} incomplete, probably doesn't exist, no edits made.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log($"Set Task #{id} Incomplete for DateTime '{(date is null ? "Null (now)" : date)}'");
         return entry;
     }
 
-    // disable
-    public DailyTask Activate(int id)
-    {
-        _repo.ActivateEntry(id);
-        return GetTask(id, DateTime.Now);
-    }
-
-    // reenable
+    // disable    
     public DailyTask Deactivate(int id)
     {
         _repo.DeactivateEntry(id);
-        return GetTask(id, DateTime.Now);
+        var entry = _repo.GetTask(id, DateTime.Now);
+        if (entry == null)
+        {
+            var ex = new Exception($"Returned as null.");
+            Log($"Error deactivating Task #{id}, probably doesn't exist, no edits made.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log($"Deactivated Task #{id}");
+        return entry;
+    }
+
+    // reenable
+    public DailyTask Activate(int id)
+    {
+        _repo.ActivateEntry(id);
+        var entry = _repo.GetTask(id, DateTime.Now);
+        if (entry == null)
+        {
+            var ex = new Exception($"Returned as null.");
+            Log($"Error activating Task #{id}, probably doesn't exist, no edits made.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log($"Activated Task #{id}");
+        return entry;
     }
 }
