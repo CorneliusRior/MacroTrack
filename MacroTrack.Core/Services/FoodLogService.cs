@@ -8,6 +8,12 @@ using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Service for interacting with FoodLog data and repo, add, retrieve, edit and delete food entries, add by preset, get general data.
+/// </summary>
+/// <remarks>
+/// Updated for logging.
+/// </remarks>
 public class FoodLogService : ServiceBase
 {
     private readonly FoodLogRepo _repo;
@@ -56,6 +62,7 @@ public class FoodLogService : ServiceBase
             Log("Error retrieving entry after adding.", LogLevel.Warning, ex);
             throw ex;
         }
+        Log($"Added entry #{added.Id} by preset #{id}.");
         return added;
     }
     

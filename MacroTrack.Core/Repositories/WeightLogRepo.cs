@@ -5,6 +5,12 @@ using MacroTrack.Core.Models;
 using Microsoft.Data.Sqlite;
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Repository for interacting with WeightLog data.
+/// </summary>
+/// <remarks>
+/// No logs.
+/// </remarks>
 public class WeightLogRepo : RepoBase
 {
     private readonly string _connectionString;

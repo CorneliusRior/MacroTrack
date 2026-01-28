@@ -7,6 +7,12 @@ using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Service for interacting with Daily Task data and repo, TaskCompletion, TaskLog and TaskRegistry. Add, retrieve, delete, set completion, activate or deactive &c.
+/// </summary>
+/// <remarks>
+/// Not updated for loggin.
+/// </remarks>
 public class TaskService : ServiceBase
 {
     private readonly TaskRepo _repo;

@@ -7,6 +7,12 @@ using System.Runtime.CompilerServices;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Infrastructure;
 
+/// <summary>
+/// Repository for interacting with Dairy data.
+/// </summary>
+/// <remarks>
+/// No logs.
+/// </remarks>
 public class DiaryRepo : RepoBase
 {
     private readonly string _connectionString;

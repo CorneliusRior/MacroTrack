@@ -7,6 +7,12 @@ using System.Runtime.CompilerServices;
 
 namespace MacroTrack.Core.Repositories;
 
+/// <summary>
+/// Repository for interacting with Task data, including TaskRegistry, TaskLog, and TaskCompletion.
+/// </summary>
+/// <remarks>
+/// No logs.
+/// </remarks>
 public class TaskRepo : RepoBase
 {
     private readonly string _connectionString;

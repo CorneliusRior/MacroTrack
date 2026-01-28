@@ -8,6 +8,12 @@ using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Service for interacting with Goal data and repo, add, retrieve, delete goals and goalactivation, find present goal, next goal, and get data.
+/// </summary>
+/// <remarks>
+/// Not fully updated for logging.
+/// </remarks>
 public class GoalService : ServiceBase
 {
     private readonly GoalRepo _repo;
@@ -164,13 +170,13 @@ public class GoalService : ServiceBase
         // get the end time:
         var endTime = startTime.AddDays(timeFrame);
         var goalHistory = _repo.GetGoalHistoryInterval(startTime, endTime);
-        var totals = new MacroTotals
-        {
-            Calories = 0,
-            Protein = 0,
-            Carbs = 0,
-            Fat = 0
-        };
+
+        double cal = 0;
+        double pro = 0;
+        double car = 0;
+        double fat = 0;
+
+        
         // see how many days each goal was active for, and add that to the totals.
         DateOnly startDate = DateOnly.FromDateTime(startTime);
         DateOnly endDate = DateOnly.FromDateTime(endTime);
@@ -194,11 +200,18 @@ public class GoalService : ServiceBase
                 if (ga.ActivatedAt < startDate) daysActive = effectiveDeactivation.DayNumber - startDate.DayNumber;
                 else daysActive = effectiveDeactivation.DayNumber - ga.ActivatedAt.DayNumber;
             }
-            totals.Calories += g.Calories * daysActive;
-            totals.Protein += g.Protein * daysActive;
-            totals.Carbs += g.Carbs * daysActive;
-            totals.Fat += g.Fat * daysActive;
+            cal += g.Calories * daysActive;
+            pro += g.Protein * daysActive;
+            car += g.Carbs * daysActive;
+            fat += g.Fat * daysActive;
         }
+
+        var totals = new MacroTotals(
+            Calories: cal,
+            Protein: pro,
+            Carbs: car,
+            Fat: fat
+        );
         return totals;
     }
 }

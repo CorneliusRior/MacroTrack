@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.Core.Services
 {
+    /// <summary>
+    /// Base Service, on which all services are based, includes logging functionality and initial '[name] initialized' log.
+    /// </summary>
     public abstract class ServiceBase
     {
         protected IMTLogger Logger { get; }
@@ -16,7 +19,7 @@ namespace MacroTrack.Core.Services
         protected ServiceBase(CoreContext ctx) 
         {
             Logger = ctx.Logger;
-            Log($"{this.GetType().Name} Initialised");
+            Log($"{this.GetType().Name} Initialized");
         }
 
         protected void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")

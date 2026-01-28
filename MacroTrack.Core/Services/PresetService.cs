@@ -7,6 +7,12 @@ using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Service for interacting with preset data and repo, add, retrieve, edit, and delete food presets
+/// </summary>
+/// <remarks>
+/// Updated for logging.
+/// </remarks>
 public class PresetService : ServiceBase
 {
     private readonly PresetRepo _repo;

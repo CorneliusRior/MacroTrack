@@ -6,6 +6,9 @@ using MacroTrack.Core.Infrastructure;
 
 namespace MacroTrack.Core.Services;
 
+/// <summary>
+/// Collection of all services needed to interact with data, should be able to use all functions in Core with this service.
+/// </summary>
 public sealed class CoreServices
 {
     public IMTLogger Logger { get; }

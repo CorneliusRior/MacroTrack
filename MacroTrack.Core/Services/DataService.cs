@@ -8,6 +8,10 @@ using MacroTrack.Core.AppModels;
 using System.Runtime.CompilerServices;
 using MacroTrack.Core.Infrastructure;
 
+/// <summary>
+/// General service with access to serveral Repos, used to get data for various purposes.
+/// Has no write ability.
+/// </summary>
 public class DataService : ServiceBase
 {
     FoodLogRepo _foodLogRepo;

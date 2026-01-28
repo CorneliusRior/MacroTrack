@@ -7,6 +7,12 @@ using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Service for interacting with diary data and repo, add, retrieve, edit, and delete diary entries &c.
+/// </summary>
+/// <remarks>
+/// Updated for logging.
+/// </remarks>
 public class DiaryService : ServiceBase
 {
     private readonly DiaryRepo _repo;
@@ -18,7 +24,7 @@ public class DiaryService : ServiceBase
 
     public DiaryEntry AddEntry(string body)
     {
-        Log("New entry requested.");
+        Log();
         _repo.AddEntry(new DiaryEntry(DateTime.Now, body));
         var entry = _repo.GetEntry(_repo.ReturnLastId());
         if (entry == null)
@@ -60,7 +66,7 @@ public class DiaryService : ServiceBase
 
     public List<DiaryEntry> GetAll()
     {
-        Log("All diary entries requested");
+        Log();
         return _repo.GetAll();
     }
 
@@ -87,7 +93,7 @@ public class DiaryService : ServiceBase
 
     public DiaryEntry DeleteLast()
     {
-        Log($"DeleteLast Requested");
+        Log();
         return DeleteEntry(_repo.ReturnLastId());
     }
 

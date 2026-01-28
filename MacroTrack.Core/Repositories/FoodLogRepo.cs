@@ -6,6 +6,12 @@ using MacroTrack.Core.Models;
 using Microsoft.Data.Sqlite;
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Repository for interacting with FoodLogData
+/// </summary>
+/// <remarks>
+/// No logs
+/// </remarks>
 public class FoodLogRepo : RepoBase
 {
     private readonly string _connectionString;

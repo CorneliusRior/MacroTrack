@@ -7,6 +7,13 @@ using MacroTrack.Core.Repositories;
 
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Service for interacting with WeightLog data and repo, add, retrieve, and delete Weight Entries
+/// </summary>
+/// <remarks>
+/// The first of the various services made if memory serves.
+/// Not Updated for logging.
+/// </remarks>
 public class WeightLogService : ServiceBase
 {
     private readonly WeightLogRepo _repo;

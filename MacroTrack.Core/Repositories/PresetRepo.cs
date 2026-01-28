@@ -6,6 +6,12 @@ using MacroTrack.Core.Models;
 using Microsoft.Data.Sqlite;
 using System.Runtime.CompilerServices;
 
+/// <summary>
+/// Repository for interacting with Preset data.
+/// </summary>
+/// <remarks>
+/// No logs.
+/// </remarks>
 public class PresetRepo : RepoBase
 {
     private readonly string _connectionString;

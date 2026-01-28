@@ -12,6 +12,7 @@ namespace MacroTrack.BasicApp
     public partial class Form1 : Form
     {
         private readonly CoreServices _services;
+        private readonly IMTLogger _logger;
         private bool _isRefreshing;
         private int _timeFrame;
 
@@ -25,6 +26,7 @@ namespace MacroTrack.BasicApp
         public Form1(CoreServices services)
         {
             _services = services;
+            _logger = services.Logger;
             _services.MessageLogged += (_, msg) => Print($"{msg.Source} {msg.Message} { (msg.Exception is null ? "" : $"| {msg.Exception.Message}") } ");
             InitializeComponent();
             SetUpClock();
@@ -125,6 +127,11 @@ namespace MacroTrack.BasicApp
             tbCommandOutput.AppendText(text);
         }
 
+        private void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            _logger.Log(this, caller, level, message, ex);
+        }
+
         private void SetUpClock()
         {
             _clockTimer.Interval = 1000;
@@ -143,17 +150,20 @@ namespace MacroTrack.BasicApp
 
         private void UpdateSummary()
         {
-            DateTime SummaryStartTime;
-            MacroSummary Summary = new MacroSummary();
+            DateTime SummaryStartTime = DateTime.Now.Date;
+            DateTime SummaryEndTime = SummaryStartTime.AddDays(1);
+            //MacroSummary Summary; = new MacroSummary();
             if (_timeFrame == 0)
             {
                 SummaryStartTime = DateTime.Now.Date;
-                Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(1));
+                SummaryEndTime = SummaryStartTime.AddDays(1);
+                //Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(1));
             }
             if (_timeFrame == 1)
             {
                 SummaryStartTime = DateTime.Now.AddDays(-1);
-                Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(1));
+                SummaryEndTime = DateTime.Now;
+                //Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(1));
             }
             if (_timeFrame == 2)
             {
@@ -161,30 +171,36 @@ namespace MacroTrack.BasicApp
                 //Print($"DateTime.Now: {DateTime.Now}");
                 //Print($"diff: {diff}");
                 SummaryStartTime = DateTime.Now.Date.AddDays(-diff);
-                Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(7));
+                SummaryEndTime = SummaryStartTime.AddDays(7);
+                //Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(7));
             }
             if (_timeFrame == 3)
             {
-                SummaryStartTime = DateTime.Now.Date.AddDays(-7);
-                Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(7));
+                SummaryStartTime = DateTime.Now.Date.AddDays(-7); // should this be -6 actually?
+                SummaryEndTime = SummaryStartTime.AddDays(7);
+                //Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(7));
             }
             if (_timeFrame == 4)
             {
                 SummaryStartTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                var SummaryEndTime = SummaryStartTime.AddMonths(1); // I don't know if this does actually go to the next calendar month of just 30 days.
-                Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryEndTime);
+                SummaryEndTime = SummaryStartTime.AddMonths(1); // I don't know if this does actually go to the next calendar month of just 30 days.
+                //Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryEndTime);
             }
             if (_timeFrame == 5)
             {
                 SummaryStartTime = DateTime.Now.Date.AddDays(-30);
-                Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(30));
+                SummaryEndTime = SummaryStartTime.AddDays(30);
+                //Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryStartTime.AddDays(30));
             }
             if (_timeFrame < 0 || _timeFrame > 5)
             {
+                Log();
                 Print("Error refreshing: invalid _timeFrame");
                 MessageBox.Show("Error refreshing: invalid _timeFrame");
                 return;
             }
+
+            MacroSummary Summary = _services.dataService.GetMacroSummary(SummaryStartTime, SummaryEndTime);
 
             labelBarBannerGoal.Text = Summary.GoalName;
 

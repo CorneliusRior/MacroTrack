@@ -11,6 +11,12 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 
+/// <summary>
+/// Repository for interacting with Goal data, being GoalRegistry and GoalHistory.
+/// </summary>
+/// <remarks>
+/// No logs.
+/// </remarks>
 public class GoalRepo : RepoBase
 {
     private readonly string _connectionString;
