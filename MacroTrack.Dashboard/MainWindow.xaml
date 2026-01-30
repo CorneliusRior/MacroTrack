@@ -1,0 +1,131 @@
+﻿<Window x:Class="MacroTrack.Dashboard.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MacroTrack.Dashboard"
+        mc:Ignorable="d"
+        Title="MacroTrack" Height="900" Width="1600">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--Main UI Space-->
+        <Grid Grid.Column="0" Margin="5,5,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!--Banner-->
+            <Border Grid.Row="0"
+                    BorderBrush="Black"
+                    BorderThickness="2"
+                    Margin="0,0,0,5"/>
+            
+            <!--First Row-->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        BorderBrush="Black"
+                        BorderThickness="2"/>
+
+                <GridSplitter Grid.Column="1"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              ShowsPreview="True"/>
+
+                <Border Grid.Column="2"
+                        BorderBrush="Black"
+                        BorderThickness="2"/>
+
+                <GridSplitter Grid.Column="3"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              ShowsPreview="True"/>
+
+                <Border Grid.Column="4"
+                        BorderBrush="Black"
+                        BorderThickness="2"/>
+
+            </Grid>
+
+            <GridSplitter Grid.Row="2"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          ShowsPreview="True"/>
+
+            <!--Second Row-->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        BorderBrush="Black"
+                        BorderThickness="2"/>
+
+                <GridSplitter Grid.Column="1"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              ShowsPreview="True"/>
+
+                <Border Grid.Column="2"
+                        BorderBrush="Black"
+                        BorderThickness="2"/>
+
+                <GridSplitter Grid.Column="3"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              ShowsPreview="True"/>
+
+                <Border Grid.Column="4"
+                        BorderBrush="Black"
+                        BorderThickness="2"/>
+
+            </Grid>
+
+            <GridSplitter Grid.Row="4"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          ShowsPreview="True"/>
+            
+            <!--REPL-->
+            <Border Grid.Row="5"
+                    BorderBrush="Black"
+                    BorderThickness="2"/>
+        </Grid>
+
+        <!--Main UI/History splitter-->
+        <GridSplitter Grid.Column="1"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      ShowsPreview="True"/>
+
+        <!--History-->
+        <Border Grid.Column="4"
+                BorderBrush="Black"
+                BorderThickness="2"
+                Margin="0,5,5,5"/>
+
+    </Grid>
+</Window>

@@ -33,12 +33,14 @@ public sealed class CoreServices
     public WeightLogService weightLogService { get; }
 
 
-    public CoreServices(string conn, CoreContext ctx, SettingsService settingsService)
+    public CoreServices(CoreContext ctx)
     {
+        string conn = ctx.ConnString;
+
         Logger = ctx.Logger;
         Logger.MessageLogged += (sender, msg) => MessageLogged?.Invoke(sender, msg);
 
-        SettingsService = settingsService;
+        SettingsService = ctx.Settings;
 
         diaryRepo = new DiaryRepo(conn, ctx);
         foodLogRepo = new FoodLogRepo(conn, ctx);

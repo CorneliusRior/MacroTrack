@@ -17,10 +17,10 @@ namespace MacroTrack.Core.Logging
         private readonly string _logFilePath;
         private readonly object _lock = new();
 
-        public MTLogger(string logFilePath)
+        public MTLogger(string logFilePath, string? program = "Unknown Program")
         {
             _logFilePath = logFilePath;
-            Log(this, "Constructor", LogLevel.Info, $"UILevel = '{UILevel}', FileLevel = '{FileLevel}'");
+            Log(this, "Constructor", LogLevel.Info, $"New logger called by '{program ?? "Null"}'. UILevel = '{UILevel}', FileLevel = '{FileLevel}'");
         }
 
         public void Log(object sourceObj, string caller, LogLevel level, string message, Exception? ex = null)

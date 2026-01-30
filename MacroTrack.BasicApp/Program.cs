@@ -33,8 +33,8 @@ namespace MacroTrack.BasicApp
             _logger.UILevel = settingsService.Settings.LogUILevel;
             _logger.FileLevel = settingsService.Settings.LogFileLevel;
 
-            var _context = new CoreContext(_logger);
-            var _services = new CoreServices(connString, _context, settingsService);
+            var _context = new CoreContext(connString, _logger, settingsService);
+            var _services = new CoreServices(_context);
 
             ApplicationConfiguration.Initialize();
             Application.Run(new Form1(_services));
