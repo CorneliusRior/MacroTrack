@@ -8,6 +8,7 @@ using MacroTrack.Puppet;
 using System.IO;
 
 Console.WriteLine("MacroTrack 8.0: Console Interface (using Puppet).");
+/*
 var dbPath = FindDBPath();
 var connString = $"Data Source={dbPath}";
 var logPath = FindLogPath();
@@ -19,8 +20,29 @@ var settingsPath = FindSettingsPath();
 var settingsService = new SettingsService(settingsPath);
 
 var _services = new CoreServices(connString, _context, settingsService);
+*/
 
-var _puppet = new Puppet(_services);
+// Get paths & apply:
+// Database:
+string dbPath = Paths.FindDBPath();
+string connString = $"Data Source ={dbPath}";
+
+// Logger:
+string logPath = Paths.FindLogPath();
+string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+var logger = new MTLogger(logFile, "Puppet CLI");
+
+// Settings:
+string settingsPath = Paths.FindSettingsPath();
+var settingsService = new SettingsService(settingsPath);
+logger.UILevel = settingsService.Settings.LogUILevel;
+logger.FileLevel = settingsService.Settings.LogFileLevel;
+
+
+// Create context, then CoreServices
+var context = new CoreContext(connString, logger, settingsService);
+var Services = new CoreServices(context);
+var _puppet = new Puppet(Services);
 
 while (true)
 {
@@ -46,7 +68,6 @@ static string FindSolutionRoot()
     if (dir == null) throw new DirectoryNotFoundException("No");
     return dir.FullName;
 }
-*/
 
 static string FindAppDataDir()
 {
@@ -87,3 +108,4 @@ static string FindSettingsPath()
     Directory.CreateDirectory(dir);
     return Path.Combine(dir, "settings.json");
 }
+*/
