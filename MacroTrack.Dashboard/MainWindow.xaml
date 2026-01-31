@@ -165,7 +165,11 @@
             <Border Grid.Row="5"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="{DynamicResource BorderThickness}"
-                    Background="{DynamicResource PanelBackGroundBrush}"/>
+                    Background="{DynamicResource PanelBackGroundBrush}">
+
+                <views:ReplControl x:Name="Repl"/>
+
+            </Border>
         </Grid>
 
         <!--Main UI/History splitter-->

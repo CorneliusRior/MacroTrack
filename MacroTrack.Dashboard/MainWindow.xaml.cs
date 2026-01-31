@@ -40,13 +40,38 @@ namespace MacroTrack.Dashboard
 
             DiaryEntry.Services = Services;
             DiaryEntry.Logger = Logger;
+
+            Repl.Services = Services;
+            Repl.Logger = Logger;
+            Repl.SubmitCommand += Repl_CommandHandler;
         }
 
+        // Log & REPL handling:
         private void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
         {
             Logger.Log(this, caller, level, message, ex);
         }
 
+        private void Print(string text)
+        {
+            Repl.AppendLine(text);
+        }
+
+        private void Repl_CommandHandler(object? sender, string cmd)
+        {
+            Log($"Command \"{cmd}\"", LogLevel.Info);
+
+            // Echo entered command:
+            Print($"> {cmd}");
+
+            // Handle (do externally):
+
+            // This is a little test, disregard:
+            if (cmd.ToLowerInvariant() == "hello world") Print("Hello!");
+        }
+
+
+        // Banner buttons:
         private void ButtonBannerYesterday_Click(object sender, RoutedEventArgs e)
         {
             Log();

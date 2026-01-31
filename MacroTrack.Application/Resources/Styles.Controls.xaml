@@ -64,8 +64,16 @@
     <!--REPL textbox-->
     <Style x:Key="TextBox.Repl" TargetType="TextBox">
         <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
         <Setter Property="FontFamily" Value="{DynamicResource ReplFont}"/>
         <Setter Property="FontSize" Value="{DynamicResource ReplSize}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    
+    <!--REPL entry-->
+    <Style x:Key="TextBox.ReplInput" TargetType="TextBox" BasedOn="{StaticResource TextBox.Repl}">
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
     <!--Explicit default-->

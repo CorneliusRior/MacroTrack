@@ -29,6 +29,6 @@
     <System:Double x:Key="UIMainTitleSize">28</System:Double>
 
     <FontFamily x:Key="ReplFont">Consolas</FontFamily>
-    <System:Double x:Key="ReplSize">12</System:Double>
+    <System:Double x:Key="ReplSize">14</System:Double>
     
 </ResourceDictionary>
