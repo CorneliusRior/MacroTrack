@@ -1,0 +1,64 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--Label Styling-->
+    <!--Base-->
+    <Style x:Key="Label.Base" TargetType="Label">
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="FontFamily" Value="{DynamicResource UIFont}"/>
+        <Setter Property="FontSize" Value="{DynamicResource UINormalSize}"/>
+    </Style>
+    
+    <!--Title (what you get in windows, UI-->
+    <Style x:Key="Label.Title" TargetType="Label" BasedOn="{StaticResource Label.Base}">
+        <Setter Property="FontSize" Value="{DynamicResource UITitleSize}"/>
+    </Style>
+
+    <!--Main Title, or "Big Title"-->
+    <Style x:Key="Label.MainTitle" TargetType="Label" BasedOn="{StaticResource Label.Base}">
+        <Setter Property="FontSize" Value="{DynamicResource UIMainTitleSize}"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <!--Implicit default-->
+    <Style TargetType="Label" BasedOn="{StaticResource Label.Base}"/>
+
+    
+    <!--Button-->
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackGroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThickness}"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="MinWidth" Value="50"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="Margin" Value="5"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!--TextBox-->
+    <Style TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+    </Style>
+
+    <!--REPL textbox-->
+    <Style x:Key="TextBox.Repl" TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        <Setter Property="FontFamily" Value="{DynamicResource ReplFont}"/>
+        <Setter Property="FontSize" Value="{DynamicResource ReplSize}"/>
+    </Style>
+
+    <!--GridSplitter-->
+    <Style TargetType="GridSplitter">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="ShowsPreview" Value="False"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    
+</ResourceDictionary>

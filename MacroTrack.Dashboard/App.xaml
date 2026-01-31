@@ -5,6 +5,13 @@
              >
     <!--StartupUri="MainWindow.xaml" was in the last line, put it back if needs be.-->
     <Application.Resources>
-         
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/MacroTrack.AppLibrary;component/Resources/Theme.Light.xaml"/>
+                <ResourceDictionary Source="/MacroTrack.AppLibrary;component/Resources/Styles.Controls.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
     </Application.Resources>
 </Application>
