@@ -151,8 +151,12 @@
                 <Border Grid.Column="4"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="{DynamicResource BorderThickness}"
-                        Background="{DynamicResource PanelBackGroundBrush}"/>
+                        Background="{DynamicResource PanelBackGroundBrush}">
 
+                    <views:DiaryEntryControl x:Name="DiaryEntry"/>
+
+                </Border>
+                
             </Grid>
 
             <GridSplitter Grid.Row="4"/>

@@ -37,6 +37,9 @@ namespace MacroTrack.Dashboard
             
             AddLogEntry.Services = Services;
             AddLogEntry.Logger = Logger;
+
+            DiaryEntry.Services = Services;
+            DiaryEntry.Logger = Logger;
         }
 
         private void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
