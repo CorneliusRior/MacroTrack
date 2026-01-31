@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MacroTrack.Dashboard"
+        xmlns:views="clr-namespace:MacroTrack.AppLibrary.Controls;assembly=MacroTrack.AppLibrary"
+        xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls;assembly=MacroTrack.AppLibrary"
         mc:Ignorable="d"
         Title="MacroTrack" Height="900" Width="1600"
         
@@ -138,7 +140,11 @@
                 <Border Grid.Column="2"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="{DynamicResource BorderThickness}"
-                        Background="{DynamicResource PanelBackGroundBrush}"/>
+                        Background="{DynamicResource PanelBackGroundBrush}">
+                    
+                    <views:AddLogEntryControl x:Name="AddLogEntry"/>
+                    
+                </Border>
 
                 <GridSplitter Grid.Column="3"/>
 

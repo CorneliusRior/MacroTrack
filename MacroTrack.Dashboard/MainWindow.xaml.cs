@@ -1,4 +1,5 @@
-﻿using MacroTrack.Core.Logging;
+﻿using MacroTrack.AppLibrary.Controls;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -33,6 +34,9 @@ namespace MacroTrack.Dashboard
             Services = services;
             Logger = services.Logger;
             Log("Main window opened.", LogLevel.Info);
+            
+            AddLogEntry.Services = Services;
+            AddLogEntry.Logger = Logger;
         }
 
         private void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")

@@ -24,6 +24,8 @@
     <!--Implicit default-->
     <Style TargetType="Label" BasedOn="{StaticResource Label.Base}"/>
 
+
+    
     
     <!--Button-->
     <Style TargetType="Button">
@@ -44,6 +46,7 @@
     <!--TextBox-->
     <Style TargetType="TextBox">
         <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        <Setter Property="Margin" Value="5"/>
     </Style>
 
     <!--REPL textbox-->

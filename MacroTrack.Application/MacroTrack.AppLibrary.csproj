@@ -11,9 +11,4 @@
     <ProjectReference Include="..\MacroTrack.Core\MacroTrack.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ViewModels\" />
-    <Folder Include="Views\" />
-  </ItemGroup>
-
 </Project>
