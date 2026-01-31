@@ -21,11 +21,10 @@ namespace MacroTrack.AppLibrary.Controls
     /// <summary>
     /// Interaction logic for AddLogEntry.xaml
     /// </summary>
-    public partial class AddLogEntryControl : UserControl
+    public partial class AddLogEntryControl : ControlBase
     {
-        public CoreServices? Services { get; set; }
-        public IMTLogger? Logger { get; set; }
         private readonly AddLogEntryWM _vm = new();
+        
         public AddLogEntryControl()
         {
             InitializeComponent();
@@ -34,17 +33,17 @@ namespace MacroTrack.AppLibrary.Controls
 
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
-            var msg = tbLog.Text?.Trim();
+            var msg = tbLog.Text.Trim();
 
-            if (msg != null)
+            if (!string.IsNullOrWhiteSpace(msg))
             {
-                Logger?.Log(this, "Add", LogLevel.Info, msg);
+                Log(msg, LogLevel.Info);
                 _vm.LastAdded = $"Last added: {msg}";
                 tbLog.Text = string.Empty;
             }
             else
             {
-                Logger?.Log(this, "Add", LogLevel.Warning, "No message :(");
+                Log("(No text)", LogLevel.Warning);
             }
         }
     }

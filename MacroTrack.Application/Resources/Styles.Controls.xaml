@@ -21,10 +21,17 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
-    <!--Implicit default-->
+    <!--Explicit default-->
     <Style TargetType="Label" BasedOn="{StaticResource Label.Base}"/>
 
-
+    <!--TextBlock (we distinguish with .Base so as not to affect buttons)-->
+    <Style x:Key="TextBlock.Base" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="FontFamily" Value="{DynamicResource UIFont}"/>
+        <Setter Property="FontSize" Value="{DynamicResource UINormalSize}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Margin" Value="5"/>
+    </Style>
     
     
     <!--Button-->
@@ -44,9 +51,14 @@
     </Style>
 
     <!--TextBox-->
-    <Style TargetType="TextBox">
+    <Style x:Key="TextBox.Base" TargetType="TextBox">
         <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
         <Setter Property="Margin" Value="5"/>
+    </Style>
+
+    <Style x:Key="TextBox.MultiLine" TargetType="TextBox" BasedOn="{StaticResource TextBox.Base}">
+        <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
 
     <!--REPL textbox-->
@@ -55,6 +67,9 @@
         <Setter Property="FontFamily" Value="{DynamicResource ReplFont}"/>
         <Setter Property="FontSize" Value="{DynamicResource ReplSize}"/>
     </Style>
+
+    <!--Explicit default-->
+    <Style TargetType="TextBox" BasedOn="{StaticResource TextBox.Base}"/>
 
     <!--GridSplitter-->
     <Style TargetType="GridSplitter">
