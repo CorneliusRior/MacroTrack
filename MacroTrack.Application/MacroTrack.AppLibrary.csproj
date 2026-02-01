@@ -11,4 +11,10 @@
     <ProjectReference Include="..\MacroTrack.Core\MacroTrack.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Controls\ControlTemplate.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

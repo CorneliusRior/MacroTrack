@@ -22,19 +22,17 @@
                      Style="{StaticResource TextBox.MultiLine}"/>
 
             <StackPanel Grid.Row="2"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="right"
-                        FlowDirection="RightToLeft">
+                        Style="{DynamicResource StackPanel.Footer}">
                 
-                <Button Content="Add"
-                        Name="ButtonAdd"
-                        Click="ButtonAdd_Click"/>
-                <Button Content="Clear"
-                        Name="ButtonClear"
-                        Click="ButtonClear_Click"/>
                 <Button Content="View Diary"
                         Name="ButtonViewDiary"
                         Click="ButtonViewDiary_Click"/>
+                <Button Content="Clear"
+                        Name="ButtonClear"
+                        Click="ButtonClear_Click"/>
+                <Button Content="Add"
+                        Name="ButtonAdd"
+                        Click="ButtonAdd_Click"/>
 
             </StackPanel>
 

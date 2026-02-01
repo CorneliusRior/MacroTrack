@@ -7,7 +7,7 @@
         xmlns:views="clr-namespace:MacroTrack.AppLibrary.Controls;assembly=MacroTrack.AppLibrary"
         xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls;assembly=MacroTrack.AppLibrary"
         mc:Ignorable="d"
-        Title="MacroTrack" Height="900" Width="1600"
+        Title="MacroTrack" Height="1080" Width="1920"
         
         Background="{DynamicResource AppBackGroundBrush}"
         Foreground="{DynamicResource AppForeGroundBrush}"
@@ -53,7 +53,7 @@
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 Height="50">
-                        
+
                         <Button Content="Yesterday"
                                 Name="ButtonBannerYesterday"
                                 Click="ButtonBannerYesterday_Click"/>
@@ -74,7 +74,7 @@
                                 Click="ButtonBannerLightDark_Click"/>
 
                     </StackPanel>
-                    
+
                     <Label Grid.Column="2"
                            Style="{StaticResource Label.Title}"
                            Content="19:33 30/01/2026"
@@ -133,7 +133,11 @@
                 <Border Grid.Column="0"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="{DynamicResource BorderThickness}"
-                        Background="{DynamicResource PanelBackGroundBrush}"/>
+                        Background="{DynamicResource PanelBackGroundBrush}">
+
+                    <views:FoodEntryControl x:Name="FoodEntry"/>
+
+                </Border>
 
                 <GridSplitter Grid.Column="1"/>
 
@@ -141,9 +145,9 @@
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="{DynamicResource BorderThickness}"
                         Background="{DynamicResource PanelBackGroundBrush}">
-                    
+
                     <views:AddLogEntryControl x:Name="AddLogEntry"/>
-                    
+
                 </Border>
 
                 <GridSplitter Grid.Column="3"/>
@@ -156,7 +160,7 @@
                     <views:DiaryEntryControl x:Name="DiaryEntry"/>
 
                 </Border>
-                
+
             </Grid>
 
             <GridSplitter Grid.Row="4"/>

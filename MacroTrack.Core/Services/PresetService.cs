@@ -73,6 +73,19 @@ public class PresetService : ServiceBase
         return _repo.GetCategoryList();
     }
 
+    // Get all categories with (No filter) and (No Category)
+    public List <string> GetDisplayCategoryList()
+    {
+        Log();
+        List<string> catList = new();
+        catList.AddRange(["(No Filter)", "(No Category)"]);
+
+        List<string> categories = _repo.GetCategoryList();
+        categories.Sort();
+        catList.AddRange(categories);
+        return catList;
+    }
+
     // Load all names
     public List<string>? GetAllNames()
     {

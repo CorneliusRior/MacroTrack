@@ -35,6 +35,7 @@ namespace MacroTrack.AppLibrary.Controls
                 throw ex;
             }
             Services.diaryService.AddEntry(tbDiary.Text);
+            tbDiary.Clear();
         }
 
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
