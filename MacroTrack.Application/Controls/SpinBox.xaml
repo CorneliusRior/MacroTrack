@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="MacroTrack.AppLibrary.Controls.SpinBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="80"
+             MinHeight="25">
+    <Border BorderBrush="{Binding OuterBorderBrush, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            BorderThickness="{Binding OuterBorderThickness, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{Binding ButtonWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="tbValue"  
+                     Style="{StaticResource TextBox.SpinBox}"
+                     Grid.Column="0"/>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Button x:Name="ButtonUp"
+                        Content="▲"
+                        Click="ButtonUp_Click"
+                        Style="{StaticResource Button.SpinBox}"  
+                        Grid.Row="0"/>
+
+                <Button x:Name="ButtonDown"
+                        Content="▼"
+                        Click="ButtonDown_Click"
+                        Style="{StaticResource Button.SpinBox}"
+                        Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

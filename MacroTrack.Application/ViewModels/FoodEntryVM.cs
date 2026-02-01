@@ -116,6 +116,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
             Log();
             if (Time is null) Time = DateTime.Now;
+            Mult = 1;
             try
             {
                 List<Preset> presetList = Services.presetService.GetAll();

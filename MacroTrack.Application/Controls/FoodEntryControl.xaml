@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+             xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls"
              mc:Ignorable="d" 
              xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -65,12 +66,15 @@
                           SelectionChanged="cbItem_SelectionChanged"
                           Grid.Row="1" Grid.Column="1"/>
 
-                <TextBox Name="tbMult"
-                         Text="{Binding Mult}"
-                         Style="{StaticResource TextBox.Numeric}"
-                         Grid.Row="1" Grid.Column="2"/>
-                
-                
+                <controls:SpinBox x:Name="spinMult"
+                                  Value="{Binding Mult}"
+                                  Step="1"
+                                  SmallStep="0.1"
+                                  DefaultValue="1"
+                                  Margin="5"
+                                  Grid.Row="1" Grid.Column="2"/>
+
+
                 <!--Row2-->
                 <Label Content="Filter:"
                        Grid.Row="2" Grid.Column="0"/>
