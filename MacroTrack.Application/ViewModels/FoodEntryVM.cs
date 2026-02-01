@@ -43,7 +43,14 @@ namespace MacroTrack.AppLibrary.ViewModels
         public double? Mult
         {
             get => _mult;
-            set { _mult = value; OnPropertyChanged(); }
+            set 
+            {
+                if (_mult == value) return;
+                _mult = value; 
+                OnPropertyChanged();
+
+                Recalculate();
+            }
         }
 
         private double? _cal;
@@ -166,6 +173,11 @@ namespace MacroTrack.AppLibrary.ViewModels
             Pro = p.Protein;
             Car = p.Carbs;
             Fat = p.Fat;
+        }
+
+        private void Recalculate()
+        {
+
         }
     }
 }

@@ -72,6 +72,7 @@
                                   SmallStep="0.1"
                                   DefaultValue="1"
                                   Margin="5"
+                                  
                                   Grid.Row="1" Grid.Column="2"/>
 
 

@@ -27,7 +27,10 @@ namespace MacroTrack.AppLibrary.Controls
             tbValue.TextChanged += TbValue_TextChanged;
             tbValue.PreviewKeyDown += TbValue_PreviewKeyDown;
             tbValue.PreviewMouseWheel += TbValue_PreviewMouseWheel;
+            tbValue.LostFocus += TbValue_LostFocus;
         }
+
+        
 
         // Operational values:
         public static readonly DependencyProperty ValueProperty =
@@ -130,9 +133,9 @@ namespace MacroTrack.AppLibrary.Controls
         {
             var sb = (SpinBox)d;
             sb._updating = true;
-            if (e.NewValue is null) sb.tbValue.Text = string.Empty;
-            else sb.tbValue.Text = ((double)e.NewValue).ToString("0.00");
+            if (sb.Value != 0) sb.tbValue.Text = e.NewValue?.ToString() ?? "";
             sb._updating = false;
+            if (!sb.tbValue.IsFocused) sb.OnExitFormat();
         }
 
         private void TbValue_TextChanged(object sender, TextChangedEventArgs e)
@@ -142,10 +145,75 @@ namespace MacroTrack.AppLibrary.Controls
             else if (string.IsNullOrWhiteSpace(tbValue.Text)) Value = null;
         }
 
+        private void OnExitFormat()
+        {
+            if (_updating) return;
+            if (!double.TryParse(tbValue.Text, out var value)) return;
+            tbValue.Text = value.ToString("0.00");
+            tbValue.CaretIndex = tbValue.Text.Length;
+            
+        }
+
+        private int CaretPositionBefore(string s, int caretPos)
+        {
+            int count = 0;
+            for (int i=0; i < Math.Min(s.Length, caretPos); i++)
+            {
+                if (char.IsDigit(s[i]) || char.Equals(s[i], '.')) count++;
+            }
+            return count;
+        }
+
+        private int CaretPositionAfter(string s, int caretPos)
+        {
+            if (s.Length <= 0) return 0;
+            if (s.Length < caretPos) return s.Length;
+            int count = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (char.IsDigit(s[i]) || char.Equals(s[i], '.'))
+                {
+                    count++;
+                    if (count == caretPos) return i + 1; 
+                }
+            }
+            return s.Length;
+        }
+
         private void ChangeValue(double delta)
         {
             var v = Value ?? 0;
             Value = Math.Round(v + delta, 2);
+        }
+
+        private void ChangeValueMaintainCaret(double delta)
+        {
+            // Method to get number length, converts double n into a formatted string, if we want to change formate we need to change this.
+            int GetNumberLength(double n)
+            {
+                string s = n.ToString("0.00");
+                int count = 0;
+                for (int i = 0; i < s.Length; i++)
+                {
+                    if (Char.IsDigit(s[i])) count++;
+                }
+                return count;
+            }
+
+            // Get pre-change caret position and numberonly length
+            int ci = CaretPositionBefore(tbValue.Text, tbValue.CaretIndex);
+            int startNL = GetNumberLength(Math.Round(Value ?? 0, 2 ));
+
+            // Change value
+            ChangeValue(delta); // I feel like we should call this instead of changing it manually here, idk.
+
+            // Get end numberlength and compare.
+            int endNL = GetNumberLength(Value ?? 0); // We don't need to round it again.
+            int diff = endNL - startNL;
+
+            // Format and put caret back in place with adjustment for diff:
+            OnExitFormat();
+            tbValue.CaretIndex = CaretPositionAfter(tbValue.Text, ci + diff);
         }
 
         private void SetToDefault()
@@ -164,29 +232,32 @@ namespace MacroTrack.AppLibrary.Controls
         }
         private void TbValue_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            int ci = tbValue.CaretIndex;
-            int ll = tbValue.Text.Length;
             if (e.Key == Key.Up)
             {
-                ChangeValue(Step);
+                ChangeValueMaintainCaret(Step);
                 e.Handled = true;
             }
             if (e.Key == Key.Down)
             {
-                ChangeValue(-Step);
+                ChangeValueMaintainCaret(-Step);
                 e.Handled = true;
             }
-            tbValue.CaretIndex = ci + (tbValue.Text.Length - ll);
+            if (e.Key == Key.Enter || e.Key == Key.Escape || e.Key == Key.Tab)
+            {
+                OnExitFormat();
+            }
         }
         private void TbValue_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             base.OnPreviewMouseWheel(e);
-            int ci = tbValue.CaretIndex;
-            int ll = tbValue.Text.Length;
-            if (e.Delta > 0) ChangeValue(SmallStep);
-            if (e.Delta < 0) ChangeValue(-SmallStep);
-            tbValue.CaretIndex = ci + (tbValue.Text.Length - ll);
+            if (e.Delta > 0) ChangeValueMaintainCaret(SmallStep);
+            if (e.Delta < 0) ChangeValueMaintainCaret(-SmallStep);
             e.Handled = true;
+        }
+
+        private void TbValue_LostFocus(object sender, RoutedEventArgs e)
+        {
+            OnExitFormat();
         }
     }
 }
