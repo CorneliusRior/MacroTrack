@@ -44,20 +44,6 @@ namespace MacroTrack.AppLibrary.Controls
             set => SetValue(ValueProperty, value);
         }
 
-        public static readonly DependencyProperty HasErrorProperty =
-            DependencyProperty.Register(
-                nameof(HasError),
-                typeof(bool),
-                typeof(DateTimePicker),
-                new PropertyMetadata(false)
-            );
-
-        public bool HasError
-        {
-            get => (bool)GetValue(HasErrorProperty);
-            set => SetValue(HasErrorProperty, value);
-        }
-
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var c = (DateTimePicker)d;
@@ -68,14 +54,12 @@ namespace MacroTrack.AppLibrary.Controls
         {
             if (Value is null)
             {
-                PART_tb.Text = string.Empty;
                 return;
             }
 
             var time = Value.Value;
             PART_tb.Text = time.ToString(format);
             PART_Calendar.SelectedDate = time.Date;
-            HasError = false;
         }
 
         private void PART_buttonCalendar_Click(object sender, RoutedEventArgs e)
@@ -86,7 +70,6 @@ namespace MacroTrack.AppLibrary.Controls
         private void SetToCurrent()
         {
             Value = DateTime.Now;
-            HasError = false;
         }
 
         private void PART_Calendar_SelectedDatesChanged(object sender, SelectionChangedEventArgs e)
@@ -104,24 +87,53 @@ namespace MacroTrack.AppLibrary.Controls
 
         private void Commit()
         {
-            if (!DateTime.TryParse(PART_tb.Text, out DateTime dateTime))
+            var text = PART_tb.Text?.Trim();
+
+            if (string.IsNullOrWhiteSpace(text))
             {
-                HasError = true;
+                Value = null;
+                return;
+            }
+            if (!DateTime.TryParse(text, out DateTime dateTime))
+            {
+                string t = text.ToLowerInvariant();
+                if (t == "yesterday" || t == "y" || t == "yesterdat")
+                {
+                    Value = DateTime.Now.Date.AddMinutes(-1);
+                    return;
+                }
+                if (t == "tomorrow" || t == "t" || t == "tommorrow")
+                {
+                    Value = DateTime.Now.Date.AddDays(1);
+                    return;
+                }
+
+
+                Value = null;
+                return;
             }
             else
             {
                 Value = dateTime;
-                HasError = false;
             }
         }
 
         private void PART_tb_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter || e.Key == Key.Escape)
             {
                 Commit();
                 e.Handled = true;
             }
+            if (e.Key == Key.Tab)
+            {
+                Commit(); // We don't say handled = true;
+            }
+        }
+
+        private void PART_tb_LostFocus(object sender, RoutedEventArgs e)
+        {
+            Commit();
         }
     }
 }

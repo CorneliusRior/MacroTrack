@@ -18,6 +18,7 @@
 
             <TextBox x:Name="PART_tb"
                      KeyDown="PART_tb_KeyDown"
+                     LostFocus="PART_tb_LostFocus"
                      Style="{DynamicResource TextBox.DateTimePicker}"
                      Margin="0"
                      Grid.Column="0"/>

@@ -36,6 +36,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         protected readonly Dictionary<string, List<string>> _errors = new();
         public bool HasErrors => _errors.Count > 0;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+
         public IEnumerable GetErrors(string? propertyName)
         {
             if (propertyName == null) return null!;
@@ -53,25 +54,20 @@ namespace MacroTrack.AppLibrary.ViewModels
             if (_errors.Remove(propertyName)) ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
-        public bool NumericRequire(string propName, object? value, string message = "Cannot parse as double: Required")
+        public bool NumericRequire(string propName, double? value, string message = "Cannot parse as double: Required")
         {
-            Log($"string propname='{propName}', object? value='{value}', valuetype='{value?.GetType()}'");
             if (value is null)
             {
                 SetError(propName, message + ": is null"); 
                 return false;
             }
-            if (value.GetType() != typeof(double))
-            {
-                SetError(propName, message + ": not type double");
-            }
             ClearError(propName);
             return true;
         }
 
-        public bool StringRequire(string propName, object? value, string message = "Required")
+        public bool StringRequire(string propName, string? value, string message = "Required")
         {
-            if (string.IsNullOrWhiteSpace(value as string))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 SetError(propName, message);
                 return false;
@@ -80,19 +76,15 @@ namespace MacroTrack.AppLibrary.ViewModels
             return true;
         }
 
-        public bool DateTimeRequire(string propName, object? value, string message = "Required")
+        public bool DateTimeRequire(string propName, DateTime? value, string message = "Required")
         {
+            Log($"string propName='{propName}' object? value='{value}'");
             if (value is null)
             {
                 SetError(propName, message + ": is null");
                 return false;
             }
-            if (value.GetType() != typeof(DateTime))
-            {
-                SetError(propName, message + ": not type DateTime.");
-                return false;
-            }
-            if (value as DateTime? == DateTime.MinValue)
+            if (value == DateTime.MinValue)
             {
                 SetError(propName, message + ": it MinValue");
                 return false;

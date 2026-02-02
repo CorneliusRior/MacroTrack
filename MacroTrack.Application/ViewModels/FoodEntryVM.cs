@@ -27,6 +27,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             get => _time;
             set 
             {
+                Log($"Time set called: _time='{_time}', value='{value}'");
                 if (_time == value) return;
                 _time = value; 
                 OnPropertyChanged();
@@ -42,7 +43,9 @@ namespace MacroTrack.AppLibrary.ViewModels
             set 
             {
                 if (_itemName == value) return;
-                _itemName = value; 
+                _itemName = value;
+                Log($"changed, value='{value}'");
+                if (_itemName != _selectedPreset?.PresetName) SelectedPreset = null;
                 OnPropertyChanged();
                 StringRequire(nameof(ItemName), ItemName);
             }
@@ -53,7 +56,13 @@ namespace MacroTrack.AppLibrary.ViewModels
         public Preset? SelectedPreset
         {
             get => _selectedPreset;
-            set { _selectedPreset = value; OnPropertyChanged(); }
+            set 
+            {
+                if (_selectedPreset == value) return;
+                _selectedPreset = value;
+                Log($"_selectedPreset is null?='{_selectedPreset == null}' {(_selectedPreset == null ? "" : $"_selectedPreset.PresetName='{_selectedPreset.PresetName}'")}");
+                OnPropertyChanged(); 
+            }
         }
 
         private double? _mult;
@@ -167,20 +176,6 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             //MessageBox.Show($"This is what we have right now:\nTime: '{(Time == null ? "No time" : Time)}'\nItemName: '{(ItemName == null ? "null" : ItemName)}\nMult: x{Mult}\nCar: {(Cal == null ? "Null" : Cal)} / Car: {(Pro == null ? "Null" : Pro)} / Car: {(Car == null ? "Null" : Car)} / Car: {(Fat == null ? "Null" : Fat)}\nNotes: '{Notes}'");
 
-            // Ensure validity. Will make red boxes in a moment but not now:
-            bool error = false;
-            string errorString = "Error:";
-            //if (Time == null) error = true; errorString += $"\n - Null Time";
-
-            //if (ItemName == null) error = true; errorString += $"\n - Null Name";
-
-            /*
-            if (Cal == null) error = true; errorString += $"\n - Null Cal";
-            if (Pro == null) error = true; errorString += $"\n - Null Pro";
-            if (Car == null) error = true; errorString += $"\n - Null Car";
-            if (Fat == null) error = true; errorString += $"\n - Null Fat";
-            */
-
             bool ok = true;
             ok &= DateTimeRequire(nameof(Time), Time);
             ok &= StringRequire(nameof(ItemName), ItemName);
@@ -189,17 +184,20 @@ namespace MacroTrack.AppLibrary.ViewModels
             ok &= NumericRequire(nameof(Car), Car);
             ok &= NumericRequire(nameof(Fat), Fat);
 
-            // Adding this for the time being, get rid of it.
-            if (!ok) error = true; errorString += $"\n - Something in macros";
+            if (!ok) return;
 
+            // Should be a more elegant way of doing this: Could like, plug it into the require ones or something maybe? Could do that some other time, this should work for now thoughL
+            DateTime time = Time!.Value;
+            double mult = Mult!.Value;
+            double cal = Cal!.Value;
+            double pro = Pro!.Value;
+            double car = Car!.Value;
+            double fat = Fat!.Value;
 
-            if (error)
-            {
-                return;
-            }
             try 
-            { 
-                FoodEntry entry = Services?.foodLogService.AddEntry(Time.Value, ItemName, Mult.Value, Cal.Value, Pro.Value, Car.Value, Fat.Value, "none", Notes);
+            {
+                if (Services == null) throw new Exception("Null services");
+                FoodEntry entry = Services.foodLogService.AddEntry(time, ItemName!, mult, cal, pro, car, fat, (_selectedPreset == null ? null : _selectedPreset.PresetName), Notes);
                 Log($"Added entry #{entry.Id}", LogLevel.Info);
                 Clear();
             }
@@ -268,16 +266,21 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
-        public void PresetSelected(Preset p)
+        public void PresetSelected(Preset? p)
         {
-            ClearAllErrors();
-            ItemName = p.PresetName;
-            Mult = 1;
-            _cal.SetBase(p.Calories);
-            _pro.SetBase(p.Protein);
-            _car.SetBase(p.Carbs);
-            _fat.SetBase(p.Fat);
-            RefreshScaledValues();
+            if (p != null)
+            {
+                ClearAllErrors();
+                ItemName = p.PresetName;
+                Mult = 1;
+                _cal.SetBase(p.Calories);
+                _pro.SetBase(p.Protein);
+                _car.SetBase(p.Carbs);
+                _fat.SetBase(p.Fat);
+                RefreshScaledValues();
+            }
+            
+            Log($"_selectedPreset is null?='{_selectedPreset == null}' {(_selectedPreset == null ? "" : $"_selectedPreset.PresetName='{_selectedPreset.PresetName}'" )}");
         }
     }
 }

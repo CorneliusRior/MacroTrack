@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:b="clr-namespace:MacroTrack.AppLibrary.Behaviors"
-                    xmlns:v="clr-namespace:MacroTrack.AppLibrary.Validation"
                     xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls">
 
     <!--Label Styling-->
@@ -94,6 +93,7 @@
     </Style>
     
     <Style x:Key="TextBox.MultiLine" TargetType="TextBox" BasedOn="{StaticResource TextBox.Base}">
+        <Setter Property="AcceptsReturn" Value="True"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="VerticalContentAlignment" Value="Top"/>
     </Style>
