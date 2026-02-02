@@ -43,8 +43,10 @@
                 <Label Content="Time:"
                        Grid.Row="0" Grid.Column="0"/>
 
-                <TextBox Text="{Binding Time}"
-                         Grid.Row="0" Grid.Column="1"/>
+                <controls:DateTimePicker x:Name="dateTimePicker"
+                                         Value="{Binding Time, Mode=TwoWay}"
+                                         Margin="5"
+                                         Grid.Row="0" Grid.Column="1"/>
 
                 <Button Content="Current Time"
                         Name="buttonNow"
@@ -56,7 +58,8 @@
                 <Label Content="Item:"
                        Grid.Row="1" Grid.Column="0"/>
 
-                <ComboBox Name="cbItem"
+                <ComboBox Template="{DynamicResource MTComboBoxTemplate}" 
+                          Name="cbItem"
                           DisplayMemberPath="PresetName"
                           IsEditable="True"
                           IsTextSearchEnabled="True"
@@ -80,7 +83,8 @@
                 <Label Content="Filter:"
                        Grid.Row="2" Grid.Column="0"/>
 
-                <ComboBox Name="cbFilter"
+                <ComboBox Template="{DynamicResource MTComboBoxTemplate}"
+                          Name="cbFilter"
                           ItemsSource="{Binding CatList}"
                           IsEditable="True"
                           IsTextSearchEnabled="True"
@@ -108,7 +112,8 @@
                         <TextBox x:Name="tbCal"
                                  Text="{Binding Cal, 
                                         Converter={StaticResource NullDouble},
-                                        UpdateSourceTrigger=PropertyChanged}"                                 
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        ValidatesOnNotifyDataErrors=True}"                                 
                                  Style="{DynamicResource TextBox.Numeric}"
                                  Grid.Column="1"/>
                     </Grid>
@@ -125,7 +130,8 @@
                         <TextBox x:Name="tbPro"
                                  Text="{Binding Pro, 
                                         Converter={StaticResource NullDouble},
-                                        UpdateSourceTrigger=PropertyChanged}"  
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        ValidatesOnNotifyDataErrors=True}"  
                                  Style="{DynamicResource TextBox.Numeric}"
                                  Grid.Column="1"/>
                     </Grid>
@@ -142,7 +148,8 @@
                         <TextBox x:Name="tbCar"
                                  Text="{Binding Car, 
                                         Converter={StaticResource NullDouble},
-                                        UpdateSourceTrigger=PropertyChanged}"  
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        ValidatesOnNotifyDataErrors=True}"  
                                  Style="{DynamicResource TextBox.Numeric}"
                                  Grid.Column="1"/>
                     </Grid>
@@ -159,7 +166,8 @@
                         <TextBox x:Name="tbFat"
                                  Text="{Binding Fat, 
                                          Converter={StaticResource NullDouble},
-                                         UpdateSourceTrigger=PropertyChanged}"  
+                                         UpdateSourceTrigger=PropertyChanged,
+                                         ValidatesOnNotifyDataErrors=True}"  
                                  Style="{DynamicResource TextBox.Numeric}"
                                  Grid.Column="1"/>
                     </Grid>

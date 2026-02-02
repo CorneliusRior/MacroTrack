@@ -1,8 +1,12 @@
-﻿using MacroTrack.Core.Logging;
+﻿using MacroTrack.AppLibrary.Controls;
+using MacroTrack.AppLibrary.Models;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +14,42 @@ using System.Windows;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    public class FoodEntryVM : ViewModelBase
+    public class FoodEntryVM : ViewModelBase, INotifyPropertyChanged, INotifyDataErrorInfo
     {
+        // Error stuff:
+        private readonly Dictionary<string, List<string>> _errors = new();
+        public bool HasErrors => _errors.Count > 0;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+        public IEnumerable GetErrors(string? propertyName)
+        {
+            if (propertyName == null) return null!;
+            return _errors.TryGetValue(propertyName, out var list) ? list : null!;
+        }
+        private void SetError(string propertyName, string error)
+        {
+            _errors[propertyName] = new List<string> { error };
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+        private void ClearError(string propertyName)
+        {
+            if (_errors.Remove(propertyName)) ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+        public bool NumericRequire(string propName, object? value, string messgee = "Required")
+        {
+            if (!double.TryParse(value as string, out double n))
+            {
+                SetError(propName, messgee);
+                return false;
+            }
+            ClearError(propName);
+            return true;
+        }
+        // End of error stuff
+
         public ObservableCollection<Preset> PresetList { get; } = new();
         public ObservableCollection<string> CatList { get; } = new();
 
-
+        private bool _multUpdating;
 
         private DateTime? _time;
         public DateTime? Time
@@ -49,36 +83,62 @@ namespace MacroTrack.AppLibrary.ViewModels
                 _mult = value; 
                 OnPropertyChanged();
 
-                Recalculate();
+                _multUpdating = true;
+                RefreshScaledValues();
+                _multUpdating = false;
             }
         }
 
-        private double? _cal;
+        private readonly ScaledValue _cal = new();
         public double? Cal
         {
-            get => _cal;
-            set { _cal = value; OnPropertyChanged(); }
+            get => _cal.GetDisplayed(Mult);
+            set
+            {
+                if (_multUpdating) return;
+                _cal.SetFromDisplayed(value, Mult);
+                OnPropertyChanged();
+                ClearError(nameof(Cal));
+            }
         }
 
-        private double? _pro;
+        private readonly ScaledValue _pro = new();
         public double? Pro
         {
-            get => _pro;
-            set { _pro = value; OnPropertyChanged(); }
+            get => _pro.GetDisplayed(Mult);
+            set
+            {
+                if (_multUpdating) return;
+                _pro.SetFromDisplayed(value, Mult);
+                OnPropertyChanged();
+                ClearError(nameof(Pro));
+            }
         }
 
-        private double? _car;
+        private readonly ScaledValue _car = new();
         public double? Car
         {
-            get => _car;
-            set { _car = value; OnPropertyChanged(); }
+            get => _car.GetDisplayed(Mult);
+            set
+            {
+                if (_multUpdating) return;
+                _car.SetFromDisplayed(value, Mult);
+                OnPropertyChanged();
+                ClearError(nameof(Car));
+            }
         }
 
-        private double? _fat;
+        private readonly ScaledValue _fat = new();
         public double? Fat
         {
-            get => _fat;
-            set { _fat = value; OnPropertyChanged(); }
+            get => _fat.GetDisplayed(Mult);
+            set
+            {
+                if (_multUpdating) return;
+                _fat.SetFromDisplayed(value, Mult);
+                OnPropertyChanged();
+                ClearError(nameof(Fat));
+            }
         }
 
         private string? _notes;
@@ -88,20 +148,66 @@ namespace MacroTrack.AppLibrary.ViewModels
             set { _notes = value; OnPropertyChanged(); }
         }
 
+        private void RefreshScaledValues()
+        {
+            OnPropertyChanged(nameof(Cal));
+            OnPropertyChanged(nameof(Pro));
+            OnPropertyChanged(nameof(Car));
+            OnPropertyChanged(nameof(Fat));
+        }
+
         public void Clear()
         {
             ItemName = null;
             Mult = 1;
-            Cal = null;
-            Pro = null;
-            Car = null;
-            Fat = null;
+            _cal.SetBase(null);
+            _pro.SetBase(null);
+            _car.SetBase(null);
+            _fat.SetBase(null);
+            RefreshScaledValues();
             Notes = string.Empty;
         }
 
         public void Add()
         {
-            MessageBox.Show($"This is what we have right now:\nTime: '{(Time == null ? "No time" : Time)}'\nItemName: '{(ItemName == null ? "null" : ItemName)}\nMult: x{Mult}\nCar: {(Cal == null ? "Null" : Cal)} / Car: {(Pro == null ? "Null" : Pro)} / Car: {(Car == null ? "Null" : Car)} / Car: {(Fat == null ? "Null" : Fat)}\nNotes: '{Notes}'");
+            //MessageBox.Show($"This is what we have right now:\nTime: '{(Time == null ? "No time" : Time)}'\nItemName: '{(ItemName == null ? "null" : ItemName)}\nMult: x{Mult}\nCar: {(Cal == null ? "Null" : Cal)} / Car: {(Pro == null ? "Null" : Pro)} / Car: {(Car == null ? "Null" : Car)} / Car: {(Fat == null ? "Null" : Fat)}\nNotes: '{Notes}'");
+
+            // Ensure validity. Will make red boxes in a moment but not now:
+            bool error = false;
+            string errorString = "Error:";
+            if (Time == null) error = true; errorString += $"\n - Null Time";
+            if (ItemName == null) error = true; errorString += $"\n - Null Name";
+
+            /*
+            if (Cal == null) error = true; errorString += $"\n - Null Cal";
+            if (Pro == null) error = true; errorString += $"\n - Null Pro";
+            if (Car == null) error = true; errorString += $"\n - Null Car";
+            if (Fat == null) error = true; errorString += $"\n - Null Fat";
+            */
+
+            bool ok = true;
+            ok &= NumericRequire(nameof(Cal), Cal);
+            ok &= NumericRequire(nameof(Pro), Pro);
+            ok &= NumericRequire(nameof(Car), Car);
+            ok &= NumericRequire(nameof(Fat), Fat);
+
+            // Adding this for the time being, get rid of it.
+            if (!ok) error = true; errorString += $"\n - Something in macros";
+
+
+            if (error)
+            {
+                MessageBox.Show(errorString);
+                return;
+            }
+            try 
+            { 
+                FoodEntry entry = Services?.foodLogService.AddEntry(Time.Value, ItemName, Mult.Value, Cal.Value, Pro.Value, Car.Value, Fat.Value, "none", Notes);
+                Log($"Added entry #{entry.Id}", LogLevel.Info);
+                Clear();
+            }
+            catch (Exception ex) { Log("Could not add entry", LogLevel.Error, ex); }
+            
         }
 
         public void TimeNow()
@@ -118,7 +224,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             if (Services == null)
             {
-                Log("Null Service, returning.", LogLevel.Warning, NullServices);
+                Log("Null Service, returning.", LogLevel.Warning);
                 return;
             }
             Log();
@@ -150,7 +256,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             if (Services == null)
             {
-                Log("Null Service, returning.", LogLevel.Warning, NullServices);
+                Log("Null Service, returning.", LogLevel.Warning);
                 return;
             }
             Log($"SelectedIndex = {selectedIndex}");
@@ -169,15 +275,11 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             ItemName = p.PresetName;
             Mult = 1;
-            Cal = p.Calories;
-            Pro = p.Protein;
-            Car = p.Carbs;
-            Fat = p.Fat;
-        }
-
-        private void Recalculate()
-        {
-
+            _cal.SetBase(p.Calories);
+            _pro.SetBase(p.Protein);
+            _car.SetBase(p.Carbs);
+            _fat.SetBase(p.Fat);
+            RefreshScaledValues();
         }
     }
 }

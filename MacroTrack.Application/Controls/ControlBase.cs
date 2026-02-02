@@ -25,8 +25,6 @@ namespace MacroTrack.AppLibrary.Controls
         public CoreServices? Services { get; set; }
         public IMTLogger? Logger { get; set; }
 
-        public Exception NullServices = new("Null Services.");
-        public Exception NullLogger = new("Null Logger.");
 
         protected ControlBase()
         {
@@ -46,7 +44,6 @@ namespace MacroTrack.AppLibrary.Controls
         protected void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
         {
             Logger?.Log(this, caller, level, message, ex);
-            if (Logger == null) Log("Error", LogLevel.Error, NullLogger);
         }
     }
 }

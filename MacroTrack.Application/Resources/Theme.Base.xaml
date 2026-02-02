@@ -7,10 +7,27 @@
     <SolidColorBrush x:Key="AppForeGroundBrush" Color="#FF000000"/>
     <SolidColorBrush x:Key="PanelBackGroundBrush" Color="#FFF6F6F6"/>
     <SolidColorBrush x:Key="BorderBrush" Color="#FF000000"/>
-    
+    <SolidColorBrush x:Key="CaretBrush" Color="#FF000000"/>
+
+
+    <SolidColorBrush x:Key="HighLightBrush" Color="#FF888888"/>
+    <SolidColorBrush x:Key="HighLightTextBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="ControlTextBrushKey" Color="#FFFFFFFF"/>
+
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF888888"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="#FFFFFFFF"/>
+
     <!--Control Brushes-->
     <SolidColorBrush x:Key="ButtonBackGroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FFEEEEEE"/>
+    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FFCCCCCC"/>
+
     <SolidColorBrush x:Key="TextBoxBackgroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="TextBoxHoverBrush" Color="#FFFAFAFA"/>
+
+    <SolidColorBrush x:Key="SelectionBrush" Color="#FF7EB4EA"/>
+
 
     <!--Graphing Brushes-->
     <SolidColorBrush x:Key="GraphBackGroundBrush" Color="#FFFFFFFF"/>

@@ -37,7 +37,7 @@ public class FoodLogService : ServiceBase
             Log("Error adding entry, wrong ID probably", LogLevel.Warning, ex);
             throw ex;
         }
-        Log($"Added entry #{entry.Id}");
+        Log($"Added entry #{added.Id}");
         return added;
     }
 

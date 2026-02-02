@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:b="clr-namespace:MacroTrack.AppLibrary.Behaviors"
+                    xmlns:v="clr-namespace:MacroTrack.AppLibrary.Validation"
                     xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls">
 
     <!--Label Styling-->
@@ -43,6 +44,7 @@
         <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
         <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThickness}"/>
+
         <Setter Property="Padding" Value="6,4"/>
         <Setter Property="MinWidth" Value="70"/>
         <Setter Property="MinHeight" Value="25"/>
@@ -51,15 +53,44 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="6,4"/>
+                    </Border>
+
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd"  Property="Background" Value="{DynamicResource ButtonHoverBrush}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ButtonPressedBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!--TextBox-->
     <Style x:Key="TextBox.Base" TargetType="TextBox">
         <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="MinHeight" Value="25"/>
         <Setter Property="Margin" Value="5"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource HighLightBrush}"/>
+        <Setter Property="SelectionTextBrush" Value="{DynamicResource HighLightTextBrush}"/>
     </Style>
     
     <Style x:Key="TextBox.MultiLine" TargetType="TextBox" BasedOn="{StaticResource TextBox.Base}">
@@ -76,6 +107,7 @@
         <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
         <Setter Property="FontFamily" Value="{DynamicResource ReplFont}"/>
         <Setter Property="FontSize" Value="{DynamicResource ReplSize}"/>
+        <Setter Property="SelectionBrush" Value="AliceBlue"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
     
@@ -84,6 +116,7 @@
         <Setter Property="MinWidth" Value="40"/>
         <Setter Property="HorizontalContentAlignment" Value="Right"/>
         <Setter Property="b:NumericInput.IsEnabled" Value="True"/>
+        
     </Style>
     
     <!--REPL entry-->
@@ -114,13 +147,16 @@
         <Setter Property="Margin" Value="5"/>
         <Setter Property="MinHeight" Value="25"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="IsEditable" Value="True"/>
     </Style>
 
     <Style TargetType="ComboBoxItem">
         <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
         <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
-        
+        <Setter Property="BorderThickness" Value="0"/>
     </Style>
+
+
 
     <!--SpinBox Elements-->
     <Style TargetType="{x:Type controls:SpinBox}">
@@ -146,6 +182,25 @@
         <Setter Property="Margin" Value="0"/>
         <Setter Property="FontSize" Value="6"/>
         <Setter Property="Padding" Value="-1"/>
+
+        
+    </Style>
+    
+    <!--DateTimePicker Elements-->
+
+    <Style x:Key="Button.CalendarButton" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackGroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+        <Setter Property="BorderThickness" Value="1,0,0,0"/>
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+
+    <Style x:Key="TextBox.DateTimePicker" TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackGroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
 </ResourceDictionary>
