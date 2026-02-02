@@ -15,5 +15,9 @@ namespace MacroTrack.Core.Logging
         event EventHandler<LogMessage>? MessageLogged;
 
         void Log(object sourceObj, string caller, LogLevel level, string message, Exception? exception = null);
+
+        void OpenLogFile();
+
+        void OpenLogDir();
     }
 }

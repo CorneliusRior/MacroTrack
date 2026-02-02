@@ -51,6 +51,7 @@ namespace MacroTrack.AppLibrary.Controls
                 typeof(DateTimePicker),
                 new PropertyMetadata(false)
             );
+
         public bool HasError
         {
             get => (bool)GetValue(HasErrorProperty);

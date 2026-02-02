@@ -129,7 +129,16 @@ namespace MacroTrack.Dashboard
             ThemeManager.ToggleLightDark();
         }
 
-        
+        private void ButtonBannerOpenLog_Click(object sender, RoutedEventArgs e)
+        {
+            Log();
+            Logger.OpenLogFile();
+        }
 
+        private void ButtonBannerLogDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            Log();
+            Logger.OpenLogDir();
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +49,24 @@ namespace MacroTrack.Core.Logging
             {
                 MessageLogged?.Invoke(this, msg);
             }
+        }
+
+        public void OpenLogFile()
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = _logFilePath,
+                UseShellExecute = true
+            });
+        }
+
+        public void OpenLogDir()
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = Path.GetDirectoryName(_logFilePath),
+                UseShellExecute = true
+            });
         }
     }
 }

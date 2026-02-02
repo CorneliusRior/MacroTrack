@@ -45,6 +45,7 @@ namespace MacroTrack.BasicApp
 
             // Logger:
             string logPath = Paths.FindLogPath();
+            Paths.DeleteOldLogs(20);
             string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
             var logger = new MTLogger(logFile, "BasicApp");
 

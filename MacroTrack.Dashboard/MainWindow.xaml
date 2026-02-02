@@ -72,6 +72,12 @@
                         <Button Content="Light/Dark Mode"
                                 Name="ButtonBannerLightDark"
                                 Click="ButtonBannerLightDark_Click"/>
+                        <Button Content="Open Log"
+                                Name="ButtonBannerOpenLog"
+                                Click="ButtonBannerOpenLog_Click"/>
+                        <Button Content="Open Log Directory"
+                                Name="ButtonBannerLogDirectory"
+                                Click="ButtonBannerLogDirectory_Click"/>
 
                     </StackPanel>
 

@@ -44,7 +44,7 @@
                        Grid.Row="0" Grid.Column="0"/>
 
                 <controls:DateTimePicker x:Name="dateTimePicker"
-                                         Value="{Binding Time, Mode=TwoWay}"
+                                         Value="{Binding Time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Margin="5"
                                          Grid.Row="0" Grid.Column="1"/>
 
@@ -65,7 +65,9 @@
                           IsTextSearchEnabled="True"
                           ItemsSource="{Binding PresetList}"
                           SelectedItem="{Binding SelectedPreset}"
-                          Text="{Binding ItemName}"
+                          Text="{Binding ItemName,
+                                 UpdateSourceTrigger=PropertyChanged,
+                                 ValidatesOnNotifyDataErrors=True}"
                           SelectionChanged="cbItem_SelectionChanged"
                           Grid.Row="1" Grid.Column="1"/>
 

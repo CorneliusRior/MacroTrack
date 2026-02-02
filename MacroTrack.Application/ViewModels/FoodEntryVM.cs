@@ -14,38 +14,8 @@ using System.Windows;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    public class FoodEntryVM : ViewModelBase, INotifyPropertyChanged, INotifyDataErrorInfo
+    public class FoodEntryVM : ViewModelBase
     {
-        // Error stuff:
-        private readonly Dictionary<string, List<string>> _errors = new();
-        public bool HasErrors => _errors.Count > 0;
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
-        public IEnumerable GetErrors(string? propertyName)
-        {
-            if (propertyName == null) return null!;
-            return _errors.TryGetValue(propertyName, out var list) ? list : null!;
-        }
-        private void SetError(string propertyName, string error)
-        {
-            _errors[propertyName] = new List<string> { error };
-            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-        }
-        private void ClearError(string propertyName)
-        {
-            if (_errors.Remove(propertyName)) ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-        }
-        public bool NumericRequire(string propName, object? value, string messgee = "Required")
-        {
-            if (!double.TryParse(value as string, out double n))
-            {
-                SetError(propName, messgee);
-                return false;
-            }
-            ClearError(propName);
-            return true;
-        }
-        // End of error stuff
-
         public ObservableCollection<Preset> PresetList { get; } = new();
         public ObservableCollection<string> CatList { get; } = new();
 
@@ -55,14 +25,27 @@ namespace MacroTrack.AppLibrary.ViewModels
         public DateTime? Time
         {
             get => _time;
-            set { _time = value; OnPropertyChanged(); }
+            set 
+            {
+                if (_time == value) return;
+                _time = value; 
+                OnPropertyChanged();
+                Log($"Time updated, nameof='{nameof(Time)}', Time={Time}");
+                DateTimeRequire(nameof(Time), Time);
+            }
         }
 
         private string? _itemName;
         public string? ItemName
         {
             get => _itemName;
-            set { _itemName = value; OnPropertyChanged(); }
+            set 
+            {
+                if (_itemName == value) return;
+                _itemName = value; 
+                OnPropertyChanged();
+                StringRequire(nameof(ItemName), ItemName);
+            }
         }
 
         
@@ -166,6 +149,18 @@ namespace MacroTrack.AppLibrary.ViewModels
             _fat.SetBase(null);
             RefreshScaledValues();
             Notes = string.Empty;
+
+            ClearAllErrors();
+        }
+
+        public void ClearAllErrors()
+        {
+            ClearError(nameof(Time));
+            ClearError(nameof(ItemName));
+            ClearError(nameof(Cal));
+            ClearError(nameof(Pro));
+            ClearError(nameof(Car));
+            ClearError(nameof(Fat));
         }
 
         public void Add()
@@ -175,8 +170,9 @@ namespace MacroTrack.AppLibrary.ViewModels
             // Ensure validity. Will make red boxes in a moment but not now:
             bool error = false;
             string errorString = "Error:";
-            if (Time == null) error = true; errorString += $"\n - Null Time";
-            if (ItemName == null) error = true; errorString += $"\n - Null Name";
+            //if (Time == null) error = true; errorString += $"\n - Null Time";
+
+            //if (ItemName == null) error = true; errorString += $"\n - Null Name";
 
             /*
             if (Cal == null) error = true; errorString += $"\n - Null Cal";
@@ -186,6 +182,8 @@ namespace MacroTrack.AppLibrary.ViewModels
             */
 
             bool ok = true;
+            ok &= DateTimeRequire(nameof(Time), Time);
+            ok &= StringRequire(nameof(ItemName), ItemName);
             ok &= NumericRequire(nameof(Cal), Cal);
             ok &= NumericRequire(nameof(Pro), Pro);
             ok &= NumericRequire(nameof(Car), Car);
@@ -197,7 +195,6 @@ namespace MacroTrack.AppLibrary.ViewModels
 
             if (error)
             {
-                MessageBox.Show(errorString);
                 return;
             }
             try 
@@ -273,6 +270,7 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public void PresetSelected(Preset p)
         {
+            ClearAllErrors();
             ItemName = p.PresetName;
             Mult = 1;
             _cal.SetBase(p.Calories);

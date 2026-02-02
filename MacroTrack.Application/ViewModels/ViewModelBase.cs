@@ -1,6 +1,7 @@
 ﻿using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    public class ViewModelBase : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         public CoreServices? Services;
         public IMTLogger? Logger;
@@ -29,6 +30,76 @@ namespace MacroTrack.AppLibrary.ViewModels
         protected void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
         {            
             Logger?.Log(this, caller, level, message, ex);
+        }
+
+        // Error handling:
+        protected readonly Dictionary<string, List<string>> _errors = new();
+        public bool HasErrors => _errors.Count > 0;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+        public IEnumerable GetErrors(string? propertyName)
+        {
+            if (propertyName == null) return null!;
+            return _errors.TryGetValue(propertyName, out var list) ? list : null!;
+        }
+
+        protected void SetError(string propertyName, string error)
+        {
+            _errors[propertyName] = new List<string> { error };
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+
+        protected void ClearError(string propertyName)
+        {
+            if (_errors.Remove(propertyName)) ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+
+        public bool NumericRequire(string propName, object? value, string message = "Cannot parse as double: Required")
+        {
+            Log($"string propname='{propName}', object? value='{value}', valuetype='{value?.GetType()}'");
+            if (value is null)
+            {
+                SetError(propName, message + ": is null"); 
+                return false;
+            }
+            if (value.GetType() != typeof(double))
+            {
+                SetError(propName, message + ": not type double");
+            }
+            ClearError(propName);
+            return true;
+        }
+
+        public bool StringRequire(string propName, object? value, string message = "Required")
+        {
+            if (string.IsNullOrWhiteSpace(value as string))
+            {
+                SetError(propName, message);
+                return false;
+            }
+            ClearError(propName);
+            return true;
+        }
+
+        public bool DateTimeRequire(string propName, object? value, string message = "Required")
+        {
+            if (value is null)
+            {
+                SetError(propName, message + ": is null");
+                return false;
+            }
+            if (value.GetType() != typeof(DateTime))
+            {
+                SetError(propName, message + ": not type DateTime.");
+                return false;
+            }
+            if (value as DateTime? == DateTime.MinValue)
+            {
+                SetError(propName, message + ": it MinValue");
+                return false;
+            }
+            ClearError(propName);
+            return true;
+
         }
     }
 }
