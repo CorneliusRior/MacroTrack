@@ -55,7 +55,7 @@ namespace MacroTrack.Dashboard
             Repl.Services = Services;
             Repl.Logger = Logger;
             */
-            AddLogEntry.Init(Services);
+            WeightEntry.Init(Services);
             DiaryEntry.Init(Services);
             Repl.Init(Services);
             Repl.SubmitCommand += Repl_CommandHandler;

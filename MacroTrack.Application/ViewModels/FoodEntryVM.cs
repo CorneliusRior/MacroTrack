@@ -27,11 +27,9 @@ namespace MacroTrack.AppLibrary.ViewModels
             get => _time;
             set 
             {
-                Log($"Time set called: _time='{_time}', value='{value}'");
                 if (_time == value) return;
                 _time = value; 
                 OnPropertyChanged();
-                Log($"Time updated, nameof='{nameof(Time)}', Time={Time}");
                 DateTimeRequire(nameof(Time), Time);
             }
         }
@@ -44,7 +42,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             {
                 if (_itemName == value) return;
                 _itemName = value;
-                Log($"changed, value='{value}'");
                 if (_itemName != _selectedPreset?.PresetName) SelectedPreset = null;
                 OnPropertyChanged();
                 StringRequire(nameof(ItemName), ItemName);
@@ -60,7 +57,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             {
                 if (_selectedPreset == value) return;
                 _selectedPreset = value;
-                Log($"_selectedPreset is null?='{_selectedPreset == null}' {(_selectedPreset == null ? "" : $"_selectedPreset.PresetName='{_selectedPreset.PresetName}'")}");
                 OnPropertyChanged(); 
             }
         }
@@ -254,7 +250,6 @@ namespace MacroTrack.AppLibrary.ViewModels
                 Log("Null Service, returning.", LogLevel.Warning);
                 return;
             }
-            Log($"SelectedIndex = {selectedIndex}");
             List<Preset> presetList = new();
             if (selectedIndex == 0) presetList = Services.presetService.GetAll();
             if (selectedIndex == 1) presetList = Services.presetService.GetAllCategory(null);
@@ -279,8 +274,6 @@ namespace MacroTrack.AppLibrary.ViewModels
                 _fat.SetBase(p.Fat);
                 RefreshScaledValues();
             }
-            
-            Log($"_selectedPreset is null?='{_selectedPreset == null}' {(_selectedPreset == null ? "" : $"_selectedPreset.PresetName='{_selectedPreset.PresetName}'" )}");
         }
     }
 }

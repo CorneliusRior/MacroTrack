@@ -152,7 +152,7 @@
                         BorderThickness="{DynamicResource BorderThickness}"
                         Background="{DynamicResource PanelBackGroundBrush}">
 
-                    <views:AddLogEntryControl x:Name="AddLogEntry"/>
+                    <views:WeightEntryControl x:Name="WeightEntry"/>
 
                 </Border>
 
