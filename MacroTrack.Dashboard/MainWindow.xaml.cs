@@ -45,30 +45,12 @@ namespace MacroTrack.Dashboard
         // Set up controls:
         private void WireUpControls()
         {
-            /*
-            AddLogEntry.Services = Services;
-            AddLogEntry.Logger = Logger;
-
-            DiaryEntry.Services = Services;
-            DiaryEntry.Logger = Logger;
-
-            Repl.Services = Services;
-            Repl.Logger = Logger;
-            */
             WeightEntry.Init(Services);
             DiaryEntry.Init(Services);
             Repl.Init(Services);
             Repl.SubmitCommand += Repl_CommandHandler;
 
-            /*
-            FoodEntry.Services = Services;
-            FoodEntry.Logger = Logger;
-            _foodVM.Services = Services;
-            _foodVM.Logger = Logger;
-            */
             FoodEntry.Init(Services);
-
-            //RefreshPresets();
         }
 
         // Log & REPL handling:

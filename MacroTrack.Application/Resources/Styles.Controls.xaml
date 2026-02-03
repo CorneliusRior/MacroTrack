@@ -202,5 +202,17 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
+    
+    <!--CheckBoxes-->
+    <Style TargetType="CheckBox">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+    
+    <!--RadioButtons-->
+    <Style TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="Margin" Value="10,0,0,0"/>
+    </Style>
 
 </ResourceDictionary>
