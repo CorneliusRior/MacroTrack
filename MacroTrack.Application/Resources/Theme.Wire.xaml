@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Theme.Base.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <!--Overrides-->
+    
+    <!--General Brushes-->
+    <SolidColorBrush x:Key="AppBackGroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="AppForeGroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="PanelBackGroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#FFFFFFFF"/>
+    
+    <!--Control Brushes-->
+    <SolidColorBrush x:Key="ButtonBackGroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FF222222"/>
+    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FF444444"/>
+
+    <SolidColorBrush x:Key="TextBoxBackgroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="TextBoxHoverBrush" Color="#FF111111"/>
+
+    <!--Graphing Brushes-->
+    <SolidColorBrush x:Key="GraphBackGroundBrush" Color="#FF000000"/>
+    
+</ResourceDictionary>

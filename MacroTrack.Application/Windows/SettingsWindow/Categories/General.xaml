@@ -19,6 +19,8 @@
                         </Grid.ColumnDefinitions>
                         <Label Content="Theme:" Grid.Column="0"/>
                         <ComboBox Template="{DynamicResource MTComboBoxTemplate}"
+                                  ItemsSource="{Binding ThemeList}"
+                                  SelectedItem="{Binding SettingsEditable.Theme, Mode=TwoWay}"                                  
                                   Width="100"
                                   Grid.Column="1"/>
                     </Grid>

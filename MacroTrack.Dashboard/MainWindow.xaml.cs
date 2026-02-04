@@ -114,13 +114,6 @@ namespace MacroTrack.Dashboard
             _vm?.OpenSettings();
         }
 
-        private void ButtonBannerLightDark_Click(object sender, RoutedEventArgs e)
-        {
-            Log();
-            
-            ThemeManager.ToggleLightDark();
-        }
-
         private void ButtonBannerOpenLog_Click(object sender, RoutedEventArgs e)
         {
             Log();

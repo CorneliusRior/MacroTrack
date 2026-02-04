@@ -1,4 +1,5 @@
 ﻿using MacroTrack.AppLibrary.Commands;
+using MacroTrack.AppLibrary.Resources;
 using MacroTrack.AppLibrary.Windows.SettingsWindow.Categories;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
@@ -50,7 +51,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
         private void AddCategories()
         {
             Log();
-            Categories.Add(new GeneralVM(SettingsEditable));
+            Categories.Add(new GeneralVM(SettingsEditable, Logger));
             Categories.Add(new LoggingVM(SettingsEditable));
         }
 
@@ -58,6 +59,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
         {
             Log();
             Services.SettingsService.Set(SettingsEditable);
+            ThemeManager.SetTheme(Services.SettingsService.Settings.Theme);
         }
 
         public void SetSelectedToDefault()

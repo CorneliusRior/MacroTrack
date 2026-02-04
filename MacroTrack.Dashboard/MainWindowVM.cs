@@ -1,6 +1,7 @@
 ﻿using MacroTrack.AppLibrary.Commands;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Settings;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using MacroTrack.AppLibrary.Resources;
 
 namespace MacroTrack.Dashboard
 {
     public class MainWindowVM : INotifyPropertyChanged
     {
         public CoreServices Services;
+        public AppSettings Settings;
         public IMTLogger Logger;
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -28,6 +31,8 @@ namespace MacroTrack.Dashboard
         {
             Services = service;
             Logger = service.Logger;
+            Settings = service.SettingsService.Settings;
+            ApplyTheme();
 
             PrintCommand = new RelayCommand(() => RequestPrint?.Invoke(""));
             OpenSettingsCommand = new RelayCommand(() => RequestOpenSettings?.Invoke());
@@ -50,6 +55,11 @@ namespace MacroTrack.Dashboard
         public void OpenSettings()
         {
             OpenSettingsCommand.Execute(this);
+        }
+
+        public void ApplyTheme()
+        {
+            ThemeManager.SetTheme(Settings.Theme);
         }
 
     }

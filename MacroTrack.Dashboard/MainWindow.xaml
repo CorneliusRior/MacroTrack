@@ -69,9 +69,6 @@
                         <Button Content="Settings"
                                 Name="ButtonBannerSettings"
                                 Click="ButtonBannerSettings_Click"/>
-                        <Button Content="Light/Dark Mode"
-                                Name="ButtonBannerLightDark"
-                                Click="ButtonBannerLightDark_Click"/>
                         <Button Content="Open Log"
                                 Name="ButtonBannerOpenLog"
                                 Click="ButtonBannerOpenLog_Click"/>

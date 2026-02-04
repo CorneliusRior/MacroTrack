@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MacroTrack.AppLibrary.Resources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow.Categories
     /// Interaction logic for General.xaml
     /// </summary>
     public partial class General : UserControl
-    {        
+    {                
         public General()
         {
             InitializeComponent();            
