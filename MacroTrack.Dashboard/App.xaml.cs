@@ -28,15 +28,16 @@ namespace MacroTrack.Dashboard
 
             // Logger:
             string logPath = Paths.FindLogPath();
-            Paths.DeleteOldLogs(20);
             string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
             var logger = new MTLogger(logFile, this.GetType().Namespace);
 
             // Settings:
             string settingsPath = Paths.FindSettingsPath();
             var settingsService = new SettingsService(settingsPath, logger);
-            logger.UILevel = settingsService.Settings.LogUILevel;
-            logger.FileLevel = settingsService.Settings.LogFileLevel;
+            settingsService.Apply(settingsService.Settings);
+
+            // Application of some settings:
+            Paths.DeleteOldLogs(settingsService.Settings.LogRetainAmount);
 
 
             // Create context, then CoreServices

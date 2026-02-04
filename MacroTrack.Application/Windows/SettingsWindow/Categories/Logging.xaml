@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:c="clr-namespace:MacroTrack.AppLibrary.Controls"
              xmlns:log="clr-namespace:MacroTrack.Core.Logging;assembly=MacroTrack.Core"
              xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Windows.SettingsWindow.Categories"
@@ -16,6 +17,15 @@
                       VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical"
                         Margin="10">
+                <Expander Header="General" IsExpanded="True">
+                    <StackPanel>
+                        <c:LabelledNumericInput LabelText="Log Retain amount"
+                                                Value="{Binding SettingsEditable.LogRetainAmount,Mode=TwoWay}"
+                                                Min="1"/>
+                        <CheckBox Content="Log Initiation Messages"
+                                  IsChecked="{Binding SettingsEditable.LogInitMessages, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Expander>
                 <Expander Header="Logging Threshold" IsExpanded="True">
                     <StackPanel>
                         <Label Content="UI Logging Threshold:"/>

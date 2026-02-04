@@ -19,7 +19,7 @@ namespace MacroTrack.Core.Services
         protected ServiceBase(CoreContext ctx) 
         {
             Logger = ctx.Logger;
-            Log($"{this.GetType().Name} Initialized");
+            if (ctx.Settings.Settings.LogInitMessages) Log($"{this.GetType().Name} Initialized");
         }
 
         protected void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")

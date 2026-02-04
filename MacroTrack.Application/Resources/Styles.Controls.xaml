@@ -119,6 +119,20 @@
         
     </Style>
     
+    <!--Integer entry-->
+    <Style x:Key="TextBox.NumericInteger" TargetType="TextBox" BasedOn="{StaticResource TextBox.Base}">
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Height" Value="20"/>
+        
+        <Setter Property="b:IntegerInput.IsEnabled" Value="True"/>
+    </Style>
+
+    <Style TargetType="controls:LabelledNumericInput">
+        <Setter Property="Margin" Value="10,0,0,0"/>
+        <Setter Property="InputWidth" Value="30"/>
+    </Style>
+    
     <!--REPL entry-->
     <Style x:Key="TextBox.ReplInput" TargetType="TextBox" BasedOn="{StaticResource TextBox.Repl}">
         <Setter Property="TextWrapping" Value="NoWrap"/>
@@ -206,7 +220,8 @@
     <!--CheckBoxes-->
     <Style TargetType="CheckBox">
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="left"/>
+        <Setter Property="Margin" Value="10,0,0,0"/>
     </Style>
     
     <!--RadioButtons-->

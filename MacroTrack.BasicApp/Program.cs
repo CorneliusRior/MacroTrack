@@ -45,16 +45,16 @@ namespace MacroTrack.BasicApp
 
             // Logger:
             string logPath = Paths.FindLogPath();
-            Paths.DeleteOldLogs(20);
             string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
             var logger = new MTLogger(logFile, "BasicApp");
 
             // Settings:
             string settingsPath = Paths.FindSettingsPath();
-            var settingsService = new SettingsService(settingsPath);
-            logger.UILevel = settingsService.Settings.LogUILevel;
-            logger.FileLevel = settingsService.Settings.LogFileLevel;
+            var settingsService = new SettingsService(settingsPath, logger);
+            settingsService.Apply(settingsService.Settings);
 
+            // Application of some settings:
+            Paths.DeleteOldLogs(settingsService.Settings.LogRetainAmount);
 
             // Create context, then CoreServices
             var context = new CoreContext(connString, logger, settingsService);

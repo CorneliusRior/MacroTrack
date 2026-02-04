@@ -7,6 +7,23 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="450">
     <Border Background="{DynamicResource PanelBackGroundBrush}">
-        <Label Content="General"/>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical"
+                        Margin="10">
+                <Expander Header="Themes" IsExpanded="True">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Theme:" Grid.Column="0"/>
+                        <ComboBox Template="{DynamicResource MTComboBoxTemplate}"
+                                  Width="100"
+                                  Grid.Column="1"/>
+                    </Grid>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
     </Border>
 </UserControl>

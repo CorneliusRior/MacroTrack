@@ -78,7 +78,6 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public bool DateTimeRequire(string propName, DateTime? value, string message = "Required")
         {
-            Log($"string propName='{propName}' object? value='{value}'");
             if (value is null)
             {
                 SetError(propName, message + ": is null");

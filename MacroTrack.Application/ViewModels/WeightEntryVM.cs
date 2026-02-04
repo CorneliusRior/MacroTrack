@@ -19,7 +19,6 @@ namespace MacroTrack.AppLibrary.ViewModels
                 if (_time == value) return;
                 _time = value;
                 OnPropertyChanged();
-                Log($"Time updated, nameof='{nameof(Time)}', Time={Time}");
                 DateTimeRequire(nameof(Time), Time);
             }
         }

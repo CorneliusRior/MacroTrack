@@ -30,8 +30,11 @@ namespace MacroTrack.AppLibrary.Controls
         {
             Loaded += (_, _) =>
             {
-                if (Services != null) Logger = Services.Logger;
-                Log($"{this.GetType().Name} Initialized");
+                if (Services != null)
+                {
+                    Logger = Services.Logger;
+                    if (Services.SettingsService.Settings.LogInitMessages) Log($"{this.GetType().Name} Initialized");
+                }
             };
         }
 
