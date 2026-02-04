@@ -34,7 +34,7 @@ namespace MacroTrack.Dashboard
 
             // Settings:
             string settingsPath = Paths.FindSettingsPath();
-            var settingsService = new SettingsService(settingsPath);
+            var settingsService = new SettingsService(settingsPath, logger);
             logger.UILevel = settingsService.Settings.LogUILevel;
             logger.FileLevel = settingsService.Settings.LogFileLevel;
 

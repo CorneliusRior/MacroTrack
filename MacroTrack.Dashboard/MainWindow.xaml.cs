@@ -1,5 +1,6 @@
 ﻿using MacroTrack.AppLibrary.Controls;
 using MacroTrack.AppLibrary.ViewModels;
+using MacroTrack.AppLibrary.Windows.SettingsWindow;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 using MacroTrack.Core.Models;
@@ -25,9 +26,7 @@ namespace MacroTrack.Dashboard
         // Core/CoreServices stuff:
         public CoreServices Services { get; private set; } = null!;
         private IMTLogger Logger = null!;
-
-        // ViewModels:
-        private readonly FoodEntryVM _foodVM = new();
+        private readonly MainWindowVM? _vm;
 
         public MainWindow()
         {
@@ -38,6 +37,16 @@ namespace MacroTrack.Dashboard
         {
             Services = services;
             Logger = services.Logger;
+            _vm = new MainWindowVM(Services);
+            DataContext = _vm;
+
+            _vm.RequestPrint += text => Print(text);
+            _vm.RequestOpenSettings += () =>
+            {
+                var w = new SettingsWindow(Services) { Owner = this };
+                w.Show();
+            };
+
             Log("Main window opened.", LogLevel.Info);
             WireUpControls();            
         }
@@ -102,6 +111,7 @@ namespace MacroTrack.Dashboard
         private void ButtonBannerSettings_Click(object sender, RoutedEventArgs e)
         {
             Log();
+            _vm?.OpenSettings();
         }
 
         private void ButtonBannerLightDark_Click(object sender, RoutedEventArgs e)

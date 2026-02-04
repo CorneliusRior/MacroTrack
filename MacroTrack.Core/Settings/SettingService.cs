@@ -1,23 +1,28 @@
-﻿using System;
+﻿using MacroTrack.Core.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace MacroTrack.Core.Settings
 {
     public class SettingsService
     {
+        public IMTLogger Logger;
+
         private readonly string _filePath;
         private readonly JsonSerializerOptions _jsonOptions;
 
         public AppSettings Settings { get; private set; }
 
-        public SettingsService(string filePath)
+        public SettingsService(string filePath, IMTLogger logger)
         {
             _filePath = filePath;
+            Logger = logger;
 
             _jsonOptions = new JsonSerializerOptions
             {
@@ -47,8 +52,30 @@ namespace MacroTrack.Core.Settings
 
         private void Save(AppSettings settings)
         {
+            Log($"Called. Right now Settigns are: UI: {Settings.LogUILevel} // File: {Settings.LogFileLevel}", LogLevel.Info);
+            Log($"Settings UI: {settings.LogUILevel} // settings file: {settings.LogFileLevel}", LogLevel.Info);
             string json = JsonSerializer.Serialize(settings, _jsonOptions);
             File.WriteAllText(_filePath, json);
+            Settings = settings;
+            Log($"Now Settigns are: UI: {Settings.LogUILevel} // File: {Settings.LogFileLevel}", LogLevel.Info);
+        }
+
+        public void Set(AppSettings settings)
+        {
+            Log();
+            Save(settings);
+        }
+
+        public void Apply(AppSettings settings)
+        {
+            // Apply every parameter which wouldn't be UI driven.
+            Logger.UILevel = settings.LogUILevel;
+            Logger.FileLevel = settings.LogFileLevel;
+        }
+
+        private void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
+        {
+            Logger.Log(this, caller, level, message, ex);
         }
     }
 }

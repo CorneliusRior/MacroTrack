@@ -214,5 +214,19 @@
         <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
         <Setter Property="Margin" Value="10,0,0,0"/>
     </Style>
+    
+    <!--ListBox-->
+    <Style TargetType="ListBox">
+        <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        
+        <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThickness}"/>
+        <Setter Property="Padding" Value="3"/>
+    </Style>
+    
+    <!--TextBlock-->
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+    </Style>
 
 </ResourceDictionary>
