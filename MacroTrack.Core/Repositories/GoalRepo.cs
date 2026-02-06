@@ -2,7 +2,7 @@
 
 namespace MacroTrack.Core.Repositories;
 
-using MacroTrack.Core.AppModels;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;

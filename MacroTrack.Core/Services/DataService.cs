@@ -3,7 +3,7 @@ namespace MacroTrack.Core.Services;
 
 using MacroTrack.Core.Repositories;
 using MacroTrack.Core.Models;
-using MacroTrack.Core.AppModels;
+using MacroTrack.Core.DataModels;
 
 using System.Runtime.CompilerServices;
 using MacroTrack.Core.Infrastructure;

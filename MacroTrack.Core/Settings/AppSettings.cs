@@ -15,7 +15,7 @@ namespace MacroTrack.Core.Settings
         public string ThemeCustomForeground { get; set; } = "#FFFFFF00";
         public string GraphColorPro { get; set; } = "#FFFF0000";
         public string GraphColorCar { get; set; } = "#FF0000FF";
-        public string GraphColorFat { get; set; } = "#FFFF0000";
+        public string GraphColorFat { get; set; } = "#FFFFFF00";
         public bool LogInitMessages { get; set; } = true;
         public int LogRetainAmount { get; set; } = 20;
         public LogLevel LogUILevel { get; set; } = LogLevel.Warning;

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using MacroTrack.Core.Settings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Media3D;
+using System.Windows.Media;
 
 namespace MacroTrack.AppLibrary.Resources
 {
@@ -17,8 +18,11 @@ namespace MacroTrack.AppLibrary.Resources
             ["Light"] = new Uri($"pack://application:,,,{ThemePrefix}Light.xaml",
                 UriKind.Absolute),
             ["Dark"] = new Uri($"pack://application:,,,{ThemePrefix}Dark.xaml",
+                UriKind.Absolute),
+            ["Dark custom"] = new Uri($"pack://application:,,,{ThemePrefix}DarkCustom.xaml",
+                UriKind.Absolute),
+            ["Wire"] = new Uri($"pack://application:,,,{ThemePrefix}Wire.xaml",
                 UriKind.Absolute)
-            // ...
         };
 
         public static IReadOnlyList<string> GetThemeList()
@@ -45,6 +49,16 @@ namespace MacroTrack.AppLibrary.Resources
             var existing = dictionaries.FirstOrDefault(d => d.Source?.OriginalString.Contains(ThemePrefix) == true)?.Source?.OriginalString ?? "";
             if (existing != null) return existing;
             else return "Light";
+        }
+
+        public static void SetCustomColors(AppSettings settings)
+        {
+            Application.Current.Resources["ThemeCustomForeground"] = ConvertToColor(settings.ThemeCustomForeground);
+        }
+
+        private static Color ConvertToColor(string s)
+        {
+            return (Color)ColorConverter.ConvertFromString(s)!;
         }
     }
 }

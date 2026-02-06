@@ -9,7 +9,7 @@
     <!--General Brushes-->
     <SolidColorBrush x:Key="AppBackGroundBrush" Color="#FF000000"/>
     <SolidColorBrush x:Key="AppForeGroundBrush" Color="{DynamicResource ThemeCustomForeground}"/>
-    <SolidColorBrush x:Key="PanelBackGroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="PanelBackGroundBrush" Color="#FF111111"/>
     <SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource ThemeCustomForeground}"/>
     
     <!--Control Brushes-->

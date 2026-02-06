@@ -1,5 +1,5 @@
 ﻿using MacroTrack.BasicApp.UserControls;
-using MacroTrack.Core.AppModels;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;

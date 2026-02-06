@@ -1,7 +1,7 @@
 using MacroTrack.Core.Services;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Logging;
-using MacroTrack.Core.AppModels;
+using MacroTrack.Core.DataModels;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms.DataVisualization.Charting;
 using MacroTrack.BasicApp.Forms;

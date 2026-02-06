@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MacroTrack.Core.AppModels;
+namespace MacroTrack.Core.DataModels;
 
 public record CalSeriesPoint
 {

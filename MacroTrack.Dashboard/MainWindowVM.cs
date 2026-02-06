@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using MacroTrack.AppLibrary.Resources;
+using MacroTrack.AppLibrary.Graphs;
 
 namespace MacroTrack.Dashboard
 {
@@ -33,6 +34,8 @@ namespace MacroTrack.Dashboard
             Logger = service.Logger;
             Settings = service.SettingsService.Settings;
             ApplyTheme();
+
+            
 
             PrintCommand = new RelayCommand(() => RequestPrint?.Invoke(""));
             OpenSettingsCommand = new RelayCommand(() => RequestOpenSettings?.Invoke());
@@ -59,7 +62,8 @@ namespace MacroTrack.Dashboard
 
         public void ApplyTheme()
         {
-            ThemeManager.SetTheme(Settings.Theme);
+            ThemeManager.SetCustomColors(Settings);
+            ThemeManager.SetTheme(Settings.Theme);            
         }
 
     }

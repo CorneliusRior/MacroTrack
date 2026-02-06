@@ -1,9 +1,10 @@
 ﻿using MacroTrack.AppLibrary.Controls;
+using MacroTrack.AppLibrary.Graphs;
 using MacroTrack.AppLibrary.ViewModels;
 using MacroTrack.AppLibrary.Windows.SettingsWindow;
 using MacroTrack.Core.Logging;
-using MacroTrack.Core.Services;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -58,6 +59,8 @@ namespace MacroTrack.Dashboard
             DiaryEntry.Init(Services);
             Repl.Init(Services);
             Repl.SubmitCommand += Repl_CommandHandler;
+
+            
 
             FoodEntry.Init(Services);
         }

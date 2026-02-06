@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MacroTrack.Dashboard"
         xmlns:views="clr-namespace:MacroTrack.AppLibrary.Controls;assembly=MacroTrack.AppLibrary"
+        xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs;assembly=MacroTrack.AppLibrary"
         xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls;assembly=MacroTrack.AppLibrary"
         mc:Ignorable="d"
         Title="MacroTrack" Height="1080" Width="1920"
@@ -103,7 +104,22 @@
                 <Border Grid.Column="0"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="{DynamicResource BorderThickness}"
-                    Background="{DynamicResource PanelBackGroundBrush}"/>
+                    Background="{DynamicResource PanelBackGroundBrush}">
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <graphs:MTDonut x:Name="DonutPresent"
+                                        Grid.Column="0"/>
+                        <graphs:MTDonut x:Name="DonutGoal"
+                                        Grid.Column="1"/>
+
+                    </Grid>
+
+                </Border>
 
                 <GridSplitter Grid.Column="1"/>
 

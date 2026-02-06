@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MacroTrack.Core.AppModels;
+namespace MacroTrack.Core.DataModels;
 
 public static class TimeFrameList
 {

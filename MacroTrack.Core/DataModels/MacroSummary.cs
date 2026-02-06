@@ -1,5 +1,5 @@
 // maybe this isn't the best name for it, I don't know.
-namespace MacroTrack.Core.AppModels;
+namespace MacroTrack.Core.DataModels;
 
 public record MacroTotals(
     double Calories,
