@@ -37,7 +37,8 @@
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="{DynamicResource BorderThickness}"
                     Background="{DynamicResource PanelBackGroundBrush}"
-                    Margin="0,0,0,5">
+                    Margin="0,0,0,5"
+                    Padding="20,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -48,7 +49,7 @@
                     <Label Grid.Column="0"
                            Style="{StaticResource Label.MainTitle}"
                            Content="MacroTrack"
-                           Padding="20,0" Margin="0"/>
+                           Margin="0"/>
 
                     <StackPanel Grid.Column="1" 
                                 Orientation="Horizontal"
@@ -82,8 +83,7 @@
                     <Label Grid.Column="2"
                            Style="{StaticResource Label.Title}"
                            Content="19:33 30/01/2026"
-                           VerticalAlignment="Center"
-                           Padding="20"/>
+                           VerticalAlignment="Center"/>
                 </Grid>
 
             </Border>
@@ -96,7 +96,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="5"/>
-                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="5"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
@@ -113,8 +113,12 @@
                         </Grid.ColumnDefinitions>
 
                         <graphs:MTDonut x:Name="DonutPresent"
+                                        Summary="{Binding CurrentSummary}"
+                                        TotalType="Actual"
                                         Grid.Column="0"/>
                         <graphs:MTDonut x:Name="DonutGoal"
+                                        Summary="{Binding CurrentSummary}"
+                                        TotalType="Target"
                                         Grid.Column="1"/>
 
                     </Grid>
@@ -126,7 +130,12 @@
                 <Border Grid.Column="2"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="{DynamicResource BorderThickness}"
-                        Background="{DynamicResource PanelBackGroundBrush}"/>
+                        Background="{DynamicResource PanelBackGroundBrush}">
+                    <controls:Summary x:Name="Summary" 
+                                      CurrentSummary="{Binding CurrentSummary}"
+                                      TimeFrame="{Binding SummaryTimeFrame, Mode=TwoWay}"/>
+
+                </Border>
 
                 <GridSplitter Grid.Column="3"/>
 
@@ -154,7 +163,8 @@
                         BorderThickness="{DynamicResource BorderThickness}"
                         Background="{DynamicResource PanelBackGroundBrush}">
 
-                    <views:FoodEntryControl x:Name="FoodEntry"/>
+                    <views:FoodEntryControl x:Name="FoodEntry"
+                                            RequestRefreshCommand="{Binding DataContext.RefreshSummaryCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
 
                 </Border>
 
@@ -199,11 +209,41 @@
         <GridSplitter Grid.Column="1"/>
 
         <!--History-->
-        <Border Grid.Column="4"
-                BorderBrush="{DynamicResource BorderBrush}"
-                BorderThickness="{DynamicResource BorderThickness}"
-                Background="{DynamicResource PanelBackGroundBrush}"
-                Margin="0,5,5,5"/>
+        
+        <Grid Grid.Column="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="{DynamicResource BorderThickness}"
+                    Background="{DynamicResource PanelBackGroundBrush}"
+                    Margin="0,5,5,0"
+                    Padding="20,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Recent Entries (3 days)"
+                           Style="{DynamicResource Label.Title}"
+                           Grid.Column="0"/>
+                    <Button Content="Refresh"
+                            Command="{Binding DataContext.RefreshSummaryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Grid.Column="1"/>
+
+                </Grid>
+            </Border>
+            
+            <Border Grid.Row="1"
+                    Padding="0"
+                    Margin="0,5,5,5">
+                <controls:HistoryControl x:Name="History"/>
+            </Border>
+        </Grid>
+            
+        
 
     </Grid>
 </Window>

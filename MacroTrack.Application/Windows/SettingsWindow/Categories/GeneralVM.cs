@@ -14,19 +14,10 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow.Categories
 {
     internal class GeneralVM : CategoryVMBase
     {
-        IMTLogger Logger;
         public ObservableCollection<string> ThemeList { get; } = new();
-        public GeneralVM(AppSettings settings, IMTLogger logger) : base("General", settings)
+        public GeneralVM(AppSettings settings) : base("General", settings)
         {
-            Logger = logger;
             foreach (var t in ThemeManager.GetThemeList()) ThemeList.Add(t);
-            Log("List of themese:");
-            foreach (string t in ThemeList) Log(t);
-        }
-
-        private void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
-        {
-            Logger?.Log(this, caller, level, message, ex);
         }
     }
 }

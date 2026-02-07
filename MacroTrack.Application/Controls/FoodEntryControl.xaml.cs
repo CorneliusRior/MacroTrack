@@ -39,6 +39,17 @@ namespace MacroTrack.AppLibrary.Controls
             _vm.Populate();
         }
 
+        public static readonly DependencyProperty RequestRefreshCommandProperty = DependencyProperty.Register(
+            nameof(RequestRefreshCommand),
+            typeof(ICommand),
+            typeof(FoodEntryControl)
+        );
+        public ICommand? RequestRefreshCommand
+        {
+            get => (ICommand?)GetValue(RequestRefreshCommandProperty);
+            set => SetValue(RequestRefreshCommandProperty, value);
+        }
+
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
             _vm.Clear();
@@ -47,6 +58,7 @@ namespace MacroTrack.AppLibrary.Controls
         private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
             _vm.Add();
+            RequestRefreshCommand?.Execute(null);
         }
 
         private void buttonNow_Click(object sender, RoutedEventArgs e)

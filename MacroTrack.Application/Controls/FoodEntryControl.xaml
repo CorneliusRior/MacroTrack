@@ -198,7 +198,8 @@
                         Click="ButtonClear_Click"/>
                 <Button Content="Add"
                         Name="ButtonAdd"
-                        Click="ButtonAdd_Click"/>
+                        Click="ButtonAdd_Click"
+                        Command="{Binding RefreshSummaryCommand, RelativeSource={RelativeSource AncestorType=local:ControlBase}}"/>
                 
             </StackPanel>
         </Grid>                

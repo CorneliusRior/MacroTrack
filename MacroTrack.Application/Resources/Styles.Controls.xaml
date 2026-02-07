@@ -246,10 +246,12 @@
     </Style>
     
     <!--Donut Charts-->
-    <Style TargetType="{x:Type graphs:MTDonut}">
+    <Style x:Key="MTDonutBase" TargetType="{x:Type graphs:MTDonut}">
         <Setter Property="BackgroundBrush" Value="{DynamicResource GraphBackGroundBrush}"/>
         <Setter Property="LabelBrush" Value="{DynamicResource AppForeGroundBrush}"/>
-        
+        <Setter Property="ProBrush" Value="{DynamicResource GraphColorPro}"/>
+        <Setter Property="CarBrush" Value="{DynamicResource GraphColorCar}"/>
+        <Setter Property="FatBrush" Value="{DynamicResource GraphColorFat}"/>
     </Style>
 
 </ResourceDictionary>

@@ -31,7 +31,7 @@ namespace MacroTrack.Dashboard
 
         public MainWindow()
         {
-            InitializeComponent();
+            
         }
 
         public MainWindow(CoreServices services) : this()
@@ -40,6 +40,7 @@ namespace MacroTrack.Dashboard
             Logger = services.Logger;
             _vm = new MainWindowVM(Services);
             DataContext = _vm;
+            InitializeComponent();
 
             _vm.RequestPrint += text => Print(text);
             _vm.RequestOpenSettings += () =>
@@ -55,20 +56,24 @@ namespace MacroTrack.Dashboard
         // Set up controls:
         private void WireUpControls()
         {
+            Summary.Init(Services);
+            FoodEntry.Init(Services);
             WeightEntry.Init(Services);
             DiaryEntry.Init(Services);
+            History.Init(Services);
             Repl.Init(Services);
-            Repl.SubmitCommand += Repl_CommandHandler;
-
-            
-
-            FoodEntry.Init(Services);
+            Repl.SubmitCommand += Repl_CommandHandler;            
         }
 
         // Log & REPL handling:
         private void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
         {
             Logger.Log(this, caller, level, message, ex);
+        }
+
+        private void LogVars(object vars, string? prefix = null, [CallerMemberName] string caller = "")
+        {
+            Logger.LogVars(this, vars, caller, prefix);
         }
 
         private void Print(string text)

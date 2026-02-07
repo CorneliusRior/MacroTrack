@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs"
                     xmlns:System="clr-namespace:System;assembly=mscorlib">
     
     <!--General Brushes-->
@@ -34,6 +35,9 @@
     <SolidColorBrush x:Key="GraphColorPro" Color="Red"/>
     <SolidColorBrush x:Key="GraphColorCar" Color="Blue"/>
     <SolidColorBrush x:Key="GraphColorFat" Color="Yellow"/>
+    <Style TargetType="{x:Type graphs:MTDonut}" BasedOn="{StaticResource MTDonutBase}">
+        <Setter Property="Hatch" Value="True"/>
+    </Style>
 
     <!--Other formatting-->
     <Thickness x:Key="BorderThickness">2</Thickness>

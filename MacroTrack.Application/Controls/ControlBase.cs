@@ -25,6 +25,7 @@ namespace MacroTrack.AppLibrary.Controls
         public CoreServices? Services { get; set; }
         public IMTLogger? Logger { get; set; }
 
+        
 
         protected ControlBase()
         {

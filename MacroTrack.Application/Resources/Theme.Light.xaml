@@ -1,10 +1,13 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Theme.Base.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
     <!--Overrides-->
-    
-    
+    <Style TargetType="{x:Type graphs:MTDonut}" BasedOn="{StaticResource MTDonutBase}">
+        <Setter Property="Hatch" Value="False"/>
+    </Style>
+
 </ResourceDictionary>

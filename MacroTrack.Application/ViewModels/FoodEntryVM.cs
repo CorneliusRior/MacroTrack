@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
@@ -18,6 +19,8 @@ namespace MacroTrack.AppLibrary.ViewModels
     {
         public ObservableCollection<Preset> PresetList { get; } = new();
         public ObservableCollection<string> CatList { get; } = new();
+
+        
 
         private bool _multUpdating;
 
@@ -198,7 +201,7 @@ namespace MacroTrack.AppLibrary.ViewModels
                 Clear();
             }
             catch (Exception ex) { Log("Could not add entry", LogLevel.Error, ex); }
-            
+
         }
 
         public void TimeNow()

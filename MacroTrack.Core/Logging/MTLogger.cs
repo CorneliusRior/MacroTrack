@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace MacroTrack.Core.Logging
 {
@@ -49,6 +50,23 @@ namespace MacroTrack.Core.Logging
             {
                 MessageLogged?.Invoke(this, msg);
             }
+        }
+
+        public void LogVars(object sourceObj, object vars, string caller, string? prefix = null)
+        {
+            var props = vars.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var parts = props.Select(p =>
+            {
+                var value = p.GetValue(vars);
+                return $"{p.Name}={Format(value)}";
+            });
+            Log(sourceObj, caller, LogLevel.Debug, $"{(prefix ?? "LogVars: ")}, {string.Join(", ", parts)}");
+        }
+
+        private string Format(object? value)
+        {
+            if (value is null) return "null";
+            return $"{value.GetType().Name} '{value}'";
         }
 
         public void OpenLogFile()

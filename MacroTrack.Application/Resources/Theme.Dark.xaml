@@ -22,5 +22,9 @@
 
     <!--Graphing Brushes-->
     <SolidColorBrush x:Key="GraphBackGroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="GraphColorPro" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="GraphColorCar" Color="#FFAAAAAA"/>
+    <SolidColorBrush x:Key="GraphColorFat" Color="#FF555555"/>
     
+
 </ResourceDictionary>

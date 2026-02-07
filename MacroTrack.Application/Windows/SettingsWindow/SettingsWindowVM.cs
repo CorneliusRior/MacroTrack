@@ -38,7 +38,6 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
             Log();
             SettingsEditable = Services.SettingsService.Settings.Clone();
 
-            Log($"Just so you know, such are settings editable: UI: {SettingsEditable.LogUILevel} // File: {SettingsEditable.LogFileLevel}");
 
             AddCategories();
             SelectedCategory = Categories[0];
@@ -51,7 +50,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
         private void AddCategories()
         {
             Log();
-            Categories.Add(new GeneralVM(SettingsEditable, Logger));
+            Categories.Add(new GeneralVM(SettingsEditable));
             Categories.Add(new LoggingVM(SettingsEditable));
         }
 
