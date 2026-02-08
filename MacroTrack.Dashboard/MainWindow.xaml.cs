@@ -46,8 +46,15 @@ namespace MacroTrack.Dashboard
             _vm.RequestOpenSettings += () =>
             {
                 var w = new SettingsWindow(Services) { Owner = this };
+                w.RequestRefresh += () =>
+                {
+                    RefreshAll();
+                    _vm.RefreshVM();
+                };
                 w.Show();
             };
+            _vm.RequestRefreshAll += RefreshAll;
+
 
             Log("Main window opened.", LogLevel.Info);
             WireUpControls();            
@@ -61,6 +68,7 @@ namespace MacroTrack.Dashboard
             WeightEntry.Init(Services);
             DiaryEntry.Init(Services);
             History.Init(Services);
+            History.RequestRefresh += () => _vm?.RefreshSummaryCommand.Execute(null);
             Repl.Init(Services);
             Repl.SubmitCommand += Repl_CommandHandler;            
         }
@@ -79,6 +87,11 @@ namespace MacroTrack.Dashboard
         private void Print(string text)
         {
             Repl.AppendLine(text);
+        }
+
+        private void RefreshAll()
+        {
+            History.Refresh();
         }
 
         private void Repl_CommandHandler(object? sender, string cmd)

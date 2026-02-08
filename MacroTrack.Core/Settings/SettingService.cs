@@ -77,5 +77,10 @@ namespace MacroTrack.Core.Settings
         {
             Logger.Log(this, caller, level, message, ex);
         }
+
+        public string DateTimeFormatString()
+        {
+            return DTFormatSList.FormatByValue.TryGetValue(Settings.DTFormatShort, out var fmt) ? fmt : "yyyy-MM-dd HH:mm";
+        }
     }
 }

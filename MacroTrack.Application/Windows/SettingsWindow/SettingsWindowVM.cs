@@ -30,6 +30,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
 
 
         public event Action<bool>? RequestClose;
+        public event Action? RequestRefresh;
         
         public SettingsWindowVM(CoreServices services)
         {            
@@ -59,6 +60,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
             Log();
             Services.SettingsService.Set(SettingsEditable);
             ThemeManager.SetTheme(Services.SettingsService.Settings.Theme);
+            RequestRefresh?.Invoke();
         }
 
         public void SetSelectedToDefault()

@@ -33,6 +33,19 @@ namespace MacroTrack.AppLibrary.Controls
             get => (FoodEntry?)GetValue(EntryProperty);
             set => SetValue(EntryProperty, value);
         }
+
+        public static readonly DependencyProperty TimeFormatProperty = DependencyProperty.Register(
+            nameof(TimeFormat),
+            typeof(string),
+            typeof(FoodEntryCard),
+            new PropertyMetadata("yyyy/M/d - HH:mm")
+        );
+        public string TimeFormat
+        {
+            get => (string)GetValue(TimeFormatProperty);
+            set => SetValue(TimeFormatProperty, value);
+        }
+
         public FoodEntryCard()
         {
             InitializeComponent();

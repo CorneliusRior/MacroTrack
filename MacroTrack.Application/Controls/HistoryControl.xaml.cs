@@ -24,22 +24,16 @@ namespace MacroTrack.AppLibrary.Controls
     public partial class HistoryControl : ControlBase
     {
         private readonly HistoryVM _vm = new();
-        /*
-        public static readonly DependencyProperty RequestRefreshCommandProperty = DependencyProperty.Register(
-            nameof(RequestRefreshCommand),
-            typeof(ICommand),
-            typeof(FoodEntryControl)
-        );
-        public ICommand? RequestRefreshCommand
-        {
-            get => (ICommand?)GetValue(RequestRefreshCommandProperty);
-            set => SetValue(RequestRefreshCommandProperty, value);
-        }*/
+        public event Action? RequestRefresh;
 
         public HistoryControl()
         {
             InitializeComponent();
             DataContext = _vm;
+            _vm.RequestRefresh += () =>
+            {
+                RequestRefresh?.Invoke();
+            };
         }
 
         public override void Init(CoreServices services)
@@ -47,6 +41,11 @@ namespace MacroTrack.AppLibrary.Controls
             base.Init(services);
             _vm.Services = Services;
             _vm.Logger = Logger;
+            _vm.Populate();
+        }
+
+        public void Refresh()
+        {
             _vm.Populate();
         }
     }

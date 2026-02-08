@@ -14,7 +14,8 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow.Categories
 {
     internal class GeneralVM : CategoryVMBase
     {
-        public ObservableCollection<string> ThemeList { get; } = new();
+        public ObservableCollection<string> ThemeList { get; } = new();        
+
         public GeneralVM(AppSettings settings) : base("General", settings)
         {
             foreach (var t in ThemeManager.GetThemeList()) ThemeList.Add(t);

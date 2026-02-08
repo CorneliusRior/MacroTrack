@@ -3,12 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:set="clr-namespace:MacroTrack.Core.Settings;assembly=MacroTrack.Core"
+             xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
              Margin="0,0,5,5"
              
              mc:Ignorable="d" 
              d:DesignWidth="300"
              Height="auto">
+    <UserControl.Resources>
+        <conv:EnumDateTimeConverter x:Key="DateFmt"/>
+    </UserControl.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="{DynamicResource BorderThickness}" Padding="7">
@@ -56,7 +61,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <Label x:Name="PART_LabelTime"
-                           ContentStringFormat="{}{0:g}}"
+                           ContentStringFormat="{Binding TimeFormat, ElementName=Root}"
                            Content="{Binding Entry.Time, ElementName=Root}"
                            Padding="2"
                            Grid.Column="0"/>
@@ -81,10 +86,14 @@
                 </Grid.RowDefinitions>
                 <Button x:Name="buttonEdit"
                         Content="Edit"
+                        Command="{Binding DataContext.EditEntryCommand, RelativeSource={RelativeSource AncestorType=local:HistoryControl}}"
+                        CommandParameter="{Binding}"
                         VerticalAlignment="Bottom"
                         Grid.Row="0"/>
                 <Button x:Name="buttonDelete"
                         Content="Delete"
+                        Command="{Binding DataContext.DeleteEntryCommand, RelativeSource={RelativeSource AncestorType=local:HistoryControl}}"
+                        CommandParameter="{Binding}"
                         VerticalAlignment="Top"
                         Grid.Row="1"/>
             </Grid>
