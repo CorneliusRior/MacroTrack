@@ -34,6 +34,11 @@ namespace MacroTrack.AppLibrary.ViewModels
             Logger?.Log(this, caller, level, message, ex);
         }
 
+        protected void LogVars(object vars, string? prefix = null, [CallerMemberName] string caller = "")
+        {
+            Logger?.LogVars(this, vars, caller, prefix);
+        }
+
         // Error handling:
         protected readonly Dictionary<string, List<string>> _errors = new();
         public bool HasErrors => _errors.Count > 0;

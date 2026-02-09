@@ -44,15 +44,11 @@ namespace MacroTrack.AppLibrary.ViewModels
         public void Populate()
         {
             Log();
-            if (Services == null) return;
+            if (Services == null) throw new Exception("Null Services");
             List<FoodEntry> HistoryList = Services.foodLogService.FromTimes(DateTime.Now.Date.AddDays(-3), DateTime.Now.Date.AddDays(3));
             Entries.Clear();
             TimeFormat = Services.SettingsService.DateTimeFormatString();
-            foreach (var entry in HistoryList)
-            {
-                Entries.Add(entry);
-            }
-
+            foreach (var entry in HistoryList) Entries.Add(entry);
         }
 
         private void DeleteEntry(FoodEntry? entry)

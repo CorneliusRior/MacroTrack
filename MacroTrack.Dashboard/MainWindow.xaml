@@ -142,7 +142,9 @@
                 <Border Grid.Column="4"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="{DynamicResource BorderThickness}"
-                        Background="{DynamicResource PanelBackGroundBrush}"/>
+                        Background="{DynamicResource PanelBackGroundBrush}">
+                    <controls:DailyTaskControl x:Name="DailyTasks"/>
+                </Border>
 
             </Grid>
 

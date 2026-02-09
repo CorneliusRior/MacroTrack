@@ -86,13 +86,15 @@
                 </Grid.RowDefinitions>
                 <Button x:Name="buttonEdit"
                         Content="Edit"
-                        Command="{Binding DataContext.EditEntryCommand, RelativeSource={RelativeSource AncestorType=local:HistoryControl}}"
+                        Command="{Binding DataContext.EditEntryCommand, 
+                                  RelativeSource={RelativeSource AncestorType=local:HistoryControl}}"
                         CommandParameter="{Binding}"
                         VerticalAlignment="Bottom"
                         Grid.Row="0"/>
                 <Button x:Name="buttonDelete"
                         Content="Delete"
-                        Command="{Binding DataContext.DeleteEntryCommand, RelativeSource={RelativeSource AncestorType=local:HistoryControl}}"
+                        Command="{Binding DataContext.DeleteEntryCommand, 
+                                  RelativeSource={RelativeSource AncestorType=local:HistoryControl}}"
                         CommandParameter="{Binding}"
                         VerticalAlignment="Top"
                         Grid.Row="1"/>

@@ -16,7 +16,7 @@
         </CollectionViewSource>
     </local:ControlBase.Resources>
     
-    <Border Background="{DynamicResource PanelBackGroundBrush}">
+    <Border Background="{DynamicResource AppBackGroundBrush}">
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0" Margin="0">
             <ItemsControl x:Name="HistoryItems" ItemsSource="{Binding Source={StaticResource SortedEntries}}">
                 <ItemsControl.ItemsPanel>

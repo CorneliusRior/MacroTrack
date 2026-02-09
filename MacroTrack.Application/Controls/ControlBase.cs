@@ -49,5 +49,10 @@ namespace MacroTrack.AppLibrary.Controls
         {
             Logger?.Log(this, caller, level, message, ex);
         }
+        protected void LogVars(object vars, string? prefix = null, [CallerMemberName] string caller = "")
+        {
+            Logger?.LogVars(this, vars, caller, prefix);
+        }
+
     }
 }

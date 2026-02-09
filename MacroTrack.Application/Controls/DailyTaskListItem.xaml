@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="MacroTrack.AppLibrary.Controls.DailyTaskListItem"
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="200">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <CheckBox x:Name="PART_CheckBox"
+                  Content="{Binding Task.Name, ElementName=Root}"
+                  IsChecked="{Binding Task.Completed, ElementName=Root}"
+                  Command="{Binding DataContext.ToggleCompleteCommand, 
+                            RelativeSource={RelativeSource AncestorType=local:DailyTaskControl}}"
+                  CommandParameter="{Binding}"
+                  Grid.Column="0"/>
+        <Label x:Name="PART_StreakLabel"
+               Content="{Binding Task.Streak, ElementName=Root}"
+               Margin="10,0"
+               Grid.Column="1"/>
+    </Grid>
+</UserControl>

@@ -64,6 +64,7 @@ namespace MacroTrack.Dashboard
         private void WireUpControls()
         {
             Summary.Init(Services);
+            DailyTasks.Init(Services);
             FoodEntry.Init(Services);
             WeightEntry.Init(Services);
             DiaryEntry.Init(Services);
@@ -92,6 +93,7 @@ namespace MacroTrack.Dashboard
         private void RefreshAll()
         {
             History.Refresh();
+            DailyTasks.Refresh();
         }
 
         private void Repl_CommandHandler(object? sender, string cmd)
