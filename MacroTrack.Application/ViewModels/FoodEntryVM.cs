@@ -206,13 +206,15 @@ namespace MacroTrack.AppLibrary.ViewModels
 
             try 
             {
-                if (Services == null) throw new Exception("Null services");
+                if (Services == null) throw new Exception("Null Services");
+                if (AppServices == null) throw new Exception("Null AppServices");
                 FoodEntry entry = Services.foodLogService.AddEntry(time, ItemName!, mult, cal, pro, car, fat, (_selectedPreset == null ? null : _selectedPreset.PresetName), Notes);
                 Log($"Added entry #{entry.Id}", LogLevel.Info);
+                AppServices.AppEvents.Publish(new FoodLogChanged());
                 Clear();
             }
             catch (Exception ex) { Log("Could not add entry", LogLevel.Error, ex); }
-
+            
         }
 
         public void TimeNow()
@@ -222,7 +224,8 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public void NewPreset()
         {
-            MessageBox.Show("Not yet implemnted");
+            if (AppServices == null) return;
+            AppServices.WindowService.Show(WindowType.AddPreset);
         }
 
         public void Populate()

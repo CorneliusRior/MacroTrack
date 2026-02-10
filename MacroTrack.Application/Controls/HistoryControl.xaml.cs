@@ -24,17 +24,12 @@ namespace MacroTrack.AppLibrary.Controls
     /// </summary>
     public partial class HistoryControl : ControlBase
     {
-        private readonly HistoryVM _vm = new();
-        public event Action? RequestRefresh;
+        private readonly HistoryVM _vm = new();        
 
         public HistoryControl()
         {
             InitializeComponent();
             DataContext = _vm;
-            _vm.RequestRefresh += () =>
-            {
-                RequestRefresh?.Invoke();
-            };
         }
 
         public override void Init(CoreServices services, AppServices appServices)

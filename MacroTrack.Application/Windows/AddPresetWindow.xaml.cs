@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Logging;
+using MacroTrack.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +22,22 @@ namespace MacroTrack.AppLibrary.Windows
     /// </summary>
     public partial class AddPresetWindow : Window
     {
+        private CoreServices Services;
+        private IMTLogger Logger;
+        private AppServices AppServices;
+
+        /*
         public AddPresetWindow()
         {
             InitializeComponent();
+        }*/
+
+        public AddPresetWindow(CoreServices services, AppServices appServices)
+        {
+            InitializeComponent();
+            Services = services;
+            Logger = services.Logger;
+            AppServices = appServices;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         public ICommand DeleteEntryCommand { get; }
         public ICommand EditEntryCommand { get; }
 
-        public event Action? RequestRefresh;
+        //public event Action? RequestRefresh;
 
         public HistoryVM()
         {
@@ -47,6 +47,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             base.Init(services, appServices);
             EventSubscribe(AppServices!.AppEvents.Subscribe<FoodLogChanged>(_ => Populate()));
+            EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => Populate()));
             Populate();
         }
 
@@ -63,6 +64,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         private void DeleteEntry(FoodEntry? entry)
         {
             if (Services == null) return;
+            if (AppServices == null) return;
             if (entry == null)
             {
                 Log($"Null entry, returning.", LogLevel.Warning);
@@ -72,7 +74,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             {
                 Services.foodLogService.DeleteEntry(entry.Id);
                 Entries.Remove(entry);
-                RequestRefresh?.Invoke();
+                AppServices.AppEvents.Publish(new FoodLogChanged());
             }
             catch (Exception ex)
             {
@@ -83,9 +85,11 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         private void EditEntry(FoodEntry? entry)
         {
+            if (Services == null) return;
+            if (AppServices == null) return;
             MessageBox.Show("Not yet implemented");
             // basically call EditFoodEntry then Populate();
-            RequestRefresh?.Invoke();
+            AppServices.AppEvents.Publish(new FoodLogChanged());
         }
     }
 

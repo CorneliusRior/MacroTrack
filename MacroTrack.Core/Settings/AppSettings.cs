@@ -24,7 +24,8 @@ namespace MacroTrack.Core.Settings
         public bool ClockInLongFormat { get; set; } = true;
         public DTFormatS DTFormatShort { get; set; } = DTFormatS.Default; // Default, 2026/2/7 - 7:42 PM
         public DTFormatL DTFormatLong { get; set; } = DTFormatL.Default;
-
+        public bool TaskShowInactive { get; set; } = false;
+        public bool TaskShowActive { get; set; } = true;
 
         public AppSettings Clone()
         {
@@ -38,7 +39,9 @@ namespace MacroTrack.Core.Settings
                 WeightMode = this.WeightMode,
                 ClockInLongFormat = this.ClockInLongFormat,
                 DTFormatShort = this.DTFormatShort,
-                DTFormatLong = this.DTFormatLong
+                DTFormatLong = this.DTFormatLong,
+                TaskShowInactive = this.TaskShowInactive,
+                TaskShowActive = this.TaskShowActive,
             };
         }
 

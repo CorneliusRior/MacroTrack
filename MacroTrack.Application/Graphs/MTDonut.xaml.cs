@@ -37,7 +37,7 @@ namespace MacroTrack.AppLibrary.Graphs
                 typeof(MacroSummary),
                 typeof(MTDonut),
                 new PropertyMetadata(null, (d, e) => ((MTDonut)d).Redraw())
-            );
+        );
         public MacroSummary? Summary
         {
             get => (MacroSummary?)GetValue(SummaryProperty);
@@ -247,7 +247,6 @@ namespace MacroTrack.AppLibrary.Graphs
 
         private void Redraw()
         {
-            Debug.WriteLine("Redraw called");
             if (!IsLoaded || PART_Canvas == null) return;
 
             UpdateCenterText();
@@ -261,7 +260,6 @@ namespace MacroTrack.AppLibrary.Graphs
             double w = ActualWidth;
             double h = ActualHeight;
             if (w <= 1 || h <= 1) return;
-            Debug.WriteLine($"ActualHeight={ActualHeight}, ActualWidth={ActualWidth}"); 
 
             double size = Math.Min(w, h);
             double outerR = (size / 2) - DonutPadding;
@@ -351,10 +349,8 @@ namespace MacroTrack.AppLibrary.Graphs
 
         private Brush ApplyHatching(Brush baseBrush)
         {
-            Debug.WriteLine("Made it to applyhatching");
             if (!Hatch) return baseBrush;
             if (baseBrush is not SolidColorBrush scb) return baseBrush;
-            Debug.WriteLine("Not returning");
             //var c = scb.Color;
 
             double tile = HatchSpacing * 2;
@@ -454,7 +450,6 @@ namespace MacroTrack.AppLibrary.Graphs
 
         private static Point PointOnCircle(Point c, double r, double deg)
         {
-            Debug.WriteLine($"PointonCircle Called, c={c}, r={r}, deg={deg}");
             double rad = deg * Math.PI / 180;
             return new Point(
                 c.X + (r*Math.Cos(rad)),

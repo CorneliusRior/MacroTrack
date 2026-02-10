@@ -109,7 +109,7 @@ namespace MacroTrack.AppLibrary.Controls
         public Summary()
         {
             InitializeComponent();
-            DataContext = _vm;
+            //DataContext = _vm;
         }
 
         public override void Init(CoreServices services, AppServices appServices)
@@ -127,6 +127,8 @@ namespace MacroTrack.AppLibrary.Controls
 
         public void Populate()
         {
+            Log("We got here, print CurrentSummary things");
+            LogVars(new {CurrentSummary, CurrentSummary?.GoalName, CurrentSummary?.Target.Calories});
             if (CurrentSummary == null)
             {
                 CalPct = "(-%)";

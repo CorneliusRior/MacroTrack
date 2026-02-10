@@ -36,9 +36,9 @@ namespace MacroTrack.Dashboard
         public event Action? RequestOpenSettings;
 
         // Get rid of these once events are implemented:
-        public ICommand RefreshSummaryCommand { get; }
+        //public ICommand RefreshSummaryCommand { get; }
 
-        public Action? RequestRefreshAll;
+        //public Action? RequestRefreshAll;
 
         // Event Subscriptions:
         private List<IDisposable> _subscriptions = new List<IDisposable>();
@@ -137,7 +137,7 @@ namespace MacroTrack.Dashboard
             RefreshSummary();
 
             // Commands (some might be redundant)
-            RefreshSummaryCommand = new RelayCommand(RefreshSummary);
+            //RefreshSummaryCommand = new RelayCommand(RefreshSummary);
             PrintCommand = new RelayCommand(() => RequestPrint?.Invoke(""));
             OpenSettingsCommand = new RelayCommand(() => RequestOpenSettings?.Invoke());
 
@@ -148,6 +148,10 @@ namespace MacroTrack.Dashboard
                 ApplyTheme();
             });
             _subscriptions.Add(_subSettingsChanged);
+            IDisposable _foodLogChanged = AppServices.AppEvents.Subscribe<FoodLogChanged>(_ =>
+            {
+                RefreshSummary();
+            });
 
             // Clock logic:      
             SetClockFormat();
@@ -192,12 +196,7 @@ namespace MacroTrack.Dashboard
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-
-        public void RequestMainRefresh()
-        {
-            RequestRefreshAll?.Invoke();
-        }        
-
+        
         private void RefreshSummary()
         {
             Log($"SummaryTimeFrame='{SummaryTimeFrame}'");
@@ -249,12 +248,13 @@ namespace MacroTrack.Dashboard
                     }
             }
             CurrentSummary = Services.dataService.GetMacroSummary(SummaryStartTime, SummaryEndTime);
-            RequestMainRefresh(); // Change this to summary changed.
+            AppServices.AppEvents.Publish(new SummaryChanged(CurrentSummary));
         }
 
         public void OpenSettings()
         {
-            OpenSettingsCommand.Execute(this);
+            //OpenSettingsCommand.Execute(this);
+            AppServices.WindowService.Show(WindowType.Settings);
         }
 
         public void ApplyTheme()

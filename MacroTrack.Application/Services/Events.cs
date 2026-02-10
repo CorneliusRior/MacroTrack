@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MacroTrack.Core.DataModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,7 +29,7 @@ namespace MacroTrack.AppLibrary.Services
     or just (_ => Method()) if you prefer.
     */
     public sealed record SettingsChanged;
-    public sealed record SummaryChanged;
+    public sealed record SummaryChanged(MacroSummary summary);
     public sealed record FoodLogChanged;
     public sealed record PresetListChanged;
     public sealed record TaskCompletionChanged;

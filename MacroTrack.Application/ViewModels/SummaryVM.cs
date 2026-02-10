@@ -22,6 +22,6 @@ namespace MacroTrack.AppLibrary.ViewModels
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-        }
+        }        
     }
 }

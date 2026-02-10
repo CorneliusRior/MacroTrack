@@ -28,7 +28,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
         public AppServices AppServices;
 
         private SettingsWindowVM _vm;
-        public event Action? RequestRefresh;
+        //public event Action? RequestRefresh;
         public SettingsWindow(CoreServices services, AppServices appServices)
         {
             InitializeComponent();
@@ -38,7 +38,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
             _vm = new SettingsWindowVM(Services, AppServices);
             DataContext = _vm;
             _vm.RequestClose += r => { Close(); };
-            _vm.RequestRefresh += () => RequestRefresh?.Invoke();
+            //_vm.RequestRefresh += () => RequestRefresh?.Invoke();
         }
 
         private void ButtonRevert_Click(object sender, RoutedEventArgs e)

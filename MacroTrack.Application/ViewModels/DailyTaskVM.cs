@@ -19,8 +19,8 @@ namespace MacroTrack.AppLibrary.ViewModels
         public ObservableCollection<DailyTask> Tasks { get; } = new ObservableCollection<DailyTask>();
         
         // Make these DP:
-        public bool FilterActive = false;
-        public bool FilterInactive = true;
+        private bool _filterActive = false;
+        private bool _filterInactive = true;
 
         // Commands:
         public ICommand ToggleCompleteCommand { get; }
@@ -32,16 +32,28 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public override void Init(CoreServices services, AppServices appServices)
         {
-            base.Init(services, appServices);           
+            base.Init(services, appServices);   
+            ApplySettings();
             EventSubscribe(AppServices!.AppEvents.Subscribe<TaskCompletionChanged>(_ => Populate()));
+            EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ =>
+            {
+                ApplySettings();
+                Populate();
+            }));
             Populate();
+        }
+
+        private void ApplySettings()
+        {
+            _filterActive = !Services!.SettingsService.Settings.TaskShowActive;
+            _filterInactive = !Services!.SettingsService.Settings.TaskShowInactive;
         }
 
         public void Populate()
         {
             Log();
             if (Services == null) throw new Exception("Null Services");
-            List<DailyTask> tasksRaw = Services.taskService.GetAllStreaks(DateTime.Now, FilterActive, FilterInactive);
+            List<DailyTask> tasksRaw = Services.taskService.GetAllStreaks(DateTime.Now, _filterActive, _filterInactive);
             Tasks.Clear();
             foreach (DailyTask t in tasksRaw) Tasks.Add(t);
         }

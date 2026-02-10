@@ -69,6 +69,15 @@
                                   IsChecked="{Binding SettingsEditable.ClockInLongFormat, Mode=TwoWay}"/>
                     </StackPanel>
                 </Expander>
+
+                <Expander Header="Daily Tasks" IsExpanded="True">
+                    <StackPanel Orientation="Vertical">
+                        <CheckBox Content="Show inactive tasks"
+                                  IsChecked="{Binding SettingsEditable.TaskShowInactive, Mode=TwoWay}"/>
+                        <CheckBox Content="Show active tasks"
+                                  IsChecked="{Binding SettingsEditable.TaskShowActive, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Expander>
                 
             </StackPanel>
         </ScrollViewer>

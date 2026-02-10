@@ -49,7 +49,7 @@ namespace MacroTrack.Dashboard
             Services = new CoreServices(context);
 
             // Create AppServices:
-            AppServices = new AppServices();
+            AppServices = new AppServices(Services);
 
             // Show Window:
             var mainWindow = new MainWindow(Services, AppServices);
