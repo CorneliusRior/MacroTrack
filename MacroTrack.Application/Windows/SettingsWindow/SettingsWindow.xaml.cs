@@ -1,4 +1,5 @@
-﻿using MacroTrack.Core.Logging;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 using MacroTrack.Core.Settings;
 using System;
@@ -24,14 +25,17 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
     {
         public CoreServices Services;
         public IMTLogger Logger;
+        public AppServices AppServices;
+
         private SettingsWindowVM _vm;
         public event Action? RequestRefresh;
-        public SettingsWindow(CoreServices services)
+        public SettingsWindow(CoreServices services, AppServices appServices)
         {
             InitializeComponent();
             Services = services;
             Logger = services.Logger;
-            _vm = new SettingsWindowVM(Services);
+            AppServices = appServices;
+            _vm = new SettingsWindowVM(Services, AppServices);
             DataContext = _vm;
             _vm.RequestClose += r => { Close(); };
             _vm.RequestRefresh += () => RequestRefresh?.Invoke();

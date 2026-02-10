@@ -1,4 +1,5 @@
-﻿using MacroTrack.AppLibrary.ViewModels;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.AppLibrary.ViewModels;
 using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
@@ -24,6 +25,7 @@ namespace MacroTrack.AppLibrary.Controls
     {
         public CoreServices? Services { get; set; }
         public IMTLogger? Logger { get; set; }
+        public AppServices? AppServices { get; set; }
 
         
 
@@ -39,10 +41,11 @@ namespace MacroTrack.AppLibrary.Controls
             };
         }
 
-        public virtual void Init(CoreServices services)
+        public virtual void Init(CoreServices services, AppServices appServices)
         {
             Services = services;
             Logger = services.Logger;
+            AppServices = appServices;
         }
 
         protected void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")

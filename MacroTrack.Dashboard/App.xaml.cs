@@ -2,7 +2,7 @@
 using System.Data;
 using System.IO;
 using System.Windows;
-
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
@@ -11,11 +11,16 @@ using MacroTrack.Core.Settings;
 namespace MacroTrack.Dashboard
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for App.xaml.
+    /// Composition Root for Dashboard Application of AppLibrary WPF assets.
     /// </summary>
+    /// <remarks>
+    /// You might notice that we ignore our usual convention of trying to put Parameters in alphabetical order: No, Services goes first, it deserves it.
+    /// </remarks>
     public partial class App : Application
     {
         public CoreServices Services { get; private set; } = null!;
+        public AppServices AppServices { get; private set; } = null!;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -39,13 +44,15 @@ namespace MacroTrack.Dashboard
             // Application of some settings:
             Paths.DeleteOldLogs(settingsService.Settings.LogRetainAmount);
 
-
-            // Create context, then CoreServices
+            // Create context, then CoreServices:
             var context = new CoreContext(connString, logger, settingsService);
             Services = new CoreServices(context);
 
+            // Create AppServices:
+            AppServices = new AppServices();
+
             // Show Window:
-            var mainWindow = new MainWindow(Services);
+            var mainWindow = new MainWindow(Services, AppServices);
             mainWindow.Show();            
         }
     }

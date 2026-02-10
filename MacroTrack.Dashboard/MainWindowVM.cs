@@ -17,6 +17,7 @@ using MacroTrack.Core.DataModels;
 using MacroTrack.AppLibrary.Models;
 using MacroTrack.AppLibrary.Controls;
 using System.Windows.Threading;
+using MacroTrack.AppLibrary.Services;
 
 namespace MacroTrack.Dashboard
 {
@@ -25,16 +26,22 @@ namespace MacroTrack.Dashboard
         public CoreServices Services;
         //public AppSettings Settings;
         public IMTLogger Logger;
+        public AppServices AppServices;
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public ICommand PrintCommand { get; }
         public event Action<string>? RequestPrint;
+
         public ICommand OpenSettingsCommand { get; }
         public event Action? RequestOpenSettings;
 
+        // Get rid of these once events are implemented:
         public ICommand RefreshSummaryCommand { get; }
 
         public Action? RequestRefreshAll;
+
+        // Event subscriptions:
+        private IDisposable _subSettingsChanged;
 
         // Variables:
         private MacroSummary? _currentSummary;
@@ -94,7 +101,7 @@ namespace MacroTrack.Dashboard
             }
         }
 
-        private string _clockFormat;
+        private string _clockFormat = "ddddd, d MMMM, yyyy, HH:mm:ss";
         public string ClockFormat
         {
             get => _clockFormat;
@@ -105,7 +112,7 @@ namespace MacroTrack.Dashboard
             }
         }
 
-        private string _clockString;
+        private string _clockString = "Time to get a new clock";
         public string ClockString
         {
             get => _clockString;
@@ -120,21 +127,27 @@ namespace MacroTrack.Dashboard
 
         private readonly DispatcherTimer _clockTimer;
 
-        public MainWindowVM(CoreServices service)
+        public MainWindowVM(CoreServices service, AppServices appServices)
         {
             Services = service;
             Logger = service.Logger;
-            //Settings = service.SettingsService.Settings;
+            AppServices = appServices;
             ApplyTheme();
 
             RefreshSummary();
 
+            // Commands (some might be redundant)
             RefreshSummaryCommand = new RelayCommand(RefreshSummary);
             PrintCommand = new RelayCommand(() => RequestPrint?.Invoke(""));
             OpenSettingsCommand = new RelayCommand(() => RequestOpenSettings?.Invoke());
 
-            // Clock logic:            
-            ClockFormat = "ddddd, d MMMM, yyyy, HH:MM:SS";
+            // Event Subscriptions:
+            _subSettingsChanged = AppServices.AppEvents.Subscribe<SettingsChanged>(_ =>
+            {
+                SetClockFormat();
+            });
+
+            // Clock logic:      
             SetClockFormat();
             CurrentTime = DateTime.Now;            
             ClockString = CurrentTime.ToString(ClockFormat);
@@ -150,22 +163,16 @@ namespace MacroTrack.Dashboard
             _clockTimer.Start();
         }
 
+        public void OnClose()
+        {
+            _subSettingsChanged.Dispose();
+        }
+
         private void SetClockFormat()
         {
             Log();
-            if (Services.SettingsService.Settings.ClockInLongFormat)
-            {
-                LogVars(new{ Services.SettingsService.Settings.ClockInLongFormat }, "Determined ClockInLongFormat=true: ");
-                Log($"This is what you would get with DTFormatLList...: '{(DTFormatLList.FormatByValue.TryGetValue(Services.SettingsService.Settings.DTFormatLong, out var fnt) ? fnt : "null")}'");
-                ClockFormat = DTFormatLList.FormatByValue.TryGetValue(Services.SettingsService.Settings.DTFormatLong, out var fmt) ? fmt : "ddddd, d MMMM, yyyy, HH:MM:ss";
-                LogVars(new { Services.SettingsService.Settings.ClockInLongFormat }, "Meant to have changed it now.: ");
-            }
-            else
-            {
-                LogVars(new { Services.SettingsService.Settings.ClockInLongFormat, ClockFormat }, "Determined ClockInLongFormat=false: ");
-                ClockFormat = DTFormatSList.FormatByValue.TryGetValue(Services.SettingsService.Settings.DTFormatShort, out var fmt) ? fmt : "yyyy/MM/dd HH:mm:ss";
-                LogVars(new { Services.SettingsService.Settings.ClockInLongFormat, ClockFormat }, "Meant to have changed it now.: ");
-            }
+            if (Services.SettingsService.Settings.ClockInLongFormat) ClockFormat = DTFormatLList.FormatByValue.TryGetValue(Services.SettingsService.Settings.DTFormatLong, out var fmt) ? fmt : "ddddd, d MMMM, yyyy, HH:MM:ss";
+            else ClockFormat = DTFormatSList.FormatByValue.TryGetValue(Services.SettingsService.Settings.DTFormatShort, out var fmt) ? fmt : "yyyy/MM/dd HH:mm:ss";
         }
 
         // Log & REPL handling:
@@ -187,13 +194,7 @@ namespace MacroTrack.Dashboard
         public void RequestMainRefresh()
         {
             RequestRefreshAll?.Invoke();
-        }
-
-        // If we want some parameter in settings to change something in here, put it here:
-        public void RefreshVM()
-        {
-            SetClockFormat();
-        }
+        }        
 
         private void RefreshSummary()
         {

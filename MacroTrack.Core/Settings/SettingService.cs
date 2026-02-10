@@ -52,12 +52,10 @@ namespace MacroTrack.Core.Settings
 
         private void Save(AppSettings settings)
         {
-            Log($"Called. Right now Settigns are: UI: {Settings.LogUILevel} // File: {Settings.LogFileLevel}", LogLevel.Info);
-            Log($"Settings UI: {settings.LogUILevel} // settings file: {settings.LogFileLevel}", LogLevel.Info);
+            Log();
             string json = JsonSerializer.Serialize(settings, _jsonOptions);
             File.WriteAllText(_filePath, json);
             Settings = settings;
-            Log($"Now Settigns are: UI: {Settings.LogUILevel} // File: {Settings.LogFileLevel}", LogLevel.Info);
         }
 
         public void Set(AppSettings settings)

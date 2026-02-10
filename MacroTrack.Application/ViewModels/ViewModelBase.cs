@@ -1,4 +1,5 @@
-﻿using MacroTrack.Core.Logging;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections;
@@ -15,13 +16,15 @@ namespace MacroTrack.AppLibrary.ViewModels
     {
         public CoreServices? Services;
         public IMTLogger? Logger;
+        public AppServices? AppServices;
         public event PropertyChangedEventHandler? PropertyChanged;
 
 
-        protected void Init(CoreServices services)
+        protected void Init(CoreServices services, AppServices appServices)
         {
             Services = services;
             Logger = services.Logger;
+            AppServices = appServices;
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

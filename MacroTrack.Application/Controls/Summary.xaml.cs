@@ -1,4 +1,5 @@
 ﻿using MacroTrack.AppLibrary.Models;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.AppLibrary.ViewModels;
 using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Logging;
@@ -110,11 +111,12 @@ namespace MacroTrack.AppLibrary.Controls
             InitializeComponent();
         }
 
-        public override void Init(CoreServices services)
+        public override void Init(CoreServices services, AppServices appServices)
         {
-            base.Init(services);
+            base.Init(services, appServices);
             _vm.Services = services;
-            _vm.Logger = Logger;
+            _vm.Logger = services.Logger;
+            _vm.AppServices = appServices;
             //DataContext = _vm;
             Log($"Ideally we should hav a summary now, here: CurrentSummary is null?='{CurrentSummary is null}', GoalName={CurrentSummary?.GoalName}, datacontext='{_vm}'", LogLevel.Info);
         }

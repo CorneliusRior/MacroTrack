@@ -1,4 +1,5 @@
-﻿using MacroTrack.AppLibrary.ViewModels;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.AppLibrary.ViewModels;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -29,11 +30,12 @@ namespace MacroTrack.AppLibrary.Controls
             DataContext = _vm;
         }
 
-        public override void Init(CoreServices services)
+        public override void Init(CoreServices services, AppServices appServices)
         {
-            base.Init(services);
+            base.Init(services, appServices);
             _vm.Services = Services;
             _vm.Logger = Logger;
+            _vm.AppServices = appServices;
             _vm.TimeNow();
         }
 

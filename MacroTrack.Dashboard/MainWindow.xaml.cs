@@ -1,5 +1,6 @@
 ﻿using MacroTrack.AppLibrary.Controls;
 using MacroTrack.AppLibrary.Graphs;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.AppLibrary.ViewModels;
 using MacroTrack.AppLibrary.Windows.SettingsWindow;
 using MacroTrack.Core.Logging;
@@ -26,6 +27,7 @@ namespace MacroTrack.Dashboard
     {
         // Core/CoreServices stuff:
         public CoreServices Services { get; private set; } = null!;
+        public AppServices AppServices { get; private set; } = null!;
         private IMTLogger Logger = null!;
         private readonly MainWindowVM? _vm;
 
@@ -34,22 +36,22 @@ namespace MacroTrack.Dashboard
             
         }
 
-        public MainWindow(CoreServices services) : this()
+        public MainWindow(CoreServices services, AppServices appServices) : this()
         {
             Services = services;
             Logger = services.Logger;
-            _vm = new MainWindowVM(Services);
+            AppServices = appServices;
+            _vm = new MainWindowVM(Services, AppServices);
             DataContext = _vm;
             InitializeComponent();
 
             _vm.RequestPrint += text => Print(text);
             _vm.RequestOpenSettings += () =>
             {
-                var w = new SettingsWindow(Services) { Owner = this };
+                var w = new SettingsWindow(Services, AppServices) { Owner = this };
                 w.RequestRefresh += () =>
                 {
                     RefreshAll();
-                    _vm.RefreshVM();
                 };
                 w.Show();
             };
@@ -63,14 +65,14 @@ namespace MacroTrack.Dashboard
         // Set up controls:
         private void WireUpControls()
         {
-            Summary.Init(Services);
-            DailyTasks.Init(Services);
-            FoodEntry.Init(Services);
-            WeightEntry.Init(Services);
-            DiaryEntry.Init(Services);
-            History.Init(Services);
+            Summary.Init(Services, AppServices);
+            DailyTasks.Init(Services, AppServices);
+            FoodEntry.Init(Services, AppServices);
+            WeightEntry.Init(Services, AppServices);
+            DiaryEntry.Init(Services, AppServices);
+            History.Init(Services, AppServices);
             History.RequestRefresh += () => _vm?.RefreshSummaryCommand.Execute(null);
-            Repl.Init(Services);
+            Repl.Init(Services, AppServices);
             Repl.SubmitCommand += Repl_CommandHandler;            
         }
 

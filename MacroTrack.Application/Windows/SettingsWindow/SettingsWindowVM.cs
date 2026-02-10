@@ -1,5 +1,6 @@
 ﻿using MacroTrack.AppLibrary.Commands;
 using MacroTrack.AppLibrary.Resources;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.AppLibrary.Windows.SettingsWindow.Categories;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
@@ -19,6 +20,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
     {
         public CoreServices Services;
         public IMTLogger Logger;
+        public AppServices AppServices;
 
         public AppSettings SettingsEditable { get; }
         public ObservableCollection<CategoryVMBase> Categories { get; } = new();
@@ -32,10 +34,11 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
         public event Action<bool>? RequestClose;
         public event Action? RequestRefresh;
         
-        public SettingsWindowVM(CoreServices services)
+        public SettingsWindowVM(CoreServices services, AppServices appServices)
         {            
             Services = services;
             Logger = services.Logger;
+            AppServices = appServices;
             Log();
             SettingsEditable = Services.SettingsService.Settings.Clone();
 
@@ -59,8 +62,9 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
         {
             Log();
             Services.SettingsService.Set(SettingsEditable);
-            ThemeManager.SetTheme(Services.SettingsService.Settings.Theme);
-            RequestRefresh?.Invoke();
+            AppServices.AppEvents.Publish(new SettingsChanged());
+            //ThemeManager.SetTheme(Services.SettingsService.Settings.Theme);
+            //RequestRefresh?.Invoke();
         }
 
         public void SetSelectedToDefault()

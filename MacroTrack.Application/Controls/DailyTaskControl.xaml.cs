@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MacroTrack.AppLibrary.Services;
 
 namespace MacroTrack.AppLibrary.Controls
 {
@@ -31,11 +32,12 @@ namespace MacroTrack.AppLibrary.Controls
             DataContext = _vm;
         }
 
-        public override void Init(CoreServices services)
+        public override void Init(CoreServices services, AppServices appServices)
         {
-            base.Init(services);
-            _vm.Services = Services;
-            _vm.Logger = Logger;
+            base.Init(services, appServices);
+            _vm.Services = services;
+            _vm.Logger = services.Logger;
+            _vm.AppServices = appServices;
             try { _vm.Populate(); }
             catch (Exception ex) { Log("Error populating DailyTasks.", LogLevel.Error, ex); }
         }
