@@ -109,16 +109,19 @@ namespace MacroTrack.AppLibrary.Controls
         public Summary()
         {
             InitializeComponent();
+            DataContext = _vm;
         }
 
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-            _vm.Services = services;
-            _vm.Logger = services.Logger;
-            _vm.AppServices = appServices;
-            //DataContext = _vm;
-            Log($"Ideally we should hav a summary now, here: CurrentSummary is null?='{CurrentSummary is null}', GoalName={CurrentSummary?.GoalName}, datacontext='{_vm}'", LogLevel.Info);
+            _vm.Init(services, appServices);
+        }
+
+        protected override void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            base.OnUnloaded(sender, e);
+            _vm.OnClose();
         }
 
 

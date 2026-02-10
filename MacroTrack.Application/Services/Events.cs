@@ -19,8 +19,17 @@ namespace MacroTrack.AppLibrary.Services
                 meg.Arg1 ...
                 msg.Arg2 ...
             });
+
+    For types which have the method EventSubscribe(IDisposable e); and _subscription list you can do this:
+        EventSubscribe(AppServices.AppEvents.Subscribe<Event>(msg =>
+            {
+                msg.Arg1 ...
+            });
+    or just (_ => Method()) if you prefer.
     */
     public sealed record SettingsChanged;
     public sealed record SummaryChanged;
     public sealed record FoodLogChanged;
+    public sealed record PresetListChanged;
+    public sealed record TaskCompletionChanged;
 }

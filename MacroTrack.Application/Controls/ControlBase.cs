@@ -27,6 +27,7 @@ namespace MacroTrack.AppLibrary.Controls
         public IMTLogger? Logger { get; set; }
         public AppServices? AppServices { get; set; }
 
+        protected List<IDisposable> _subscriptions = new();
         
 
         protected ControlBase()
@@ -39,6 +40,12 @@ namespace MacroTrack.AppLibrary.Controls
                     if (Services.SettingsService.Settings.LogInitMessages) Log($"{this.GetType().Name} Initialized");
                 }
             };
+            Unloaded += OnUnloaded;
+        }
+
+        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            foreach (IDisposable s in _subscriptions) s.Dispose();
         }
 
         public virtual void Init(CoreServices services, AppServices appServices)

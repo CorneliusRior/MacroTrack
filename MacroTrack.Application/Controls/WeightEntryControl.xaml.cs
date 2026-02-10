@@ -33,10 +33,13 @@ namespace MacroTrack.AppLibrary.Controls
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-            _vm.Services = Services;
-            _vm.Logger = Logger;
-            _vm.AppServices = appServices;
-            _vm.TimeNow();
+            _vm.Init(services, appServices);
+        }
+
+        protected override void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            base.OnUnloaded(sender, e);
+            _vm.OnClose();
         }
 
         private void ButtonClear_Click(object sender, RoutedEventArgs e)

@@ -32,7 +32,6 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
 
 
         public event Action<bool>? RequestClose;
-        public event Action? RequestRefresh;
         
         public SettingsWindowVM(CoreServices services, AppServices appServices)
         {            

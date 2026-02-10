@@ -18,13 +18,24 @@ namespace MacroTrack.AppLibrary.ViewModels
         public IMTLogger? Logger;
         public AppServices? AppServices;
         public event PropertyChangedEventHandler? PropertyChanged;
+        protected List<IDisposable> _subscriptions = new();
 
 
-        protected void Init(CoreServices services, AppServices appServices)
+        public virtual void Init(CoreServices services, AppServices appServices)
         {
             Services = services;
             Logger = services.Logger;
             AppServices = appServices;
+        }
+
+        public void OnClose()
+        {
+            foreach (IDisposable s in _subscriptions) s.Dispose();
+        }
+
+        protected void EventSubscribe(IDisposable e)
+        {
+            _subscriptions.Add(e);
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

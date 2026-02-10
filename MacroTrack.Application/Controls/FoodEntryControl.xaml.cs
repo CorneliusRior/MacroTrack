@@ -25,6 +25,18 @@ namespace MacroTrack.AppLibrary.Controls
     public partial class FoodEntryControl : ControlBase
     {
         private readonly FoodEntryVM _vm = new();
+        
+        public static readonly DependencyProperty RequestRefreshCommandProperty = DependencyProperty.Register(
+            nameof(RequestRefreshCommand),
+            typeof(ICommand),
+            typeof(FoodEntryControl)
+        );
+
+        public ICommand? RequestRefreshCommand
+        {
+            get => (ICommand?)GetValue(RequestRefreshCommandProperty);
+            set => SetValue(RequestRefreshCommandProperty, value);
+        }
 
         public FoodEntryControl()
         {
@@ -35,20 +47,13 @@ namespace MacroTrack.AppLibrary.Controls
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-            _vm.Services = Services;
-            _vm.Logger = Logger;
-            _vm.Populate();
+            _vm.Init(services, appServices);
         }
 
-        public static readonly DependencyProperty RequestRefreshCommandProperty = DependencyProperty.Register(
-            nameof(RequestRefreshCommand),
-            typeof(ICommand),
-            typeof(FoodEntryControl)
-        );
-        public ICommand? RequestRefreshCommand
+        protected override void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            get => (ICommand?)GetValue(RequestRefreshCommandProperty);
-            set => SetValue(RequestRefreshCommandProperty, value);
+            base.OnUnloaded(sender, e);
+            _vm.OnClose();
         }
 
         private void ButtonClear_Click(object sender, RoutedEventArgs e)

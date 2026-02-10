@@ -1,4 +1,7 @@
-﻿using MacroTrack.Core.Logging;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.AppLibrary.ViewModels;
+using MacroTrack.Core.Logging;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +24,22 @@ namespace MacroTrack.AppLibrary.Controls
     /// </summary>
     public partial class DiaryEntryControl : ControlBase
     {
+        private readonly DiaryEntryVM _vm = new();
         public DiaryEntryControl()
         {
             InitializeComponent();
+        }
+
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);
+            _vm.Init(services, appServices);
+        }
+
+        protected override void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            base.OnUnloaded(sender, e);
+            _vm.OnClose();
         }
 
         private void ButtonAdd_Click(object sender, RoutedEventArgs e)

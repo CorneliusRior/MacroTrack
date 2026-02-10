@@ -1,7 +1,9 @@
 ﻿using MacroTrack.AppLibrary.Commands;
 using MacroTrack.AppLibrary.Controls;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using MacroTrack.Core.Settings;
 
 using System;
@@ -39,6 +41,13 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             DeleteEntryCommand = new RelayCommand<FoodEntry>(DeleteEntry);
             EditEntryCommand = new RelayCommand<FoodEntry>(EditEntry);
+        }
+
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);
+            EventSubscribe(AppServices!.AppEvents.Subscribe<FoodLogChanged>(_ => Populate()));
+            Populate();
         }
 
         public void Populate()

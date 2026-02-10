@@ -1,6 +1,8 @@
 ﻿using MacroTrack.AppLibrary.Commands;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 
 using System;
 using System.Collections.Generic;
@@ -20,11 +22,19 @@ namespace MacroTrack.AppLibrary.ViewModels
         public bool FilterActive = false;
         public bool FilterInactive = true;
 
+        // Commands:
         public ICommand ToggleCompleteCommand { get; }
 
         public DailyTaskVM()
         {
             ToggleCompleteCommand = new RelayCommand<DailyTask>(ToggleComplete);
+        }
+
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);           
+            EventSubscribe(AppServices!.AppEvents.Subscribe<TaskCompletionChanged>(_ => Populate()));
+            Populate();
         }
 
         public void Populate()

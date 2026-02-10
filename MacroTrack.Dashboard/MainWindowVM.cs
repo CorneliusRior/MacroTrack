@@ -40,8 +40,8 @@ namespace MacroTrack.Dashboard
 
         public Action? RequestRefreshAll;
 
-        // Event subscriptions:
-        private IDisposable _subSettingsChanged;
+        // Event Subscriptions:
+        private List<IDisposable> _subscriptions = new List<IDisposable>();
 
         // Variables:
         private MacroSummary? _currentSummary;
@@ -142,10 +142,12 @@ namespace MacroTrack.Dashboard
             OpenSettingsCommand = new RelayCommand(() => RequestOpenSettings?.Invoke());
 
             // Event Subscriptions:
-            _subSettingsChanged = AppServices.AppEvents.Subscribe<SettingsChanged>(_ =>
+            IDisposable _subSettingsChanged = AppServices.AppEvents.Subscribe<SettingsChanged>(_ =>
             {
                 SetClockFormat();
+                ApplyTheme();
             });
+            _subscriptions.Add(_subSettingsChanged);
 
             // Clock logic:      
             SetClockFormat();
@@ -165,7 +167,7 @@ namespace MacroTrack.Dashboard
 
         public void OnClose()
         {
-            _subSettingsChanged.Dispose();
+            foreach (IDisposable s in _subscriptions) s.Dispose();
         }
 
         private void SetClockFormat()
@@ -247,7 +249,7 @@ namespace MacroTrack.Dashboard
                     }
             }
             CurrentSummary = Services.dataService.GetMacroSummary(SummaryStartTime, SummaryEndTime);
-            RequestMainRefresh(); // shuold be the other way around maybe?
+            RequestMainRefresh(); // Change this to summary changed.
         }
 
         public void OpenSettings()

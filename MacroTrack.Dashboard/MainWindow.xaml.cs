@@ -31,6 +31,9 @@ namespace MacroTrack.Dashboard
         private IMTLogger Logger = null!;
         private readonly MainWindowVM? _vm;
 
+        // Event Subscriptions:
+        private List<IDisposable> _subscriptions = new();
+
         public MainWindow()
         {
             
@@ -44,6 +47,16 @@ namespace MacroTrack.Dashboard
             _vm = new MainWindowVM(Services, AppServices);
             DataContext = _vm;
             InitializeComponent();
+
+            // Event Subscriptions:
+            IDisposable _subSettingsChanged = AppServices.AppEvents.Subscribe<SettingsChanged>(_ =>
+            {
+                Print("SettingsChanged event announced");
+                Log("SettiggsChanged event announced and detected.");
+                RefreshAll(); // Given that this only calls 2 events which will also probably subscribe to it, we might not need it.
+            });
+            _subscriptions.Add(_subSettingsChanged);
+
 
             _vm.RequestPrint += text => Print(text);
             _vm.RequestOpenSettings += () =>
@@ -60,6 +73,13 @@ namespace MacroTrack.Dashboard
 
             Log("Main window opened.", LogLevel.Info);
             WireUpControls();            
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            if (_vm != null) _vm.OnClose();
+            foreach (IDisposable s in _subscriptions) s.Dispose(); // probably don't need to do this but you know.
+            base.OnClosed(e);
         }
 
         // Set up controls:

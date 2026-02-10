@@ -23,12 +23,18 @@ namespace MacroTrack.AppLibrary.Controls
     /// </summary>
     public partial class AddLogEntryControl : ControlBase
     {
-        private readonly AddLogEntryWM _vm = new();
+        private readonly AddLogEntryVM _vm = new();
         
         public AddLogEntryControl()
         {
             InitializeComponent();
             DataContext = _vm;
+        }
+
+        protected override void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            base.OnUnloaded(sender, e);
+            _vm.OnClose();
         }
 
         private void buttonAdd_Click(object sender, RoutedEventArgs e)

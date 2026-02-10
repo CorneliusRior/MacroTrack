@@ -1,5 +1,7 @@
 ﻿using MacroTrack.AppLibrary.Controls;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.DataModels;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +19,9 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         }
 
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);
+        }
     }
 }

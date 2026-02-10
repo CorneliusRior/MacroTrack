@@ -1,5 +1,7 @@
-﻿using MacroTrack.Core.Logging;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +10,17 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    internal class WeightEntryVM : ViewModelBase
+    public class WeightEntryVM : ViewModelBase
     {
+        public WeightEntryVM() { }
+
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);
+            EventSubscribe( AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => Log("Settings changed, detected by WeightEntryVM, but we haven't implemented that yet", LogLevel.Info)));
+            TimeNow();
+        }
+
         private DateTime? _time;
         public DateTime? Time
         {

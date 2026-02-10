@@ -1,7 +1,9 @@
 ﻿using MacroTrack.AppLibrary.Controls;
 using MacroTrack.AppLibrary.Models;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,11 +20,20 @@ namespace MacroTrack.AppLibrary.ViewModels
     public class FoodEntryVM : ViewModelBase
     {
         public ObservableCollection<Preset> PresetList { get; } = new();
-        public ObservableCollection<string> CatList { get; } = new();
-
-        
+        public ObservableCollection<string> CatList { get; } = new();        
 
         private bool _multUpdating;
+
+        public FoodEntryVM() { }
+
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);
+            EventSubscribe(AppServices!.AppEvents.Subscribe<PresetListChanged>(_ => Populate()));
+            Populate();
+        }
+
+
 
         private DateTime? _time;
         public DateTime? Time
@@ -223,7 +234,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
             Log();
             if (Time is null) Time = DateTime.Now;
-            Mult = 1;
+            //Mult = 1; getting rid of this so we can update when presets change without mult changing.
             try
             {
                 List<Preset> presetList = Services.presetService.GetAll();

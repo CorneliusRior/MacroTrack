@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    public class AddLogEntryWM : ViewModelBase
+    public class AddLogEntryVM : ViewModelBase
     {      
 
-        public AddLogEntryWM()
-        {
-        }
+        public AddLogEntryVM() { }
 
         private string _lastAdded = "Last added: none";
         public string LastAdded

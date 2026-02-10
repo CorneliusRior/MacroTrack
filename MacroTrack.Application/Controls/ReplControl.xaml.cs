@@ -1,4 +1,7 @@
-﻿using MacroTrack.Core.Logging;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.AppLibrary.ViewModels;
+using MacroTrack.Core.Logging;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +24,24 @@ namespace MacroTrack.AppLibrary.Controls
     /// </summary>
     public partial class ReplControl : ControlBase
     {
+        private readonly ReplVM _vm = new();
         public event EventHandler<string>? SubmitCommand;
         public ReplControl()
         {
             InitializeComponent();
+            DataContext = _vm;
+        }
+
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);
+            _vm.Init(services, appServices);
+        }
+
+        protected override void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            base.OnUnloaded(sender, e);
+            _vm.OnClose();
         }
 
         public void AppendLine(string line)
