@@ -30,6 +30,8 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
         public ICommand OKCommand { get; }
         public ICommand CancelCommand { get; }
 
+        private List<IDisposable> _subscriptions = new();
+
 
         public event Action<bool>? RequestClose;
         
@@ -48,6 +50,11 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
             ApplyCommand = new RelayCommand(Apply);
             OKCommand = new RelayCommand(() => { Apply(); RequestClose?.Invoke(true); });
             CancelCommand = new RelayCommand(() => RequestClose?.Invoke(false));
+        }
+
+        public void OnClose()
+        {
+            foreach (IDisposable s in _subscriptions) s.Dispose();
         }
 
         private void AddCategories()

@@ -20,24 +20,12 @@ namespace MacroTrack.AppLibrary.Windows
     /// <summary>
     /// Interaction logic for AddPresetWindow.xaml
     /// </summary>
-    public partial class AddPresetWindow : Window
+    public partial class AddPresetWindow : WindowBase
     {
-        private CoreServices Services;
-        private IMTLogger Logger;
-        private AppServices AppServices;
-
-        /*
-        public AddPresetWindow()
+        public AddPresetWindow(CoreServices services, AppServices appServices) : base(services, appServices)
         {
             InitializeComponent();
-        }*/
-
-        public AddPresetWindow(CoreServices services, AppServices appServices)
-        {
-            InitializeComponent();
-            Services = services;
-            Logger = services.Logger;
-            AppServices = appServices;
+            Log();
         }
     }
 }

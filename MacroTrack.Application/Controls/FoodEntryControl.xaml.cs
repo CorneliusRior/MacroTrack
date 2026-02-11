@@ -40,7 +40,7 @@ namespace MacroTrack.AppLibrary.Controls
 
         public FoodEntryControl()
         {
-            InitializeComponent();
+            InitializeComponent();            
             DataContext = _vm;
         }
 
@@ -52,8 +52,8 @@ namespace MacroTrack.AppLibrary.Controls
 
         protected override void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            base.OnUnloaded(sender, e);
             _vm.OnClose();
+            base.OnUnloaded(sender, e);
         }
 
         private void ButtonClear_Click(object sender, RoutedEventArgs e)

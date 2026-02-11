@@ -21,24 +21,21 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class SettingsWindow : WindowBase
     {
-        public CoreServices Services;
-        public IMTLogger Logger;
-        public AppServices AppServices;
-
         private SettingsWindowVM _vm;
-        //public event Action? RequestRefresh;
-        public SettingsWindow(CoreServices services, AppServices appServices)
+        public SettingsWindow(CoreServices services, AppServices appServices) : base(services, appServices)
         {
             InitializeComponent();
-            Services = services;
-            Logger = services.Logger;
-            AppServices = appServices;
             _vm = new SettingsWindowVM(Services, AppServices);
             DataContext = _vm;
             _vm.RequestClose += r => { Close(); };
-            //_vm.RequestRefresh += () => RequestRefresh?.Invoke();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _vm.OnClose();
+            base.OnClosed(e);
         }
 
         private void ButtonRevert_Click(object sender, RoutedEventArgs e)

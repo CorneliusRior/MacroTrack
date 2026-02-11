@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    public class ViewModelBase : INotifyPropertyChanged, INotifyDataErrorInfo
+    public abstract class ViewModelBase : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         public CoreServices? Services;
         public IMTLogger? Logger;
