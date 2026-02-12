@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="MacroTrack.AppLibrary.Controls.DateTimePicker"
+﻿<UserControl x:Class="MacroTrack.AppLibrary.Controls.DateTimePicker" x:Name="Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,9 +7,26 @@
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="170
              ">
-    <Border Background="{DynamicResource PanelBackGroundBrush}"
-            BorderBrush="{DynamicResource BorderBrush}"
-            BorderThickness="{DynamicResource ButtonBorderThickness}">
+    <Border>
+
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="Background" Value="{DynamicResource PanelBackGroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThickness}"/>
+                <Style.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsMouseOver, ElementName=Root}" Value="True"/>
+                            <Condition Binding="{Binding IsKeyboardFocusWithin, ElementName=Root}" Value="False"/>
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}"/>
+                        <Setter Property="BorderThickness" Value="{DynamicResource SelectedBorderThickness}"/>
+                    </MultiDataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -30,18 +47,25 @@
                     Grid.Column="1"/>
 
             <Popup x:Name="PART_Popup"
-                   PlacementTarget="{Binding ElementName=PART_tb}"                   
+                   PlacementTarget="{Binding ElementName=PART_tb}"                        
                    Placement="Bottom"
                    StaysOpen="False"
                    AllowsTransparency="True">
                 <Border BorderThickness="{DynamicResource BorderThickness}"
                         BorderBrush="{DynamicResource BorderBrush}"
-                        Background="{DynamicResource PanelBackGroundBrush}"
+                        Background="{DynamicResource AppBackGroundBrush}"
                         
                         Padding="8">
 
                     <Calendar x:Name="PART_Calendar"
-                              SelectedDatesChanged="PART_Calendar_SelectedDatesChanged"/>
+                              SelectedDatesChanged="PART_Calendar_SelectedDatesChanged"
+                              Margin="0"
+                              FirstDayOfWeek="Monday"
+                              FontFamily="{DynamicResource UIFont}"
+                              FontSize="{DynamicResource UINormalSize}"
+                              BorderThickness="0"
+                              BorderBrush="{DynamicResource BorderBrush}"
+                              Background="{DynamicResource PanelBackGroundBrush}"/>
 
                 </Border>
             </Popup>

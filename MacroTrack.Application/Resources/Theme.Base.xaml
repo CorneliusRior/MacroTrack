@@ -21,13 +21,14 @@
 
     <!--Control Brushes-->
     <SolidColorBrush x:Key="ButtonBackGroundBrush" Color="#FFFFFFFF"/>
-    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FFEEEEEE"/>
-    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FFCCCCCC"/>
+    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FFF9F9F9"/>
+    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FFEEEEEE"/>
 
     <SolidColorBrush x:Key="TextBoxBackgroundBrush" Color="#FFFFFFFF"/>
-    <SolidColorBrush x:Key="TextBoxHoverBrush" Color="#FFFAFAFA"/>
+    <SolidColorBrush x:Key="TextBoxHoverBrush" Color="#FFFFFFFF"/>
 
-    <SolidColorBrush x:Key="SelectionBrush" Color="Purple"/>
+    <SolidColorBrush x:Key="HoverBorderBrush" Color="#FF888888"/>
+    <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FF000000"/>
 
 
     <!--Graphing Brushes-->
@@ -42,6 +43,7 @@
     <!--Other formatting-->
     <Thickness x:Key="BorderThickness">2</Thickness>
     <Thickness x:Key="ButtonBorderThickness">1</Thickness>
+    <Thickness x:Key="SelectedBorderThickness">1.2</Thickness>
     
     <!--Font-->
     <FontFamily x:Key="UIFont">Segoe UI</FontFamily>

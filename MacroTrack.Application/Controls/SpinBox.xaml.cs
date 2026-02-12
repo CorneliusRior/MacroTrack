@@ -115,6 +115,32 @@ namespace MacroTrack.AppLibrary.Controls
             set => SetValue(OuterBorderBrushProperty, value);
         }
 
+        public static readonly DependencyProperty HoverOuterBorderBrushProperty =
+            DependencyProperty.Register(
+                nameof(HoverOuterBorderBrush),
+                typeof(Brush),
+                typeof(SpinBox),
+                new PropertyMetadata(Brushes.Transparent)
+            );
+        public Brush HoverOuterBorderBrush
+        {
+            get => (SolidColorBrush)GetValue(HoverOuterBorderBrushProperty);
+            set => SetValue(HoverOuterBorderBrushProperty, value);
+        }
+
+        public static readonly DependencyProperty SelectedOuterBorderBrushProperty =
+            DependencyProperty.Register(
+                nameof(SelectedOuterBorderBrush),
+                typeof(Brush),
+                typeof(SpinBox),
+                new PropertyMetadata(Brushes.Transparent)
+            );
+        public Brush SelectedOuterBorderBrush
+        {
+            get => (SolidColorBrush)GetValue(SelectedOuterBorderBrushProperty);
+            set => SetValue(SelectedOuterBorderBrushProperty, value);
+        }
+
         public static readonly DependencyProperty ButtonWidthProperty =
             DependencyProperty.Register(
                 nameof(ButtonWidth),

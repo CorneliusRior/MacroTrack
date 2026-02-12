@@ -68,7 +68,7 @@
                     <Label x:Name="PART_LabelMult"
                            ContentStringFormat="(x{0:N1})"
                            Content="{Binding Entry.Amount, ElementName=Root}"
-                           Padding="2"
+                           Padding="7,2"
                            Grid.Column="1"/>
                 </Grid>
                 <Label x:Name="PART_LabelNotes"

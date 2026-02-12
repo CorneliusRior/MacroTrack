@@ -12,6 +12,7 @@
                 <ResourceDictionary Source="/MacroTrack.AppLibrary;component/Resources/Styles.Controls.xaml"/>
                 <ResourceDictionary Source="/MacroTrack.AppLibrary;component/Resources/MTComboBox.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            
         </ResourceDictionary>
         
     </Application.Resources>
