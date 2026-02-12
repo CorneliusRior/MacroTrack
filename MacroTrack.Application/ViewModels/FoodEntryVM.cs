@@ -62,6 +62,18 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        private string? _categoryText;
+        public string? CategoryText
+        {
+            get => _categoryText;
+            set
+            {
+                if (_categoryText == value) return;
+                _categoryText = value;
+                OnPropertyChanged();
+            }
+        }
+
         
         private Preset? _selectedPreset;
         public Preset? SelectedPreset
@@ -208,7 +220,17 @@ namespace MacroTrack.AppLibrary.ViewModels
             {
                 if (Services == null) throw new Exception("Null Services");
                 if (AppServices == null) throw new Exception("Null AppServices");
-                FoodEntry entry = Services.foodLogService.AddEntry(time, ItemName!, mult, cal, pro, car, fat, (_selectedPreset == null ? null : _selectedPreset.PresetName), Notes);
+                //string? category = _selectedPreset == null ? (string.IsNullOrWhiteSpace(CategoryText) ? null : CategoryText) : _selectedPreset.Category;
+
+                string? category = null;
+
+                if (_selectedPreset == null)
+                {
+                    if (!string.IsNullOrWhiteSpace(CategoryText)) category = CategoryText;
+                }
+                else category = _selectedPreset.Category;
+
+                FoodEntry entry = Services.foodLogService.AddEntry(time, ItemName!, mult, cal, pro, car, fat, category, Notes);
                 Log($"Added entry #{entry.Id}", LogLevel.Info);
                 AppServices.AppEvents.Publish(new FoodLogChanged());
                 Clear();
@@ -242,22 +264,13 @@ namespace MacroTrack.AppLibrary.ViewModels
             {
                 List<Preset> presetList = Services.presetService.GetAll();
                 PresetList.Clear();
-                foreach (Preset p in presetList)
-                {
-                    PresetList.Add(p);
-                }
+                foreach (Preset p in presetList) PresetList.Add(p);
 
                 List<string> catList = Services.presetService.GetDisplayCategoryList();
                 CatList.Clear();
-                foreach (string c in catList)
-                {
-                    CatList.Add(c);
-                }
+                foreach (string c in catList) CatList.Add(c);
             }
-            catch (Exception ex)
-            {
-                Log("Error", LogLevel.Warning, ex);
-            }
+            catch (Exception ex) { Log("Error", LogLevel.Warning, ex); }
         }
 
         public void FilterPresetList(int selectedIndex)

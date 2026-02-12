@@ -27,7 +27,7 @@
     <SolidColorBrush x:Key="TextBoxBackgroundBrush" Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="TextBoxHoverBrush" Color="#FFFAFAFA"/>
 
-    <SolidColorBrush x:Key="SelectionBrush" Color="#FF7EB4EA"/>
+    <SolidColorBrush x:Key="SelectionBrush" Color="Purple"/>
 
 
     <!--Graphing Brushes-->

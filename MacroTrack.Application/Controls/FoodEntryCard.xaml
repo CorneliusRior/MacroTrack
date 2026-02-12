@@ -6,7 +6,7 @@
              xmlns:set="clr-namespace:MacroTrack.Core.Settings;assembly=MacroTrack.Core"
              xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
-             Margin="0,0,5,5"
+             Margin="0,0,0,5"
              
              mc:Ignorable="d" 
              d:DesignWidth="300"

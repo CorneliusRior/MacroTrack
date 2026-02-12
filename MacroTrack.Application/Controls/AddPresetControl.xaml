@@ -5,7 +5,12 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                    xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
                    mc:Ignorable="d" 
+                   xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
                    d:DesignHeight="350" d:DesignWidth="600">
+    <local:ControlBase.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:NullableDoubleConverter x:Key="NullDouble"/>
+    </local:ControlBase.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}">
         <Grid>
             <Grid.RowDefinitions>
@@ -38,9 +43,15 @@
                     
                     <!--First Row-->
                     <Label Content="Preset Name:" Grid.Row="0" Grid.Column="0"/>
-                    <TextBox x:Name="tbPresetName" MinWidth="200" Grid.Row="0" Grid.Column="1"/>
+                    
+                    <TextBox x:Name="tbPresetName" 
+                             Text="{Binding PresetName}" 
+                             MinWidth="200" 
+                             Grid.Row="0" Grid.Column="1"/>
+                    
                     <Grid Grid.Row="0" Grid.Column="2">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="auto"/>
@@ -51,19 +62,34 @@
                                HorizontalAlignment="Right" 
                                Grid.Row="0" Grid.Column="0"/>
                         <TextBox x:Name="tbWeight" 
+                                 Text="{Binding Weight}"
                                  Style="{DynamicResource TextBox.Numeric}" 
                                  Grid.Row="0" Grid.Column="1"/>
-                        <ComboBox x:Name="cbUnit"
-                                  Width="50"
-                                  Template="{DynamicResource MTComboBoxTemplate}"
-                                  Grid.Column="2"/>
-
+                        <RadioButton x:Name="rbUnitGram"
+                                     GroupName="rbgUnit"
+                                     IsChecked="{Binding UnitGram}"
+                                     Content="g"
+                                     Margin="6,0,4,0"
+                                     VerticalAlignment="Center"
+                                     Grid.Column="2"/>
+                        <RadioButton x:Name="rbUnitMl"
+                                     GroupName="rbgUnit"
+                                     IsChecked="{Binding UnitMl}"
+                                     Content="ml"
+                                     Margin="5"
+                                     VerticalAlignment="Center"
+                                     Grid.Column="3"/>
                     </Grid>
                     
                     <!--Second Row-->
                     <Label Content="Preset Category" Grid.Row="1" Grid.Column="0"/>
                     <ComboBox x:Name="cbCategory" 
+                              IsEditable="True"
+                              IsTextSearchEnabled="True"
                               Template="{DynamicResource MTComboBoxTemplate}"
+                              ItemsSource="{Binding CatList}"
+                              Text="{Binding Category,
+                                     UpdateSourceTrigger=PropertyChanged}"
                               Grid.Row="1" Grid.Column="1"/>
                     
                     <!--Third Row-->
@@ -76,6 +102,10 @@
                             </Grid.ColumnDefinitions>
                             <Label Content="Calories (Kcal):" Grid.Column="0"/>
                             <TextBox x:Name="tbCal" 
+                                     Text="{Binding Cal, 
+                                            Converter={StaticResource NullDouble},
+                                            UpdateSourceTrigger=PropertyChanged,
+                                            ValidatesOnDataErrors=True}"
                                      Style="{DynamicResource TextBox.Numeric}" 
                                      Grid.Column="1"/>
                         </Grid>
@@ -87,6 +117,10 @@
                             <Label Content="Protein (g):" 
                                    Grid.Column="0"/>
                             <TextBox x:Name="tbPro" 
+                                     Text="{Binding Pro, 
+                                            Converter={StaticResource NullDouble},
+                                            UpdateSourceTrigger=PropertyChanged,
+                                            ValidatesOnDataErrors=True}"
                                      Style="{DynamicResource TextBox.Numeric}" 
                                      Grid.Column="1"/>
                         </Grid>
@@ -97,6 +131,10 @@
                             </Grid.ColumnDefinitions>
                             <Label Content="Carbs (g):" Grid.Column="0"/>
                             <TextBox x:Name="tbCar" 
+                                     Text="{Binding Car, 
+                                            Converter={StaticResource NullDouble},
+                                            UpdateSourceTrigger=PropertyChanged,
+                                            ValidatesOnDataErrors=True}"
                                      Style="{DynamicResource TextBox.Numeric}" 
                                      Grid.Column="1"/>
                         </Grid>
@@ -107,6 +145,10 @@
                             </Grid.ColumnDefinitions>
                             <Label Content="Fat (g):" Grid.Column="0"/>
                             <TextBox x:Name="tbFat" 
+                                     Text="{Binding Fat, 
+                                            Converter={StaticResource NullDouble},
+                                            UpdateSourceTrigger=PropertyChanged,
+                                            ValidatesOnDataErrors=True}"
                                      Style="{DynamicResource TextBox.Numeric}" 
                                      Grid.Column="1"/>
                         </Grid>
@@ -115,7 +157,8 @@
 
                     <!--Fourth & Fifth Row-->
                     <Label Content="Notes:" Grid.Row="3"/>
-                    <TextBox Style="{DynamicResource TextBox.MultiLine}" 
+                    <TextBox Text="{Binding Notes}" 
+                             Style="{DynamicResource TextBox.MultiLine}"                              
                              Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"/>
 
 
@@ -126,7 +169,10 @@
                         Grid.Row="2">
                 <Button x:Name="buttonCancel"
                         Content="Cancel"
-                        Click="buttonCancel_Click"/>
+                        Click="buttonCancel_Click"
+                        Visibility="{Binding InWindow, 
+                                     RelativeSource={RelativeSource AncestorType=local:AddPresetControl},
+                                     Converter={StaticResource BoolToVis}}"/>
                 <Button x:Name="buttonClear"
                         Content="Clear"
                         Click="buttonClear_Click"/>

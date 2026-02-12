@@ -25,6 +25,8 @@ namespace MacroTrack.AppLibrary.Windows
         public AddPresetWindow(CoreServices services, AppServices appServices) : base(services, appServices)
         {
             InitializeComponent();
+            ControlAddPreset.Init(Services, AppServices);
+            ControlAddPreset.RequestClose += r => { Close(); };
             Log();
         }
     }

@@ -197,8 +197,8 @@
         <Setter Property="Margin" Value="0"/>
         <Setter Property="FontSize" Value="6"/>
         <Setter Property="Padding" Value="-1"/>
+        <Setter Property="IsTabStop" Value="False"/>
 
-        
     </Style>
     
     <!--DateTimePicker Elements-->
@@ -209,6 +209,7 @@
         <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
         <Setter Property="BorderThickness" Value="1,0,0,0"/>
         <Setter Property="Margin" Value="0"/>
+        <Setter Property="IsTabStop" Value="False"/>
     </Style>
 
     <Style x:Key="TextBox.DateTimePicker" TargetType="TextBox">

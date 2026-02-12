@@ -88,6 +88,8 @@
                 <ComboBox Template="{DynamicResource MTComboBoxTemplate}"
                           Name="cbFilter"
                           ItemsSource="{Binding CatList}"
+                          Text="{Binding CategoryText, 
+                                 UpdateSourceTrigger=PropertyChanged}"
                           IsEditable="True"
                           IsTextSearchEnabled="True"
                           SelectionChanged="cbFilter_SelectionChanged"
