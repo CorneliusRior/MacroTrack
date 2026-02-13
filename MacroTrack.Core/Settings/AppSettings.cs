@@ -24,8 +24,12 @@ namespace MacroTrack.Core.Settings
         public bool ClockInLongFormat { get; set; } = true;
         public DTFormatS DTFormatShort { get; set; } = DTFormatS.Default; // Default, 2026/2/7 - 7:42 PM
         public DTFormatL DTFormatLong { get; set; } = DTFormatL.Default;
+        public DFormatS DFormatShort { get; set; } = DFormatS.ymd;
+        public DFormatL DFormatLong { get; set; } = DFormatL.dayDateMonthYear;
+        public TimeFormat TimeFormat { get; set; } = TimeFormat.Default;
         public bool TaskShowInactive { get; set; } = false;
         public bool TaskShowActive { get; set; } = true;
+        public bool DiaryViewIsLongFormat { get; set; } = true;
 
         public AppSettings Clone()
         {
@@ -40,8 +44,12 @@ namespace MacroTrack.Core.Settings
                 ClockInLongFormat = this.ClockInLongFormat,
                 DTFormatShort = this.DTFormatShort,
                 DTFormatLong = this.DTFormatLong,
+                DFormatShort = this.DFormatShort,
+                DFormatLong = this.DFormatLong,
+                TimeFormat = this.TimeFormat,
                 TaskShowInactive = this.TaskShowInactive,
                 TaskShowActive = this.TaskShowActive,
+                DiaryViewIsLongFormat = this.DiaryViewIsLongFormat,
             };
         }
 

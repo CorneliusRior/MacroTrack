@@ -57,7 +57,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             if (Services == null) throw new Exception("Null Services");
             List<FoodEntry> HistoryList = Services.foodLogService.FromTimes(DateTime.Now.Date.AddDays(-3), DateTime.Now.Date.AddDays(3));
             Entries.Clear();
-            TimeFormat = Services.SettingsService.DateTimeFormatString();
+            TimeFormat = Services.SettingsService.GetDTFormatShortString();
             foreach (var entry in HistoryList) Entries.Add(entry);
         }
 

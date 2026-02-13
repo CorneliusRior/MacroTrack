@@ -48,6 +48,7 @@
     <!--Font-->
     <FontFamily x:Key="UIFont">Segoe UI</FontFamily>
     <System:Double x:Key="UINormalSize">12</System:Double>
+    <System:Double x:Key="UISmallTitleSize">14</System:Double>
     <System:Double x:Key="UITitleSize">16</System:Double>
     <System:Double x:Key="UIMainTitleSize">28</System:Double>
 

@@ -23,6 +23,10 @@
                         <Setter Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}"/>
                         <Setter Property="BorderThickness" Value="{DynamicResource SelectedBorderThickness}"/>
                     </MultiDataTrigger>
+
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.56"/>
+                    </Trigger>
                 </Style.Triggers>
             </Style>
         </Border.Style>

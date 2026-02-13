@@ -21,7 +21,7 @@ namespace MacroTrack.AppLibrary.Models
 
     public static class SummaryTimeFrameValues
     {
-        public static readonly IReadOnlyList<TimeFrameItem> List =
+        public static readonly IReadOnlyList<SummaryTimeFrameItem> List =
         [
             new(SummaryTimeFrame.CalendarDay, "Calendar Day"),
             new(SummaryTimeFrame.Last24Hours, "Last 24 Hours"),
@@ -33,7 +33,7 @@ namespace MacroTrack.AppLibrary.Models
     }
     
 
-    public sealed record TimeFrameItem(SummaryTimeFrame Value, string Display);
+    public sealed record SummaryTimeFrameItem(SummaryTimeFrame Value, string Display);
 
 
 }

@@ -76,9 +76,30 @@ namespace MacroTrack.Core.Settings
             Logger.Log(this, caller, level, message, ex);
         }
 
-        public string DateTimeFormatString()
+        public string GetDTFormatShortString()
         {
             return DTFormatSList.FormatByValue.TryGetValue(Settings.DTFormatShort, out var fmt) ? fmt : "yyyy-MM-dd HH:mm";
+        }
+
+        public string GetDTFormatLongString()
+        {
+            return DTFormatLList.FormatByValue.TryGetValue(Settings.DTFormatLong, out var fmt) ? fmt : "dddd, d MMMM, yyyy, H:mm:ss tt";
+        }
+
+        public string GetLongDateTimeString(bool timeBeforeDate = true, bool includeSeconds = true, string dateSeperator = "/", string timeSeperator = ":")
+        {
+            string date = Settings.DFormatLong.GetFormatString();
+            string time = Settings.TimeFormat.GetFormatString(includeSeconds, timeSeperator);
+            if (timeBeforeDate) return $"{time}, {date}";
+            else return $"{date} {time}";
+        }
+
+        public string GetShortDateTimeString(bool timeBeforeDate = true, bool includeSeconds = true, string dateSeperator = "/", string timeSeperator = ":")
+        {
+            string date = Settings.DFormatShort.GetFormatString(dateSeperator);
+            string time = Settings.TimeFormat.GetFormatString(includeSeconds, timeSeperator);
+            if (timeBeforeDate) return $"{time} {date}";
+            else return $"{date} {time}";
         }
     }
 }

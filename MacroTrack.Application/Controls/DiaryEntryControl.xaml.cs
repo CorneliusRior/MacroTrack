@@ -63,6 +63,7 @@ namespace MacroTrack.AppLibrary.Controls
         private void ButtonViewDiary_Click(object sender, RoutedEventArgs e)
         {
             Log();
+            _vm.ShowDiaryView();
         }
     }
 }

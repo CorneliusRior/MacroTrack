@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,6 +19,42 @@ namespace MacroTrack.Core.Settings
         Iso24,
         Iso12,
         ShortLocal
+    }
+
+    public static class DTFormatSExtensions
+    {
+        public static string GetFormatString(this DTFormatS format, bool includeSeconds = false)
+        {
+            if (includeSeconds)
+            {
+                return format switch
+                {
+                    DTFormatS.Default       => "yyyy/M/d - h:mm:ss tt",
+                    DTFormatS.Default24Hour => "yyyy/M/d - HH:mm:ss",
+                    DTFormatS.dmy           => "d/M/yyyy - h:mm:ss tt",
+                    DTFormatS.dmy24Hour     => "d/M/yyyy - HH:mm:ss",
+                    DTFormatS.myd           => "M/d/yyyy - h:mm:ss tt",
+                    DTFormatS.myd24Hour     => "M/d/yyyy - HH:mm:ss",
+                    DTFormatS.Iso24         => "yyyy-MM-dd HH:mm:ss",
+                    DTFormatS.Iso12         => "yyyy-MM-dd h:mm:ss tt",
+                    DTFormatS.ShortLocal    => "g",
+                    _ => "yyyy/M/d - h:mm:ss tt" // Revert to default
+                };
+            }
+            return format switch
+            {
+                DTFormatS.Default       => "yyyy/M/d - h:mm tt",
+                DTFormatS.Default24Hour => "yyyy/M/d - HH:mm",
+                DTFormatS.dmy           => "d/M/yyyy - h:mm tt",
+                DTFormatS.dmy24Hour     => "d/M/yyyy - HH:MM",
+                DTFormatS.myd           => "M/d/yyyy - h:mm tt",
+                DTFormatS.myd24Hour     => "M/d/yyyy - HH:mm",
+                DTFormatS.Iso24         => "yyyy-MM-dd HH:mm",
+                DTFormatS.Iso12         => "yyyy-MM-dd h:mm tt",
+                DTFormatS.ShortLocal    => "g",
+                _ => "yyyy/M/d - h:mm tt" // Revert to default
+            };
+        }
     }
 
     public sealed record DTFormatSItem(DTFormatS Value, string Format, string Display);
@@ -39,7 +76,104 @@ namespace MacroTrack.Core.Settings
 
         public static readonly IReadOnlyDictionary<DTFormatS, string> FormatByValue = List.ToDictionary(i => i.Value, i => i.Format);
     }
-        
+
+    public enum DFormatS
+    {
+        ymd,
+        ymdShortYear,
+        ymdFullDigits,
+        ymdSYFD,        //short year full digits
+        dmy,
+        dmyShortYear,
+        dmyFullDigits,
+        dmySYFD,      
+        mdy,
+        mdyShortYear,
+        mdyFullDigits,
+        mdySYFD      
+    }
+
+    public static class DFormatSExtensions
+    {
+        public static string GetFormatString(this DFormatS format, string DateSeperator = "/")
+        {
+            string s = DateSeperator;
+            return format switch
+            {
+                DFormatS.ymd            => $"yyyy{s}M{s}d",
+                DFormatS.ymdShortYear   => $"yy{s}M{s}d",
+                DFormatS.ymdFullDigits  => $"yyyy{s}MM{s}dd",
+                DFormatS.ymdSYFD        => $"yy{s}MM{s}DD",
+                DFormatS.dmy            => $"d{s}M{s}yyyy",
+                DFormatS.dmyShortYear   => $"d{s}M{s}dd",
+                DFormatS.dmyFullDigits  => $"dd{s}MM{s}yyyy",
+                DFormatS.dmySYFD        => $"dd{s}MM{s}yy",
+                DFormatS.mdy            => $"m{s}d{s}yyyy",
+                DFormatS.mdyShortYear   => $"m{s}d{s}yy",
+                DFormatS.mdyFullDigits  => $"mm{s}dd{s}yyyy",
+                DFormatS.mdySYFD        => $"mm{s}dd{s}yy",
+                _ => $"yyyy{s}M{s}d" // Revert to default.
+            };
+        }
+    }
+
+    public sealed record DFormatSListItem(DFormatS Value, string Display);
+
+    public static class FDormatSList
+    {
+        public static readonly IReadOnlyList<DFormatSListItem> List =
+        [
+            new(DFormatS.ymd           ,  "2026/2/7"),
+            new(DFormatS.ymdShortYear  ,  "2026/2/7"),
+            new(DFormatS.ymdFullDigits ,  "2026/2/7"),
+            new(DFormatS.ymdSYFD       ,  "2026/2/7"),
+            new(DFormatS.dmy           ,  "2026/2/7"),
+            new(DFormatS.dmyShortYear  ,  "2026/2/7"),
+            new(DFormatS.dmyFullDigits ,  "2026/2/7"),
+            new(DFormatS.dmySYFD       ,  "2026/2/7"),
+            new(DFormatS.mdy           ,  "2026/2/7"),
+            new(DFormatS.mdyShortYear  ,  "2026/2/7"),
+            new(DFormatS.mdyFullDigits ,  "2026/2/7"),
+            new(DFormatS.mdySYFD       ,  "2026/2/7"),
+        ];
+    }
+
+    public enum DFormatL
+    {
+        dayDateMonthYear,
+        dateMonthYear,
+        dayMonthDateYear,
+        MonthDateYear,
+    }
+
+    public static class DFormatLExtensions
+    {
+        public static string GetFormatString(this DFormatL format)
+        {
+            return format switch
+            {
+                DFormatL.dayDateMonthYear   => "dddd, d MMMM, yyyy",
+                DFormatL.dateMonthYear      => "d MMMM yyyy",
+                DFormatL.dayMonthDateYear   => "dddd, MMMM d, yyyy",
+                DFormatL.MonthDateYear      => "MMMM d yyyy",
+                _ => "dddd, d MMMM, yyyy" // Revert to default
+            };
+        }
+    }
+
+    public sealed class DFormatLListItem(DFormatL Value, string Display);
+
+    public static class DFormatLList
+    {
+        public static readonly IReadOnlyList<DFormatLListItem> List =
+        [
+            new(DFormatL.dayDateMonthYear, "Friday, 7 February, 2026"),
+            new(DFormatL.dateMonthYear,    "7 February 2026"),
+            new(DFormatL.dayMonthDateYear, "Friday, February 7, 2026"),
+            new(DFormatL.MonthDateYear,    "February 7 2026")
+        ];
+    }
+
     public enum DTFormatL // "L" for "long"
     {
         Default,
@@ -51,6 +185,42 @@ namespace MacroTrack.Core.Settings
         mydND,
         myd24HourND,
         LongLocal
+    }
+
+    public static class DTFormatLExtensions
+    {
+        public static string GetFormatString(this DTFormatL format, bool includeSeconds = false)
+        {
+            if (includeSeconds)
+            {
+                return format switch
+                {
+                    DTFormatL.Default           => "dddd, d MMMM, yyyy, h:mm:ss tt",
+                    DTFormatL.Default24Hour     => "dddd, d MMMM, yyyy, HH:mm:ss",  
+                    DTFormatL.DefaultND         => "d MMMM, yyyy, h:mm:ss tt",      
+                    DTFormatL.Default24HourND   => "d MMMM, yyyy, HH:mm:ss",        
+                    DTFormatL.myd               => "dddd, MMMM d, yyyy, h:mm:ss tt",
+                    DTFormatL.myd24Hour         => "dddd, MMMM d, yyyy, HH:mm:ss",  
+                    DTFormatL.mydND             => "MMMM d, yyyy, h:mm:ss tt",      
+                    DTFormatL.myd24HourND       => "MMMM d, yyyy, HH:mm:ss",        
+                    DTFormatL.LongLocal         => "G",
+                    _ => "dddd, d MMMM, yyyy, h:mm:ss tt" // revert to default
+                };
+            }
+            return format switch
+            {
+                DTFormatL.Default               => "dddd, d MMMM, yyyy, h:mm tt",
+                DTFormatL.Default24Hour         => "dddd, d MMMM, yyyy, HH:mm",
+                DTFormatL.DefaultND             => "d MMMM, yyyy, h:mm tt",
+                DTFormatL.Default24HourND       => "d MMMM, yyyy, HH:mm",
+                DTFormatL.myd                   => "dddd, MMMM d, yyyy, h:mm tt",
+                DTFormatL.myd24Hour             => "dddd, MMMM d, yyyy, HH:mm",
+                DTFormatL.mydND                 => "MMMM d, yyyy, h:mm tt",
+                DTFormatL.myd24HourND           => "MMMM d, yyyy, HH:mm",
+                DTFormatL.LongLocal             => "G",
+                _ => "dddd, d MMMM, yyyy, h:mm tt" // revert to default
+            };
+        }
     }
 
     public sealed record DTFormatLItem(DTFormatL Value, string Format, string Display);
@@ -72,4 +242,46 @@ namespace MacroTrack.Core.Settings
 
         public static readonly IReadOnlyDictionary<DTFormatL, string> FormatByValue = List.ToDictionary(i => i.Value, i => i.Format);
     }
+
+    public enum TimeFormat
+    {
+        Default,
+        TwentyFourHour,
+    }
+
+    public static class TimeFormatExtentions
+    {
+        public static string GetFormatString(this TimeFormat format, bool includeSeconds = true, string timeSeperator = ":")
+        {
+            string t = timeSeperator;
+            if (includeSeconds)
+            {
+                return format switch
+                {
+                    TimeFormat.Default => $"h{t}mm{t}ss tt",
+                    TimeFormat.TwentyFourHour => $"HH{t}mm{t}ss",
+                    _ => $"h{t}mm{t}ss tt" // revert to default
+                };
+            }
+            return format switch
+            {
+                TimeFormat.Default => $"h{t}mm tt",
+                TimeFormat.TwentyFourHour => $"HH{t}mm",
+                _ => $"h{t}mm tt" // revert to default
+            };
+        }
+    }
+
+    public sealed record TimeFormatListItem(TimeFormat Value, string Display);
+
+    public static class TimeFormatList
+    {
+        public static readonly IReadOnlyList<TimeFormatListItem> List =
+        [
+            new(TimeFormat.Default,         "7:49 PM"),
+            new(TimeFormat.TwentyFourHour,  "19:49")
+        ];
+    }
+
+    
 }

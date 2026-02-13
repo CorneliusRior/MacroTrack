@@ -1,0 +1,81 @@
+﻿<local:ControlBase x:Class="MacroTrack.AppLibrary.Controls.DiaryViewControl"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                   xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+                   xmlns:models="clr-namespace:MacroTrack.AppLibrary.Models"
+                   xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+                   mc:Ignorable="d" 
+                   d:DesignHeight="450" d:DesignWidth="800">
+
+    <local:ControlBase.Resources>
+        <CollectionViewSource x:Key="SortedEntries" Source="{Binding Entries}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Time" Direction="Descending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </local:ControlBase.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Background="{DynamicResource PanelBackGroundBrush}" Grid.Row="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Diary View" Style="{DynamicResource TextBlock.MidTitle}" Grid.Column="0"/>
+                <Label Content="From:" Target="{Binding ElementName=dtpFrom}" Grid.Column="1"/>
+                <local:DateTimePicker x:Name="dtpFrom" 
+                                      IsEnabled="{Binding IsCustomTimeFrame}"
+                                      Value="{Binding CustomStartTime}"
+                                      MinWidth="125"
+                                      Margin="5"
+                                      Grid.Column="2"/>
+                <Label Content="To:" Target="{Binding ElementName=dtpTo}" Grid.Column="3"/>
+                <local:DateTimePicker x:Name="dtpTo"  
+                                      IsEnabled="{Binding IsCustomTimeFrame}"
+                                      Value="{Binding CustomEndTime}"
+                                      MinWidth="125"
+                                      Margin="5"
+                                      Grid.Column="4"/>
+                <ComboBox x:Name="cbTimeFrame" 
+                          Template="{DynamicResource MTComboBoxTemplate}"
+                          ItemsSource="{x:Static models:DefaultTimeFrameValues.List}"
+                          DisplayMemberPath="Display"
+                          SelectedValuePath="Value"
+                          SelectedValue="{Binding TimeFrame, Mode=TwoWay}"
+                          MinWidth="100"
+                          Grid.Column="5"/>
+            </Grid>
+        </Border>
+
+        <Border Background="{DynamicResource AppBackGroundBrush}" Grid.Row="1">
+            <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl x:Name="DiaryItems" ItemsSource="{Binding Source={StaticResource SortedEntries}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:DiaryEntryCard Entry="{Binding}"
+                                                  TimeFormat="{Binding DataContext.TimeFormat, ElementName=DiaryItems}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</local:ControlBase>

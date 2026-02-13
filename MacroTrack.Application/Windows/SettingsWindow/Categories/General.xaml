@@ -78,6 +78,13 @@
                                   IsChecked="{Binding SettingsEditable.TaskShowActive, Mode=TwoWay}"/>
                     </StackPanel>
                 </Expander>
+
+                <Expander Header="Diary View" IsExpanded="True">
+                    <StackPanel Orientation="Vertical">
+                        <CheckBox Content="Display long-format date"
+                                  IsChecked="{Binding SettingsEditable.DiaryViewIsLongFormat, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Expander>
                 
             </StackPanel>
         </ScrollViewer>

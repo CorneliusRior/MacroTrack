@@ -77,6 +77,7 @@ namespace MacroTrack.AppLibrary.Services
             {
                 WindowType.Settings => CreateSettingsWindow(o),
                 WindowType.AddPreset => CreateAddPresetWindow(o),
+                WindowType.DiaryView => CreateDiaryViewWindow(o),
                 _ => throw new NotSupportedException($"Unknown window type '{type}'")
             };
         }        
@@ -113,6 +114,11 @@ namespace MacroTrack.AppLibrary.Services
         private Window CreateAddPresetWindow(Window? owner)
         {
             return new AddPresetWindow(_services, _appServices) { Owner = owner };
+        }
+
+        private Window CreateDiaryViewWindow(Window? owner)
+        {
+            return new DiaryViewWindow(_services, _appServices) { Owner = owner };
         }
     }
 }

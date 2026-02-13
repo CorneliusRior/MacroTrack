@@ -20,5 +20,11 @@ namespace MacroTrack.AppLibrary.ViewModels
             base.Init(services, appServices);
             // Add event subscriptions here (SubscribeEvent())
         }
+
+        public void ShowDiaryView()
+        {
+            if (AppServices == null) return;
+            AppServices.WindowService.Show(WindowType.DiaryView);
+        }
     }
 }

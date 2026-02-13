@@ -1,0 +1,147 @@
+﻿using MacroTrack.AppLibrary.Commands;
+using MacroTrack.AppLibrary.Models;
+using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
+using Microsoft.VisualBasic;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+
+namespace MacroTrack.AppLibrary.ViewModels
+{
+    internal class DiaryViewVM : ViewModelBase
+    {
+        private bool _isUpdating = true;
+        public ObservableCollection<DiaryEntry> Entries { get; } = new ObservableCollection<DiaryEntry>();
+
+        private DefaultTimeFrame _timeFrame;
+        public DefaultTimeFrame TimeFrame
+        {
+            get => _timeFrame;
+            set
+            {
+                if (_timeFrame == value) return;
+                _timeFrame = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsCustomTimeFrame));
+                Populate();
+            }
+        } 
+        public bool IsCustomTimeFrame => TimeFrame == DefaultTimeFrame.Custom;
+
+
+        private string _timeFormat = "yyyy/MM/dd - h:mm tt";
+        public string TimeFormat
+        {
+            get => _timeFormat;
+            set
+            {
+                _timeFormat = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime _customStartTime;
+        public DateTime CustomStartTime
+        {
+            get => _customStartTime;
+            set
+            {
+                if (_customStartTime == value) return;
+                _customStartTime = value;
+                OnPropertyChanged();
+                Populate();
+            }
+        }
+
+        private DateTime _customEndTime;
+        public DateTime CustomEndTime
+        {
+            get => _customEndTime;
+            set
+            {
+                if (_customEndTime == value) return;
+                _customEndTime = value;
+                OnPropertyChanged();
+                Populate();
+            }
+        }
+
+        // Commands:
+        public ICommand ViewDayCommand { get; }
+        public ICommand EditEntryCommand { get; }
+        public ICommand DeleteEntryCommand { get; }
+
+        public DiaryViewVM()
+        {
+            ViewDayCommand = new RelayCommand<FoodEntry>(ViewDay);
+            EditEntryCommand = new RelayCommand<FoodEntry>(EditEntry);
+            DeleteEntryCommand = new RelayCommand<FoodEntry>(DeleteEntry);
+
+            TimeFrame = DefaultTimeFrame.Month;
+            // Just doing this for the time being before we put in custom times:
+            _customEndTime = DateTime.Today.AddDays(1);
+            _customStartTime = _customEndTime.AddMonths(-1);
+        }
+
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);
+            EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => Populate()));
+            _isUpdating = false;
+            Populate();
+        }
+
+        public void Populate()
+        {
+            Log();
+            if (_isUpdating) return;
+            _isUpdating = true;
+            if (Services == null) throw new Exception("Null Services");
+
+            // TimeFrame Logic:
+            DateTime StartTime;
+            DateTime EndTime;
+            if (TimeFrame != DefaultTimeFrame.Custom)
+            {
+                EndTime = DateTime.Today.AddDays(1);
+                StartTime = TimeFrame.GetStartDate();
+            }
+            else
+            {
+                EndTime = _customEndTime;
+                StartTime = _customStartTime;
+            }
+
+            // Get list and add it w/ date formatting
+            List<DiaryEntry> diary = Services.diaryService.FromTimes(StartTime, EndTime);
+            Entries.Clear();
+            if (Services.SettingsService.Settings.DiaryViewIsLongFormat) TimeFormat = Services.SettingsService.GetDTFormatLongString();
+            else TimeFormat = Services.SettingsService.GetDTFormatShortString();
+            foreach (var entry in diary) Entries.Add(entry);
+
+            _isUpdating = false;
+        }
+
+        public void ViewDay(FoodEntry? entry)
+        {
+            MessageBox.Show("Not yet implemented :)");
+        }
+
+        public void EditEntry(FoodEntry? entry)
+        {
+            MessageBox.Show("Not yet implemented :)");
+        }
+
+        public void DeleteEntry(FoodEntry? entry) 
+        { 
+            MessageBox.Show("Not yet implemented :)"); 
+        }
+    }
+}

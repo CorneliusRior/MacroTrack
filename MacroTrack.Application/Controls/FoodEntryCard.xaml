@@ -11,9 +11,6 @@
              mc:Ignorable="d" 
              d:DesignWidth="300"
              Height="auto">
-    <UserControl.Resources>
-        <conv:EnumDateTimeConverter x:Key="DateFmt"/>
-    </UserControl.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="{DynamicResource BorderThickness}" Padding="7">
