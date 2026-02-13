@@ -30,10 +30,24 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             base.Init(services, appServices);
             EventSubscribe(AppServices!.AppEvents.Subscribe<PresetListChanged>(_ => Populate()));
+            EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => Populate()));
+            Mult = 1.00;
+            DTPFormat = Services!.SettingsService.Settings.DTPInLongFormat ? Services.SettingsService.GetLongDateTimeString(false, false) : Services.SettingsService.GetShortDateTimeString(false, false);
+            LogVars(new { DTPFormat });
             Populate();
         }
 
-
+        private string _dtpFormat = "d MMMM yyyy hh:mm tt";
+        public string DTPFormat
+        {
+            get => _dtpFormat;
+            set
+            {
+                if (_dtpFormat == value) return;
+                _dtpFormat = value;
+                OnPropertyChanged();
+            }
+        }
 
         private DateTime? _time;
         public DateTime? Time
@@ -259,7 +273,8 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
             Log();
             if (Time is null) Time = DateTime.Now;
-            //Mult = 1; getting rid of this so we can update when presets change without mult changing.
+            DTPFormat = Services!.SettingsService.Settings.DTPInLongFormat ? Services.SettingsService.GetLongDateTimeString(false, false) : Services.SettingsService.GetShortDateTimeString(false, false);
+            
             try
             {
                 List<Preset> presetList = Services.presetService.GetAll();

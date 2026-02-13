@@ -45,6 +45,7 @@
 
                 <controls:DateTimePicker x:Name="dateTimePicker"
                                          Value="{Binding Time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Format="{Binding DTPFormat}"
                                          Margin="5"
                                          Grid.Row="0" Grid.Column="1"/>
 

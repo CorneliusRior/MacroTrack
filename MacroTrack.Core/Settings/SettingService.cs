@@ -86,20 +86,46 @@ namespace MacroTrack.Core.Settings
             return DTFormatLList.FormatByValue.TryGetValue(Settings.DTFormatLong, out var fmt) ? fmt : "dddd, d MMMM, yyyy, H:mm:ss tt";
         }
 
-        public string GetLongDateTimeString(bool timeBeforeDate = true, bool includeSeconds = true, string dateSeperator = "/", string timeSeperator = ":")
+        public string GetLongDateTimeString(bool timeBeforeDate = false, bool includeSeconds = true, string timeSeperator = ":", string? dateTimeSeperator = null)
         {
             string date = Settings.DFormatLong.GetFormatString();
             string time = Settings.TimeFormat.GetFormatString(includeSeconds, timeSeperator);
-            if (timeBeforeDate) return $"{time}, {date}";
-            else return $"{date} {time}";
+            string sep = dateTimeSeperator == null ? Settings.DateTimeSeperator : dateTimeSeperator;
+            if (timeBeforeDate) return $"{time}{sep}{date}";
+            else return $"{date}{sep}{time}";
         }
 
-        public string GetShortDateTimeString(bool timeBeforeDate = true, bool includeSeconds = true, string dateSeperator = "/", string timeSeperator = ":")
+        public string GetShortDateTimeString(bool timeBeforeDate = false, bool includeSeconds = true, string dateSeperator = "/", string timeSeperator = ":", string? dateTimeSeperator = null)
         {
             string date = Settings.DFormatShort.GetFormatString(dateSeperator);
             string time = Settings.TimeFormat.GetFormatString(includeSeconds, timeSeperator);
-            if (timeBeforeDate) return $"{time} {date}";
-            else return $"{date} {time}";
+            string sep = dateTimeSeperator == null ? Settings.DateTimeSeperator : dateTimeSeperator;
+            if (timeBeforeDate) return $"{time}{sep}{date}";
+            else return $"{date}{sep}{time}";
+        }
+
+        public string GetLongDateString()
+        {
+            return Settings.DFormatLong.GetFormatString();
+        }
+
+        public string GetShortDateString(string? dateSeperator = null)
+        {            
+            return Settings.DFormatShort.GetFormatString(dateSeperator ?? Settings.DateSeperator);
+        }
+
+        public string GetDateTimeString(bool longDate = false, bool showMinutes = true, bool showSeconds = true)
+        {
+            if (longDate)
+            {
+                if (!showMinutes) return Settings.DFormatLong.GetFormatString();
+                else return GetLongDateTimeString(false, showSeconds);
+            }
+            else // (shortDate:)
+            {
+                if (!showMinutes) return Settings.DFormatShort.GetFormatString(Settings.DateSeperator);
+                else return GetShortDateTimeString(false, showSeconds);
+            }
         }
     }
 }

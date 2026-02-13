@@ -22,14 +22,20 @@ namespace MacroTrack.Core.Settings
         public LogLevel LogFileLevel { get; set; } = LogLevel.Debug;
         public int WeightMode { get; set; } = 0; // 0: kg, 1: lbs, 2: st
         public bool ClockInLongFormat { get; set; } = true;
+        public bool DTPInLongFormat { get; set; } = true;
         public DTFormatS DTFormatShort { get; set; } = DTFormatS.Default; // Default, 2026/2/7 - 7:42 PM
         public DTFormatL DTFormatLong { get; set; } = DTFormatL.Default;
         public DFormatS DFormatShort { get; set; } = DFormatS.ymd;
         public DFormatL DFormatLong { get; set; } = DFormatL.dayDateMonthYear;
         public TimeFormat TimeFormat { get; set; } = TimeFormat.Default;
+        public string DateSeperator { get; set; } = "/";
+        public string TimeSeperator { get; set; } = ":";
+        public string DateTimeSeperator { get; set; } = " ";
         public bool TaskShowInactive { get; set; } = false;
         public bool TaskShowActive { get; set; } = true;
-        public bool DiaryViewIsLongFormat { get; set; } = true;
+        public bool DiaryTimeIsLongFormat { get; set; } = true;
+        public bool DiaryTimeIncludesTime { get; set; } = true;
+        public bool DiaryTimeIncludesSeconds { get; set; } = true;  
 
         public AppSettings Clone()
         {
@@ -42,14 +48,20 @@ namespace MacroTrack.Core.Settings
                 LogUILevel = this.LogUILevel,
                 WeightMode = this.WeightMode,
                 ClockInLongFormat = this.ClockInLongFormat,
+                DTPInLongFormat = this.DTPInLongFormat,
                 DTFormatShort = this.DTFormatShort,
                 DTFormatLong = this.DTFormatLong,
                 DFormatShort = this.DFormatShort,
                 DFormatLong = this.DFormatLong,
                 TimeFormat = this.TimeFormat,
+                DateSeperator = this.DateSeperator,
+                TimeSeperator = this.TimeSeperator,
+                DateTimeSeperator = this.DateTimeSeperator,
                 TaskShowInactive = this.TaskShowInactive,
                 TaskShowActive = this.TaskShowActive,
-                DiaryViewIsLongFormat = this.DiaryViewIsLongFormat,
+                DiaryTimeIsLongFormat = this.DiaryTimeIsLongFormat,
+                DiaryTimeIncludesTime = this.DiaryTimeIncludesTime,
+                DiaryTimeIncludesSeconds = this.DiaryTimeIncludesSeconds,
             };
         }
 

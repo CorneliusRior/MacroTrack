@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MacroTrack.AppLibrary.Services;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,12 +22,27 @@ namespace MacroTrack.AppLibrary.Controls
     /// </summary>
     public partial class DateTimePicker : UserControl
     {
-        private readonly string format = "d MMMM yyyy hh:mm tt";
+        //private readonly string format = "d MMMM yyyy hh:mm tt";
         public DateTimePicker()
         {
             InitializeComponent();
         }
 
+        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register(
+            nameof(Format),
+            typeof(string), 
+            typeof(DateTimePicker), 
+            new PropertyMetadata(null)
+        );
+        public string Format
+        {
+            get => (string)GetValue(FormatProperty);
+            set
+            {
+                Debug.WriteLine($"Format={Format}");
+                SetValue(FormatProperty, value);
+            }
+        }
 
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register(
@@ -50,15 +67,20 @@ namespace MacroTrack.AppLibrary.Controls
             c.PrintValue();
         }
 
+        public void UpdateFormat()
+        {
+            PrintValue();
+        }
+
         private void PrintValue()
         {
             if (Value is null)
             {
                 return;
             }
-
+            Debug.WriteLine($"Printing, format: {Format}");
             var time = Value.Value;
-            PART_tb.Text = time.ToString(format);
+            PART_tb.Text = time.ToString(Format);
             PART_Calendar.SelectedDate = time.Date;
         }
 

@@ -122,8 +122,15 @@ namespace MacroTrack.AppLibrary.ViewModels
             // Get list and add it w/ date formatting
             List<DiaryEntry> diary = Services.diaryService.FromTimes(StartTime, EndTime);
             Entries.Clear();
-            if (Services.SettingsService.Settings.DiaryViewIsLongFormat) TimeFormat = Services.SettingsService.GetDTFormatLongString();
-            else TimeFormat = Services.SettingsService.GetDTFormatShortString();
+            //if (Services.SettingsService.Settings.DiaryTimeIsLongFormat) TimeFormat = Services.SettingsService.GetDTFormatLongString();
+            //else TimeFormat = Services.SettingsService.GetDTFormatShortString();
+
+            TimeFormat = Services.SettingsService.GetDateTimeString(
+                Services.SettingsService.Settings.DiaryTimeIsLongFormat,
+                Services.SettingsService.Settings.DiaryTimeIncludesTime,
+                Services.SettingsService.Settings.DiaryTimeIncludesSeconds
+            );
+
             foreach (var entry in diary) Entries.Add(entry);
 
             _isUpdating = false;

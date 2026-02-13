@@ -177,8 +177,10 @@ namespace MacroTrack.Dashboard
         private void SetClockFormat()
         {
             Log();
-            if (Services.SettingsService.Settings.ClockInLongFormat) ClockFormat = DTFormatLList.FormatByValue.TryGetValue(Services.SettingsService.Settings.DTFormatLong, out var fmt) ? fmt : "ddddd, d MMMM, yyyy, HH:MM:ss";
-            else ClockFormat = DTFormatSList.FormatByValue.TryGetValue(Services.SettingsService.Settings.DTFormatShort, out var fmt) ? fmt : "yyyy/MM/dd HH:mm:ss";
+
+            if (Services.SettingsService.Settings.ClockInLongFormat) ClockFormat = Services.SettingsService.GetLongDateTimeString();
+            else ClockFormat = Services.SettingsService.GetShortDateTimeString();
+            ClockString = DateTime.Now.ToString(ClockFormat);
         }
 
         // Log & REPL handling:

@@ -119,22 +119,22 @@ namespace MacroTrack.Core.Settings
 
     public sealed record DFormatSListItem(DFormatS Value, string Display);
 
-    public static class FDormatSList
+    public static class DFormatSList
     {
         public static readonly IReadOnlyList<DFormatSListItem> List =
         [
             new(DFormatS.ymd           ,  "2026/2/7"),
-            new(DFormatS.ymdShortYear  ,  "2026/2/7"),
-            new(DFormatS.ymdFullDigits ,  "2026/2/7"),
-            new(DFormatS.ymdSYFD       ,  "2026/2/7"),
-            new(DFormatS.dmy           ,  "2026/2/7"),
-            new(DFormatS.dmyShortYear  ,  "2026/2/7"),
-            new(DFormatS.dmyFullDigits ,  "2026/2/7"),
-            new(DFormatS.dmySYFD       ,  "2026/2/7"),
-            new(DFormatS.mdy           ,  "2026/2/7"),
-            new(DFormatS.mdyShortYear  ,  "2026/2/7"),
-            new(DFormatS.mdyFullDigits ,  "2026/2/7"),
-            new(DFormatS.mdySYFD       ,  "2026/2/7"),
+            new(DFormatS.ymdShortYear  ,  "26/2/7"),
+            new(DFormatS.ymdFullDigits ,  "2026/02/07"),
+            new(DFormatS.ymdSYFD       ,  "26/02/07"),
+            new(DFormatS.dmy           ,  "7/2/2026"),
+            new(DFormatS.dmyShortYear  ,  "7/2/26"),
+            new(DFormatS.dmyFullDigits ,  "07/02/2026"),
+            new(DFormatS.dmySYFD       ,  "07/02/26"),
+            new(DFormatS.mdy           ,  "2/7/2026"),
+            new(DFormatS.mdyShortYear  ,  "2/7/26"),
+            new(DFormatS.mdyFullDigits ,  "02/07/2026"),
+            new(DFormatS.mdySYFD       ,  "02/07/26"),
         ];
     }
 
@@ -161,7 +161,7 @@ namespace MacroTrack.Core.Settings
         }
     }
 
-    public sealed class DFormatLListItem(DFormatL Value, string Display);
+    public sealed record DFormatLListItem(DFormatL Value, string Display);
 
     public static class DFormatLList
     {

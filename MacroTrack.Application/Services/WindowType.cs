@@ -10,6 +10,9 @@ namespace MacroTrack.AppLibrary.Services
     {
         Settings,
         AddPreset,        
-        DiaryView
+        DiaryView,
+        DiaryEdit,
+        FoodLogEdit,
+        TaskView
     }
 }
