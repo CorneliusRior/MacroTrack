@@ -30,6 +30,7 @@ namespace MacroTrack.AppLibrary.Services
     */
     public sealed record SettingsChanged;
     public sealed record SummaryChanged(MacroSummary summary);
+    public sealed record DiaryChanged;
     public sealed record FoodLogChanged;
     public sealed record PresetListChanged;
     public sealed record TaskCompletionChanged;

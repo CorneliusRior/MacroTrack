@@ -6,7 +6,46 @@
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+    <Border Background="{DynamicResource PanelBackGroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Style="{DynamicResource TextBlock.MidTitle}" 
+                       Text="Edit Diary Entry"
+                       Grid.Row="0"/>
+
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                          Grid.Row="1">
+                <StackPanel>
+                    <Label Style="{DynamicResource Label.SmallTitle}"
+                           Content="{Binding HeaderText}"/>
+                    <TextBox x:Name="tbBody" Style="{DynamicResource TextBox.MultiLine}"
+                             Text="{Binding EntryBody}"
+                             MinHeight="100"/>
+                    <Label Content="Edit Notes:"/>
+                    <TextBox Style="{DynamicResource TextBox.MultiLine}" 
+                             x:Name="tbEditNotes"
+                             Text="{Binding EditNotes}"
+                             MinHeight="50"/>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <StackPanel Style="{DynamicResource StackPanel.Footer}" Grid.Row="2">
+                <Button x:Name="buttonDelete"
+                        Content="Delete"
+                        Style="{DynamicResource Button.Delete}"
+                        Click="buttonDelete_Click"/>
+                <Button x:Name="buttonCancel"
+                        Content="Cancel"
+                        Click="buttonCancel_Click"/>
+                <Button x:Name="buttonEdit"
+                        Content="Edit"
+                        Click="buttonEdit_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
 </local:ControlBase>

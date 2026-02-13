@@ -1,4 +1,5 @@
 ﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,10 @@ namespace MacroTrack.AppLibrary.Windows
     /// </summary>
     public partial class DiaryEditWindow : WindowBase
     {
-        public DiaryEditWindow(CoreServices services, AppServices appServices) : base(services, appServices)
+        public DiaryEditWindow(CoreServices services, AppServices appServices, DiaryEntry entry) : base(services, appServices)
         {
             InitializeComponent();
+            ControlDiaryEdit.Entry = entry;
             ControlDiaryEdit.Init(Services, AppServices);
             ControlDiaryEdit.RequestClose += r => Close();
             Log();

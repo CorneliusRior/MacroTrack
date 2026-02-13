@@ -51,6 +51,7 @@ namespace MacroTrack.AppLibrary.Controls
                 throw ex;
             }
             Services.diaryService.AddEntry(tbDiary.Text);
+            AppServices?.AppEvents.Publish(new DiaryChanged());
             tbDiary.Clear();
         }
 

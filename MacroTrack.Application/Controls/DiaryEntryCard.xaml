@@ -51,14 +51,20 @@
             <StackPanel Style="{DynamicResource StackPanel.Footer}" Grid.Row="2">
                 <Button x:Name="PART_ButtonViewDay"
                         Content="View Day"
-                        Click="PART_ButtonViewDay_Click"/>
+                        Command="{Binding DataContext.ViewDayCommand,
+                                  RelativeSource={RelativeSource AncestorType=local:DiaryViewControl}}"
+                        CommandParameter="{Binding}"/>
                 <Button x:Name="PART_ButtonEdit"
                         Content="Edit"
-                        Click="PART_ButtonEdit_Click"/>
+                        Command="{Binding DataContext.EditEntryCommand,
+                                  RelativeSource={RelativeSource AncestorType=local:DiaryViewControl}}"
+                        CommandParameter="{Binding}"/>
                 <Button x:Name="PART_ButtonDelete"
                         Style="{DynamicResource Button.Delete}"
                         Content="Delete"
-                        Click="PART_ButtonDelete_Click"/>
+                        Command="{Binding DataContext.DeleteEntryCommand,
+                                  RelativeSource={RelativeSource AncestorType=local:DiaryViewControl}}"
+                        CommandParameter="{Binding}"/>
             </StackPanel>
         </Grid>
     </Border>

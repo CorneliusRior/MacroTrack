@@ -80,9 +80,9 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public DiaryViewVM()
         {
-            ViewDayCommand = new RelayCommand<FoodEntry>(ViewDay);
-            EditEntryCommand = new RelayCommand<FoodEntry>(EditEntry);
-            DeleteEntryCommand = new RelayCommand<FoodEntry>(DeleteEntry);
+            ViewDayCommand = new RelayCommand<DiaryEntry>(ViewDay);
+            EditEntryCommand = new RelayCommand<DiaryEntry>(EditEntry);
+            DeleteEntryCommand = new RelayCommand<DiaryEntry>(DeleteEntry);
 
             TimeFrame = DefaultTimeFrame.Month;
             // Just doing this for the time being before we put in custom times:
@@ -93,6 +93,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
+            EventSubscribe(AppServices!.AppEvents.Subscribe<DiaryChanged>(_ => Populate()));
             EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => Populate()));
             _isUpdating = false;
             Populate();
@@ -136,17 +137,18 @@ namespace MacroTrack.AppLibrary.ViewModels
             _isUpdating = false;
         }
 
-        public void ViewDay(FoodEntry? entry)
+        public void ViewDay(DiaryEntry? entry)
         {
             MessageBox.Show("Not yet implemented :)");
         }
 
-        public void EditEntry(FoodEntry? entry)
+        public void EditEntry(DiaryEntry? entry)
         {
-            MessageBox.Show("Not yet implemented :)");
+            if (AppServices == null) throw new Exception("Null AppServices");
+            AppServices.WindowService.Show(WindowType.DiaryEdit, entry);
         }
 
-        public void DeleteEntry(FoodEntry? entry) 
+        public void DeleteEntry(DiaryEntry? entry) 
         { 
             MessageBox.Show("Not yet implemented :)"); 
         }

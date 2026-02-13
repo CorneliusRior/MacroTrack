@@ -1,5 +1,6 @@
 ﻿using MacroTrack.AppLibrary.Windows;
 using MacroTrack.AppLibrary.Windows.SettingsWindow;
+using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 
 using System;
@@ -78,7 +79,7 @@ namespace MacroTrack.AppLibrary.Services
                 WindowType.Settings => CreateSettingsWindow(o),
                 WindowType.AddPreset => CreateAddPresetWindow(o),
                 WindowType.DiaryView => CreateDiaryViewWindow(o),
-                WindowType.DiaryEdit => CreateDiaryEditWindow(o),
+                WindowType.DiaryEdit => CreateDiaryEditWindow(o, parameter),
                 WindowType.FoodLogEdit => CreateFoodLogEditWindow(o),
                 WindowType.TaskView => CreateTaskViewWindow(o),
                 _ => throw new NotSupportedException($"Unknown window type '{type}'")
@@ -124,9 +125,13 @@ namespace MacroTrack.AppLibrary.Services
             return new DiaryViewWindow(_services, _appServices) { Owner = owner };
         }
 
-        private Window CreateDiaryEditWindow(Window? owner) 
+        private Window CreateDiaryEditWindow(Window? owner, object? parameter) 
         {
-            return new DiaryEditWindow(_services, _appServices) { Owner = owner };
+            if (parameter is DiaryEntry entry)
+            {
+                return new DiaryEditWindow(_services, _appServices, entry) { Owner = owner };
+            }
+            else throw new InvalidOperationException();
         }
         private Window CreateFoodLogEditWindow(Window? owner) { throw new NotImplementedException(); }
         private Window CreateTaskViewWindow(Window? owner) { throw new NotImplementedException(); }
