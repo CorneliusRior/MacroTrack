@@ -2,6 +2,7 @@
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
+using MacroTrack.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,52 @@ namespace MacroTrack.AppLibrary.ViewModels
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-            EventSubscribe( AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => Log("Settings changed, detected by WeightEntryVM, but we haven't implemented that yet", LogLevel.Info)));
+            EventSubscribe( AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => UpdateSettings()));
+            UpdateSettings();            
             TimeNow();
+        }
+
+        private void UpdateSettings()
+        {
+            Format = Services!.SettingsService.Settings.WeightFormat;
+            UnitLabel = Format.ShortString();
+            Convert();
+        }
+
+        private WeightFormat _format;
+        public WeightFormat Format
+        {
+            get => _format;
+            set
+            {
+                if (_format == value) return;
+                _format = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string? _unitLabel;
+        public string? UnitLabel
+        {
+            get => _unitLabel;
+            set
+            {
+                if (_unitLabel == value) return;
+                _unitLabel = value; 
+                OnPropertyChanged();
+            }
+        }
+
+        private string? _conversionString;
+        public string? ConversionString
+        {
+            get => _conversionString;
+            set
+            {
+                if (_conversionString == value) return;
+                _conversionString = value;
+                OnPropertyChanged();
+            }
         }
 
         private DateTime? _time;
@@ -34,18 +79,23 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
-        private double? _weight;
-        public double? Weight
+        private double? _weightInput;
+        public double? WeightInput
         {
-            get => _weight;
+            get => _weightInput;
             set
             {
                 Log();
-                if (_weight == value) return;
-                _weight = value;
-                OnPropertyChanged();
+                if (_weightInput == value) return;
+                _weightInput = value;
+                Convert();
+                OnPropertyChanged();                
             }
         }
+
+        public double? WeightKg { get; private set; }
+        public double? WeightLbs { get; private set; }
+        public double? WeightSt { get; private set; }
 
         public void TimeNow()
         {
@@ -56,14 +106,41 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             Log();
             if (Time ==  null) Time = DateTime.Now;            
-            Weight = null;
+            WeightInput = null;
             ClearAllErrors();
         }
 
         public void ClearAllErrors()
         {
             ClearError(nameof(Time));
-            ClearError(nameof(Weight));
+            ClearError(nameof(WeightInput));
+        }
+
+        private void Convert()
+        {
+            if ( WeightInput == null)
+            {
+                WeightKg = 0;
+                WeightLbs = 0;
+                WeightSt = 0;
+            }
+            else
+            {
+                double w = WeightInput.Value; 
+                WeightKg = Format.ConvertTo(WeightFormat.Kg, w);
+                WeightLbs = Format.ConvertTo(WeightFormat.Lbs, w);
+                WeightSt = Format.ConvertTo(WeightFormat.St, w);
+            }
+            
+            UpDateConversionString();
+            LogVars(new {WeightKg, WeightLbs, WeightSt, Format});
+        }
+
+        private void UpDateConversionString()
+        {
+            if (Format == WeightFormat.Kg)  ConversionString = $"( {WeightLbs:0.#}lbs, {WeightSt:0.#}st )";
+            if (Format == WeightFormat.Lbs) ConversionString = $"( {WeightKg:0.#}kg, {WeightSt:0.#}st )";
+            if (Format == WeightFormat.St)  ConversionString = $"( {WeightKg:0.#}kg, {WeightLbs:0.#}lbs )";
         }
 
         public void Add()
@@ -71,11 +148,11 @@ namespace MacroTrack.AppLibrary.ViewModels
             Log();
             bool ok = true;
             ok &= DateTimeRequire(nameof(Time), Time);
-            ok &= NumericRequire(nameof(Weight), Weight);
+            ok &= NumericRequire(nameof(WeightInput), WeightInput);
             if (!ok) return;
 
             DateTime time = Time!.Value;
-            double weight = Weight!.Value;
+            double weight = Format.ConvertTo(WeightFormat.Kg, WeightInput!.Value);
 
             try
             {

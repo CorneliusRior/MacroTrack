@@ -8,6 +8,14 @@ public record MacroTotals(
     double Fat
 );
 
+public record MacroTotalsNullable
+(
+    double? Calories,
+    double? Protein,
+    double? Carbs,
+    double? Fat
+);
+
 public record MacroSummary(
     bool NoGoal,
     DateTime From,
@@ -15,5 +23,7 @@ public record MacroSummary(
     string? GoalName,
     MacroTotals Target,
     MacroTotals Actual,
-    MacroTotals Remaining
+    MacroTotals Remaining,
+    MacroTotalsNullable? TargetMin,
+    MacroTotalsNullable? TargetMax
 );

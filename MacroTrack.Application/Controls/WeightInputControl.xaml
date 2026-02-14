@@ -67,15 +67,16 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBox Name="tb_Entry"
-                                 Text="{Binding Weight,
+                                 Text="{Binding WeightInput,
                                         Converter={StaticResource NullDouble},
+                                        UpdateSourceTrigger=PropertyChanged,
                                         ValidatesOnDataErrors=True}"
                                  Style="{DynamicResource TextBox.Numeric}"
                                  Grid.Column="0"/>
-                        <Label Content="Kg"
+                        <Label Content="{Binding UnitLabel}"
                                Name="lbl_Unit"
                                Grid.Column="1"/>
-                        <Label Content="( 0lbs, 0st )"
+                        <Label Content="{Binding ConversionString}"
                                Name="lbl_Conversion"
                                HorizontalAlignment="Right"
                                Grid.Column="2"/>

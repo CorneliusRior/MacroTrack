@@ -110,6 +110,27 @@
                                   IsChecked="{Binding SettingsEditable.DiaryTimeIncludesSeconds, Mode=TwoWay}"/>
                     </StackPanel>
                 </Expander>
+                <Expander Header="Weight Formatting" IsExpanded="True">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Weight Format:" Target="{Binding ElementName=cbWeightFormat}" Grid.Column="0"/>
+                            <ComboBox x:Name="cbWeightFormat"
+                                      Template="{DynamicResource MTComboBoxTemplate}"
+                                      ItemsSource="{x:Static set:WeightFormatList.List}"
+                                      DisplayMemberPath="LongDisplay"
+                                      SelectedValuePath="Value"
+                                      SelectedValue="{Binding SettingsEditable.WeightFormat, Mode=TwoWay}"
+                                      Width="80"
+                                      HorizontalContentAlignment="Right"
+                                      Grid.Column="1"/>
+                        </Grid>
+                        
+                    </StackPanel>
+                </Expander>
             </StackPanel>
         </ScrollViewer>
     </Border>

@@ -21,6 +21,7 @@ namespace MacroTrack.Core.Settings
         public LogLevel LogUILevel { get; set; } = LogLevel.Warning;
         public LogLevel LogFileLevel { get; set; } = LogLevel.Debug;
         public int WeightMode { get; set; } = 0; // 0: kg, 1: lbs, 2: st
+        public WeightFormat WeightFormat { get; set; } = WeightFormat.Kg;
         public bool ClockInLongFormat { get; set; } = true;
         public bool DTPInLongFormat { get; set; } = true;
         public DTFormatS DTFormatShort { get; set; } = DTFormatS.Default; // Default, 2026/2/7 - 7:42 PM
@@ -47,6 +48,7 @@ namespace MacroTrack.Core.Settings
                 LogFileLevel = this.LogFileLevel,
                 LogUILevel = this.LogUILevel,
                 WeightMode = this.WeightMode,
+                WeightFormat = this.WeightFormat,
                 ClockInLongFormat = this.ClockInLongFormat,
                 DTPInLongFormat = this.DTPInLongFormat,
                 DTFormatShort = this.DTFormatShort,

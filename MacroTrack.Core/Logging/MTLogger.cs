@@ -52,6 +52,19 @@ namespace MacroTrack.Core.Logging
             }
         }
 
+        /// <summary>
+        /// Logs name and value of variables supplied in an anonymous object
+        /// Format like LogVars(new{ a, b, c } [...] )
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// LogVars(new{ a, b, c }, "Variables before");
+        /// </code>
+        /// </example>
+        /// <param name="sourceObj">Caller source</param>
+        /// <param name="vars">An object whose public instances are logged</param>
+        /// <param name="caller">Automatically supplied member name of caller, ignore.</param>
+        /// <param name="prefix">String which proceeds the variable listing in the log entry</param>
         public void LogVars(object sourceObj, object vars, string caller, string? prefix = null)
         {
             var props = vars.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -60,7 +73,7 @@ namespace MacroTrack.Core.Logging
                 var value = p.GetValue(vars);
                 return $"{p.Name}={Format(value)}";
             });
-            Log(sourceObj, caller, LogLevel.Debug, $"{(prefix ?? "LogVars: ")}, {string.Join(", ", parts)}");
+            Log(sourceObj, caller, LogLevel.Debug, $"{(prefix ?? "LogVars:")} {string.Join(", ", parts)}");
         }
 
         private string Format(object? value)
