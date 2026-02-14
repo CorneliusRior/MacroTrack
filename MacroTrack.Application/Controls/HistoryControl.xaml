@@ -27,7 +27,7 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <local:FoodEntryCard Entry="{Binding}"
+                        <local:FoodLogEntryCard Entry="{Binding}"
                                              TimeFormat="{Binding DataContext.TimeFormat, ElementName=HistoryItems}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

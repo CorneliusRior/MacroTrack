@@ -51,20 +51,5 @@ namespace MacroTrack.AppLibrary.Controls
         {
             InitializeComponent();
         }
-
-        private void PART_ButtonViewDay_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void PART_ButtonDelete_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void PART_ButtonEdit_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }

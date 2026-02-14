@@ -22,14 +22,14 @@ namespace MacroTrack.AppLibrary.Controls
     /// <summary>
     /// Interaction logic for FoodEntryControl.xaml
     /// </summary>
-    public partial class FoodEntryControl : ControlBase
+    public partial class FoodLogInputControl : ControlBase
     {
-        private readonly FoodEntryVM _vm = new();
+        private readonly FoodLogInputVM _vm = new();
         
         public static readonly DependencyProperty RequestRefreshCommandProperty = DependencyProperty.Register(
             nameof(RequestRefreshCommand),
             typeof(ICommand),
-            typeof(FoodEntryControl)
+            typeof(FoodLogInputControl)
         );
 
         public ICommand? RequestRefreshCommand
@@ -38,7 +38,7 @@ namespace MacroTrack.AppLibrary.Controls
             set => SetValue(RequestRefreshCommandProperty, value);
         }
 
-        public FoodEntryControl()
+        public FoodLogInputControl()
         {
             InitializeComponent();            
             DataContext = _vm;

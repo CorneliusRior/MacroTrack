@@ -165,7 +165,7 @@
                         BorderThickness="{DynamicResource BorderThickness}"
                         Background="{DynamicResource PanelBackGroundBrush}">
 
-                    <views:FoodEntryControl x:Name="FoodEntry"
+                    <views:FoodLogInputControl x:Name="FoodEntry"
                                             RequestRefreshCommand="{Binding DataContext.RefreshSummaryCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
 
                 </Border>
@@ -177,7 +177,7 @@
                         BorderThickness="{DynamicResource BorderThickness}"
                         Background="{DynamicResource PanelBackGroundBrush}">
 
-                    <views:WeightEntryControl x:Name="WeightEntry"/>
+                    <views:WeightInputControl x:Name="WeightEntry"/>
 
                 </Border>
 
@@ -188,7 +188,7 @@
                         BorderThickness="{DynamicResource BorderThickness}"
                         Background="{DynamicResource PanelBackGroundBrush}">
 
-                    <views:DiaryEntryControl x:Name="DiaryEntry"/>
+                    <views:DiaryInputControl x:Name="DiaryEntry"/>
 
                 </Border>
 

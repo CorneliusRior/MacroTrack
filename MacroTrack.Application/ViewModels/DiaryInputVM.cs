@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    internal class DiaryEntryVM : ViewModelBase
+    internal class DiaryInputVM : ViewModelBase
     {
-        public DiaryEntryVM()
+        public DiaryInputVM()
         {
 
         }

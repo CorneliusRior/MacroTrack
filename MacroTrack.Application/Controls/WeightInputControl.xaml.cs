@@ -1,6 +1,5 @@
 ﻿using MacroTrack.AppLibrary.Services;
 using MacroTrack.AppLibrary.ViewModels;
-using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -20,14 +19,15 @@ using System.Windows.Shapes;
 namespace MacroTrack.AppLibrary.Controls
 {
     /// <summary>
-    /// Interaction logic for DiaryEntryControl.xaml
+    /// Interaction logic for WeightEntryControl.xaml
     /// </summary>
-    public partial class DiaryEntryControl : ControlBase
+    public partial class WeightInputControl : ControlBase
     {
-        private readonly DiaryEntryVM _vm = new();
-        public DiaryEntryControl()
+        private readonly WeightInputVM _vm = new();
+        public WeightInputControl()
         {
             InitializeComponent();
+            DataContext = _vm;
         }
 
         public override void Init(CoreServices services, AppServices appServices)
@@ -42,29 +42,20 @@ namespace MacroTrack.AppLibrary.Controls
             _vm.OnClose();
         }
 
-        private void ButtonAdd_Click(object sender, RoutedEventArgs e)
-        {
-            if (Services == null)
-            {
-                var ex = new Exception("Null Service");
-                Log("Could not add entry.", LogLevel.Error);
-                throw ex;
-            }
-            Services.diaryService.AddEntry(tbDiary.Text);
-            AppServices?.AppEvents.Publish(new DiaryChanged());
-            tbDiary.Clear();
-        }
-
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
             Log();
-            tbDiary.Clear();
+            _vm.Clear();
         }
 
-        private void ButtonViewDiary_Click(object sender, RoutedEventArgs e)
+        private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
-            Log();
-            _vm.ShowDiaryView();
+            _vm.Add();
+        }
+
+        private void buttonNow_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.TimeNow();
         }
     }
 }

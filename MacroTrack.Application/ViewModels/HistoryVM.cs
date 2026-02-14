@@ -72,9 +72,13 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
             try
             {
-                Services.foodLogService.DeleteEntry(entry.Id);
-                Entries.Remove(entry);
-                AppServices.AppEvents.Publish(new FoodLogChanged());
+                MessageBoxResult response = MessageBox.Show($"Delete Food Log Entry #{entry.Id} '{entry.ItemName}'?\nThis cannot be undone.", "Delete Food Log Entry", MessageBoxButton.YesNo);
+                if (response == MessageBoxResult.Yes)
+                {
+                    Services.foodLogService.DeleteEntry(entry.Id);
+                    Entries.Remove(entry);
+                    AppServices.AppEvents.Publish(new FoodLogChanged());
+                }
             }
             catch (Exception ex)
             {
@@ -85,11 +89,20 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         private void EditEntry(FoodEntry? entry)
         {
-            if (Services == null) return;
-            if (AppServices == null) return;
-            MessageBox.Show("Not yet implemented");
-            // basically call EditFoodEntry then Populate();
-            AppServices.AppEvents.Publish(new FoodLogChanged());
+            if (Services == null) throw new Exception("Null Services");
+            if (AppServices == null) throw new Exception("Null AppServices");
+            if (entry == null)
+            {
+                Log("Attempted to edit Food Log Entry, but given entry is null. Probably deleted before clicking, but history did not update.", LogLevel.Warning);
+                MessageBoxResult response = MessageBox.Show($"Error: Attempted to edit Food Log Entry, but given entry is null. Probably deleted before clicking, but history did not update.\nPlease check logs.\nReturning, refresh History?", "Error editing Food Log Entry", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                if (response == MessageBoxResult.Yes)
+                {
+                    AppServices.AppEvents.Publish(new FoodLogChanged());
+                    return;
+                }
+                else return;
+            }
+            AppServices.WindowService.Show(WindowType.FoodLogEdit, entry);
         }
     }
 

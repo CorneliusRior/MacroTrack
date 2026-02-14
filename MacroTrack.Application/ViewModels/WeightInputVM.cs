@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    public class WeightEntryVM : ViewModelBase
+    public class WeightInputVM : ViewModelBase
     {
-        public WeightEntryVM() { }
+        public WeightInputVM() { }
 
         public override void Init(CoreServices services, AppServices appServices)
         {

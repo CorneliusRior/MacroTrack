@@ -20,12 +20,12 @@ namespace MacroTrack.AppLibrary.Controls
     /// <summary>
     /// Interaction logic for FoodEntryCard.xaml
     /// </summary>
-    public partial class FoodEntryCard : UserControl
+    public partial class FoodLogEntryCard : UserControl
     {
         public static readonly DependencyProperty EntryProperty = DependencyProperty.Register(
             nameof(Entry),
             typeof(FoodEntry),
-            typeof(FoodEntryCard),
+            typeof(FoodLogEntryCard),
             new PropertyMetadata(null) 
         );
         public FoodEntry? Entry
@@ -37,7 +37,7 @@ namespace MacroTrack.AppLibrary.Controls
         public static readonly DependencyProperty TimeFormatProperty = DependencyProperty.Register(
             nameof(TimeFormat),
             typeof(string),
-            typeof(FoodEntryCard),
+            typeof(FoodLogEntryCard),
             new PropertyMetadata("yyyy/M/d - HH:mm")
         );
         public string TimeFormat
@@ -46,7 +46,7 @@ namespace MacroTrack.AppLibrary.Controls
             set => SetValue(TimeFormatProperty, value);
         }
 
-        public FoodEntryCard()
+        public FoodLogEntryCard()
         {
             InitializeComponent();
         }

@@ -17,14 +17,14 @@ using System.Windows.Input;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
-    public class FoodEntryVM : ViewModelBase
+    public class FoodLogInputVM : ViewModelBase
     {
         public ObservableCollection<Preset> PresetList { get; } = new();
         public ObservableCollection<string> CatList { get; } = new();        
 
         private bool _multUpdating;
 
-        public FoodEntryVM() { }
+        public FoodLogInputVM() { }
 
         public override void Init(CoreServices services, AppServices appServices)
         {

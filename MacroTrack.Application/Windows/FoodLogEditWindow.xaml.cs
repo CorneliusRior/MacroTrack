@@ -1,4 +1,5 @@
 ﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -17,14 +18,16 @@ using System.Windows.Shapes;
 namespace MacroTrack.AppLibrary.Windows
 {
     /// <summary>
-    /// Interaction logic for DiaryView.xaml
+    /// Interaction logic for FoodLogEditWindow.xaml
     /// </summary>
-    public partial class DiaryViewWindow : WindowBase
-    {
-        public DiaryViewWindow(CoreServices services, AppServices appServices) : base(services, appServices)
+    public partial class FoodLogEditWindow : WindowBase
+    {        
+        public FoodLogEditWindow(CoreServices services, AppServices appServices, FoodEntry entry) : base(services, appServices)
         {
-            InitializeComponent();            
-            ControlDiary.Init(Services, AppServices);            
+            InitializeComponent();
+            ControlFoodEntryEdit.Entry = entry;
+            ControlFoodEntryEdit.Init(Services, AppServices);
+            ControlFoodEntryEdit.RequestClose += r => Close();
         }
     }
 }

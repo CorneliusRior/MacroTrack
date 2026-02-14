@@ -80,7 +80,7 @@ namespace MacroTrack.AppLibrary.Services
                 WindowType.AddPreset => CreateAddPresetWindow(o),
                 WindowType.DiaryView => CreateDiaryViewWindow(o),
                 WindowType.DiaryEdit => CreateDiaryEditWindow(o, parameter),
-                WindowType.FoodLogEdit => CreateFoodLogEditWindow(o),
+                WindowType.FoodLogEdit => CreateFoodLogEditWindow(o, parameter),
                 WindowType.TaskView => CreateTaskViewWindow(o),
                 _ => throw new NotSupportedException($"Unknown window type '{type}'")
             };
@@ -133,7 +133,14 @@ namespace MacroTrack.AppLibrary.Services
             }
             else throw new InvalidOperationException();
         }
-        private Window CreateFoodLogEditWindow(Window? owner) { throw new NotImplementedException(); }
+        private Window CreateFoodLogEditWindow(Window? owner, object? parameter)
+        {
+            if (parameter is FoodEntry entry)
+            {
+                return new FoodLogEditWindow(_services, _appServices, entry) { Owner = owner };
+            }
+            else throw new InvalidOperationException();
+        }
         private Window CreateTaskViewWindow(Window? owner) { throw new NotImplementedException(); }
     }
 }
