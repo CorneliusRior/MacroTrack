@@ -4,10 +4,12 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                    xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+                   xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs"
                    xmlns:models="clr-namespace:MacroTrack.AppLibrary.Models"
+                   xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
                    Height="300" Width="700">
     <Border Background="{DynamicResource PanelBackGroundBrush}">
-        <Grid Margin="10">
+        <Grid Margin="10" DataContext="{Binding Vm, RelativeSource={RelativeSource AncestorType=local:Summary}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -57,12 +59,16 @@
                 <Label Content="Fat:" Grid.Row="5" Grid.Column="0" Padding="0"/>
                 
                 <!--Column 1 MacroBars:-->
-                
+                <graphs:MacroBar Data="{Binding CalSingle}" Margin="1" Grid.Row="2" Grid.Column="1"/>
+                <graphs:MacroBar Data="{Binding ProSingle}" Margin="1" Grid.Row="3" Grid.Column="1"/>
+                <graphs:MacroBar Data="{Binding CarSingle}" Margin="1" Grid.Row="4" Grid.Column="1"/>
+                <graphs:MacroBar Data="{Binding FatSingle}" Margin="1" Grid.Row="5" Grid.Column="1"/>
+
                 <!--Column 2 Actual-->
-                <Label Content="{Binding CurrentSummary.Actual.Calories, RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" Padding="0"/>
-                <Label Content="{Binding CurrentSummary.Actual.Protein , RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Right" Padding="0"/>
-                <Label Content="{Binding CurrentSummary.Actual.Carbs,    RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Right" Padding="0"/>
-                <Label Content="{Binding CurrentSummary.Actual.Fat,      RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Right" Padding="0"/>
+                <Label Content="{Binding CurrentSummary.Actual.Calories, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" Padding="0"/>
+                <Label Content="{Binding CurrentSummary.Actual.Protein,  TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Right" Padding="0"/>
+                <Label Content="{Binding CurrentSummary.Actual.Carbs,    TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="4" Grid.Column="2" HorizontalAlignment="Right" Padding="0"/>
+                <Label Content="{Binding CurrentSummary.Actual.Fat,      TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Right" Padding="0"/>
                 
                 <!--Column 3 / (fraction)-->
                 <Label Content="/" Grid.Row="2" Grid.Column="3" Padding="0"/>
@@ -71,22 +77,22 @@
                 <Label Content="/" Grid.Row="5" Grid.Column="3" Padding="0"/>
                 
                 <!--Column 4 Target-->
-                <Label Content="{Binding CurrentSummary.Target.Calories, RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="2" Grid.Column="4" Padding="0"/>
-                <Label Content="{Binding CurrentSummary.Target.Protein,  RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="3" Grid.Column="4" Padding="0"/>
-                <Label Content="{Binding CurrentSummary.Target.Carbs,    RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="4" Grid.Column="4" Padding="0"/>
-                <Label Content="{Binding CurrentSummary.Target.Fat,      RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="5" Grid.Column="4" Padding="0"/>
+                <Label Content="{Binding CurrentSummary.Target.Calories,    TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="2" Grid.Column="4" Padding="0"/>
+                <Label Content="{Binding CurrentSummary.Target.Protein,     TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="3" Grid.Column="4" Padding="0"/>
+                <Label Content="{Binding CurrentSummary.Target.Carbs,       TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="4" Grid.Column="4" Padding="0"/>
+                <Label Content="{Binding CurrentSummary.Target.Fat,         TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="5" Grid.Column="4" Padding="0"/>
 
                 <!--Column 5 Percentage-->
-                <Label Content="{Binding CalPct, RelativeSource={RelativeSource AncestorType=local:ControlBase}}" Grid.Row="2" Grid.Column="5" Padding="0" HorizontalAlignment="Center"/>
-                <Label Content="{Binding ProPct, RelativeSource={RelativeSource AncestorType=local:ControlBase}}" Grid.Row="3" Grid.Column="5" Padding="0" HorizontalAlignment="Center"/>
-                <Label Content="{Binding CarPct, RelativeSource={RelativeSource AncestorType=local:ControlBase}}" Grid.Row="4" Grid.Column="5" Padding="0" HorizontalAlignment="Center"/>
-                <Label Content="{Binding FatPct, RelativeSource={RelativeSource AncestorType=local:ControlBase}}" Grid.Row="5" Grid.Column="5" Padding="0" HorizontalAlignment="Center"/>
+                <Label Content="{Binding CalPct}" Grid.Row="2" Grid.Column="5" Padding="0" HorizontalAlignment="Center"/>
+                <Label Content="{Binding ProPct}" Grid.Row="3" Grid.Column="5" Padding="0" HorizontalAlignment="Center"/>
+                <Label Content="{Binding CarPct}" Grid.Row="4" Grid.Column="5" Padding="0" HorizontalAlignment="Center"/>
+                <Label Content="{Binding FatPct}" Grid.Row="5" Grid.Column="5" Padding="0" HorizontalAlignment="Center"/>
 
                 <!--Column 6 Remaining-->
-                <Label Content="{Binding CurrentSummary.Remaining.Calories, RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="2" Grid.Column="6" Padding="0" HorizontalAlignment="Right"/>
-                <Label Content="{Binding CurrentSummary.Remaining.Protein,  RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="3" Grid.Column="6" Padding="0" HorizontalAlignment="Right"/>
-                <Label Content="{Binding CurrentSummary.Remaining.Carbs,    RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="4" Grid.Column="6" Padding="0" HorizontalAlignment="Right"/>
-                <Label Content="{Binding CurrentSummary.Remaining.Fat,      RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="5" Grid.Column="6" Padding="0" HorizontalAlignment="Right"/>
+                <Label Content="{Binding CurrentSummary.Remaining.Calories, TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="2" Grid.Column="6" Padding="0" HorizontalAlignment="Right"/>
+                <Label Content="{Binding CurrentSummary.Remaining.Protein,  TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="3" Grid.Column="6" Padding="0" HorizontalAlignment="Right"/>
+                <Label Content="{Binding CurrentSummary.Remaining.Carbs,    TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="4" Grid.Column="6" Padding="0" HorizontalAlignment="Right"/>
+                <Label Content="{Binding CurrentSummary.Remaining.Fat,      TargetNullValue='-'}" ContentStringFormat="{}{0:N1}" Grid.Row="5" Grid.Column="6" Padding="0" HorizontalAlignment="Right"/>
 
             </Grid>
             

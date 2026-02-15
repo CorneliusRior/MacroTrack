@@ -11,6 +11,9 @@
              mc:Ignorable="d" 
              d:DesignWidth="300"
              Height="auto">
+    <UserControl.Resources>
+        <conv:NewLineSpaceConverter x:Key="NewLineSpace"/>
+    </UserControl.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="{DynamicResource BorderThickness}" Padding="7">
@@ -68,11 +71,14 @@
                            Padding="7,2"
                            Grid.Column="1"/>
                 </Grid>
-                <Label x:Name="PART_LabelNotes"
-                       Content="{Binding Entry.Notes, ElementName=Root, TargetNullValue=''}"                       
-                       FontStyle="Italic"
-                       Padding="2"
-                       Grid.Row="3"/>
+                <TextBlock x:Name="PART_LabelNotes"
+                           Text="{Binding Entry.Notes, ElementName=Root, TargetNullValue='', Converter={StaticResource NewLineSpace}}"
+                           FontStyle="Italic"
+                           TextWrapping="NoWrap"                
+                           TextTrimming="CharacterEllipsis"
+                           
+                           Padding="2"
+                           Grid.Row="3"/>
 
             </Grid>
             

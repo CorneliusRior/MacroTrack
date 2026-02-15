@@ -26,19 +26,25 @@ namespace MacroTrack.AppLibrary.Controls
     /// </summary>
     public partial class Summary : ControlBase
     {
-        private readonly SummaryVM _vm = new();
+        public SummaryVM Vm { get; } = new SummaryVM();
 
         //Variables:
         public static readonly DependencyProperty CurrentSummaryProperty = DependencyProperty.Register(
             nameof(CurrentSummary),
             typeof(MacroSummary),
             typeof(Summary),
-            new PropertyMetadata(null, (d, e) => ((Summary)d).Populate())
+            new PropertyMetadata(null, OnCurrentSummaryChanged)
         );
         public MacroSummary? CurrentSummary
         {
             get => (MacroSummary?)GetValue(CurrentSummaryProperty);
             set => SetValue(CurrentSummaryProperty, value);
+        }
+
+        private static void OnCurrentSummaryChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var view = (Summary)d;
+            view.Vm.CurrentSummary = (MacroSummary?)e.NewValue;
         }
 
         public static readonly DependencyProperty TimeFrameProperty = DependencyProperty.Register(
@@ -55,7 +61,7 @@ namespace MacroTrack.AppLibrary.Controls
             get => (SummaryTimeFrame)GetValue(TimeFrameProperty);
             set => SetValue(TimeFrameProperty, value);
         }
-
+        /*
         public static readonly DependencyProperty CalPctProperty = DependencyProperty.Register(
             nameof(CalPct),
             typeof(string),
@@ -103,28 +109,36 @@ namespace MacroTrack.AppLibrary.Controls
             get => (string)GetValue(FatPctProperty);
             set => SetValue(FatPctProperty, value);
         }
-
+        */
         // Constructor & logic:
 
         public Summary()
         {
             InitializeComponent();
-            //DataContext = _vm;
         }
 
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-            _vm.Init(services, appServices);
+            LogVars(new { CurrentSummary, CurrentSummary?.Target.Calories }, "This is from xaml.cs before saying DataContext = _vm");
+            Vm.CurrentSummary = CurrentSummary;
+            //DataContext = _vm;
+            LogVars(new { CurrentSummary, CurrentSummary?.Target.Calories }, "This is from xaml.cs after saying DataContext = _vm, before _vm.Init()");
+            Vm.Init(services, appServices);
+            LogVars(new { CurrentSummary, CurrentSummary?.Target.Calories }, "This is from xaml.cs after _vm.Init()");
         }
 
         protected override void OnUnloaded(object sender, RoutedEventArgs e)
         {
             base.OnUnloaded(sender, e);
-            _vm.OnClose();
+            Vm.OnClose();
         }
-
-
+        public void Populate()
+        {
+            Log("We got here, print CurrentSummary things");
+            LogVars(new { CurrentSummary, CurrentSummary?.GoalName, CurrentSummary?.Target.Calories });
+        }
+        /*
         public void Populate()
         {
             Log("We got here, print CurrentSummary things");
@@ -144,7 +158,7 @@ namespace MacroTrack.AppLibrary.Controls
                 FatPct = FormatPct(CurrentSummary.Actual.Fat, CurrentSummary.Target.Fat);
             }
         }
-
+        */
         private string FormatPct(double? actual, double? target)
         {
             if (actual == null || target == null || target == 0)
