@@ -1,4 +1,5 @@
-﻿using MacroTrack.Core.DataModels;
+﻿using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,6 +29,7 @@ namespace MacroTrack.AppLibrary.Graphs
             InitializeComponent();
             SizeChanged += (_, _) => Redraw();
             Loaded += (_, _) => Redraw();
+            //IDisposable _subSettings = AppServices.AppEvents.Subscribe<SettingsChanged>(_ => Redraw());
         }
 
         // Dependencies:

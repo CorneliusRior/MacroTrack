@@ -31,14 +31,15 @@
     <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FF000000"/>
 
 
-    <!--Graphing Brushes-->
+    <!--Graphing Parameters-->
     <SolidColorBrush x:Key="GraphBackGroundBrush" Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="GraphColorPro" Color="Red"/>
     <SolidColorBrush x:Key="GraphColorCar" Color="Blue"/>
     <SolidColorBrush x:Key="GraphColorFat" Color="Yellow"/>
-    <Style TargetType="{x:Type graphs:MTDonut}" BasedOn="{StaticResource MTDonutBase}">
-        <Setter Property="Hatch" Value="True"/>
-    </Style>
+    <System:Boolean x:Key="MTDonutHatch">true</System:Boolean>
+    <SolidColorBrush x:Key="MacroBrushGood" Color="Green"/>
+    <SolidColorBrush x:Key="MacroBrushNeutral" Color="Yellow"/>
+    <SolidColorBrush x:Key="MacroBrushBad" Color="Red"/>
 
     <!--Other formatting-->
     <Thickness x:Key="BorderThickness">2</Thickness>

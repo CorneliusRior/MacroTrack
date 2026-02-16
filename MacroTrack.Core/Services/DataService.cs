@@ -4,6 +4,7 @@ namespace MacroTrack.Core.Services;
 using MacroTrack.Core.Repositories;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.DataModels;
+using MacroTrack.Core.Logging;
 
 using System.Runtime.CompilerServices;
 using MacroTrack.Core.Infrastructure;
@@ -38,9 +39,11 @@ public class DataService : ServiceBase
         MacroTotalsNullable? Max = null;
         if ((endTime - startTime).Days == 1)
         {
+            Log("Determined that it is a single day, getting MinMax", LogLevel.Info);
             Min = GetMinMax(startTime, false);
             Max = GetMinMax(startTime, true);
         }
+        else Log("Detemined that is is not a single day, no MinMax", LogLevel.Info);
         var presentGoal = _goalRepo.GetPresentGoal(DateOnly.FromDateTime(startTime));
         var goalName = presentGoal != null ? _goalRepo.GetGoal(presentGoal.GoalId)?.GoalName ?? "No Goal" : "No Goal";
         return new MacroSummary(        
@@ -108,14 +111,23 @@ public class DataService : ServiceBase
     public MacroTotalsNullable GetMinMax(DateTime time, bool max)
     {
         // Min/Max should only be given if the time period is one day (or less), if we try adding things over a longer period of time with different goals, we end up needing to add up nulls, and it gets very messy really quickly, so we'll just stick to this. Using longer time periods isn't much of a primary feature anyway, I barely ever do it.
-
+        Log();
         DateOnly date = DateOnly.FromDateTime(time);
         GoalActivation? ga = _goalRepo.GetPresentGoal(date);
-        if (ga == null) return new MacroTotalsNullable(null, null, null, null);
-        Goal? g = _goalRepo.GetGoal(ga.Id);
-        if (g == null) return new MacroTotalsNullable(null, null, null, null); // Hopefully this should never happen
+        if (ga == null)
+        {
+            Log("Determined ga as null");
+            return new MacroTotalsNullable(null, null, null, null);
+        }
+        Goal? g = _goalRepo.GetGoal(ga.GoalId);
+        if (g == null)
+        {
+            Log("Determined g as null");
+            return new MacroTotalsNullable(null, null, null, null); // Hopefully this should never happen
+        }
         if (max)
         {
+            Log("Determined as max, returning new MacroTotalsNullable");
             return new MacroTotalsNullable(
                 Calories: g.MaxCal,
                 Protein: g.MaxPro,
@@ -123,6 +135,7 @@ public class DataService : ServiceBase
                 Fat: g.MaxFat
             );
         }
+        Log("Determined as min, returning new MacroTotalsNullable");
         return new MacroTotalsNullable(
             Calories: g.MinCal,
             Protein: g.MinPro,

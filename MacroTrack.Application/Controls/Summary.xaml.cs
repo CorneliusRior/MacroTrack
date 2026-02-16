@@ -120,12 +120,9 @@ namespace MacroTrack.AppLibrary.Controls
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-            LogVars(new { CurrentSummary, CurrentSummary?.Target.Calories }, "This is from xaml.cs before saying DataContext = _vm");
             Vm.CurrentSummary = CurrentSummary;
             //DataContext = _vm;
-            LogVars(new { CurrentSummary, CurrentSummary?.Target.Calories }, "This is from xaml.cs after saying DataContext = _vm, before _vm.Init()");
             Vm.Init(services, appServices);
-            LogVars(new { CurrentSummary, CurrentSummary?.Target.Calories }, "This is from xaml.cs after _vm.Init()");
         }
 
         protected override void OnUnloaded(object sender, RoutedEventArgs e)
@@ -135,8 +132,7 @@ namespace MacroTrack.AppLibrary.Controls
         }
         public void Populate()
         {
-            Log("We got here, print CurrentSummary things");
-            LogVars(new { CurrentSummary, CurrentSummary?.GoalName, CurrentSummary?.Target.Calories });
+            
         }
         /*
         public void Populate()

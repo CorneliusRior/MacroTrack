@@ -404,6 +404,16 @@
         <Setter Property="ProBrush" Value="{DynamicResource GraphColorPro}"/>
         <Setter Property="CarBrush" Value="{DynamicResource GraphColorCar}"/>
         <Setter Property="FatBrush" Value="{DynamicResource GraphColorFat}"/>
+        <Setter Property="Hatch" Value="{DynamicResource MTDonutHatch}"/>
+    </Style>
+    
+    <!--MacroBars-->
+    <Style TargetType="{x:Type graphs:MacroBar}">
+        <Setter Property="BackGroundFillBrush" Value="{DynamicResource GraphBackGroundBrush}"/>
+        <Setter Property="BackGroundBorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BarFillGoodBrush" Value="{DynamicResource MacroBrushGood}"/>
+        <Setter Property="BarFillNeutralBrush" Value="{DynamicResource MacroBrushNeutral}"/>
+        <Setter Property="BarFillBadBrush" Value="{DynamicResource MacroBrushBad}"/>
     </Style>
 
 </ResourceDictionary>
