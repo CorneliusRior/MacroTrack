@@ -40,6 +40,7 @@
     <SolidColorBrush x:Key="MacroBrushGood" Color="Green"/>
     <SolidColorBrush x:Key="MacroBrushNeutral" Color="Yellow"/>
     <SolidColorBrush x:Key="MacroBrushBad" Color="Red"/>
+    <SolidColorBrush x:Key="GraphGridBrush" Color="Gray"/>
 
     <!--Other formatting-->
     <Thickness x:Key="BorderThickness">2</Thickness>
@@ -48,6 +49,7 @@
     
     <!--Font-->
     <FontFamily x:Key="UIFont">Segoe UI</FontFamily>
+    <System:Double x:Key="UISmallSize">9</System:Double>
     <System:Double x:Key="UINormalSize">12</System:Double>
     <System:Double x:Key="UISmallTitleSize">14</System:Double>
     <System:Double x:Key="UITitleSize">16</System:Double>

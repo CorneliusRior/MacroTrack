@@ -7,7 +7,8 @@
                    xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs"
                    xmlns:models="clr-namespace:MacroTrack.AppLibrary.Models"
                    xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
-                   Height="300" Width="700">
+                   mc:Ignorable="d"
+                   d:DesignHeight="300" d:DesignWidth="700">
     <Border Background="{DynamicResource PanelBackGroundBrush}">
         <Grid Margin="10" DataContext="{Binding Vm, RelativeSource={RelativeSource AncestorType=local:Summary}}">
             <Grid.RowDefinitions>
@@ -97,6 +98,16 @@
             </Grid>
             
             <!--Second row (graph, put line graph here)-->
+            <Border Padding="0"
+                    BorderBrush="{DynamicResource BorderBrush}" 
+                    BorderThickness="{DynamicResource ButtonBorderThickness}"
+                    Background="{DynamicResource GraphBackGroundBrush}"
+                    Grid.Row="1">
+                <graphs:MTLineChart x:Name="CalGraph" 
+                                    ShowYAxis="False"
+                                    ShowYAxisLabels="False"
+                                    PlotMargin="8,8,8,16"/>
+            </Border>
             
         </Grid>
     </Border>

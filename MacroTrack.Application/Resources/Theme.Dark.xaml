@@ -28,6 +28,7 @@
     <SolidColorBrush x:Key="GraphColorPro" Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="GraphColorCar" Color="#FFAAAAAA"/>
     <SolidColorBrush x:Key="GraphColorFat" Color="#FF555555"/>
-    
+    <SolidColorBrush x:Key="GraphGridBrush" Color="#FFAAAAAA"/>
+
 
 </ResourceDictionary>

@@ -415,5 +415,19 @@
         <Setter Property="BarFillNeutralBrush" Value="{DynamicResource MacroBrushNeutral}"/>
         <Setter Property="BarFillBadBrush" Value="{DynamicResource MacroBrushBad}"/>
     </Style>
+    
+    <!--Line Charts-->
+    <Style TargetType="{x:Type graphs:MTLineChart}">
+        <Setter Property="AxisBrush" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="BackgroundBrush" Value="{DynamicResource GraphBackGroundBrush}"/>
+        <Setter Property="AxisLabelFont" Value="{DynamicResource UIFont}"/>
+        <Setter Property="AxisLabelFontSize" Value="{DynamicResource UISmallSize}"/>
+        <Setter Property="TitleBrush" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="TitleFont" Value="{DynamicResource UIFont}"/>
+        <Setter Property="TitleFontSize" Value="{DynamicResource UITitleSize}"/>
+        <Setter Property="GridBrush" Value="{DynamicResource GraphGridBrush}"/>
+        <Setter Property="GridVerticalWeekly" Value="True"/>
+        <Setter Property="PlotMargin" Value="20, 8, 8, 16"/>
+    </Style>
 
 </ResourceDictionary>

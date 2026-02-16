@@ -4,6 +4,7 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                    xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+                   xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs"
                    xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls"
                    mc:Ignorable="d" 
                    xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
@@ -26,7 +27,7 @@
 
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 
@@ -87,9 +88,17 @@
                     
 
                 </Grid>
-                
-                <!--Put Graph here:-->
-                
+                <Border BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="{DynamicResource ButtonBorderThickness}"
+                        Margin="5"
+                        Grid.Row="1">
+                    <!--Graph is here:-->
+                    <graphs:MTLineChart x:Name="WeightGraph" YAxisSuffix="{Binding UnitLabel}" 
+                                        PlotMargin="32,8,8,16"
+                                        Grid.Row="1"/>
+                </Border>
+                        
+
             </Grid>
 
             <StackPanel Grid.Row="2"
