@@ -169,6 +169,28 @@ namespace MacroTrack.AppLibrary.Graphs
             set => SetValue(HatchSpacingProperty, value);
         }
 
+        // MaxVerticalLines:
+        public static readonly DependencyProperty MaxVerticalLinesProperty = DependencyProperty.Register(
+            nameof(MaxVerticalLines), typeof(int), typeof(MTLineChart),
+            new FrameworkPropertyMetadata(6, FrameworkPropertyMetadataOptions.AffectsRender)
+        );
+        public int MaxVerticalLines
+        {
+            get => (int)GetValue(MaxVerticalLinesProperty);
+            set => SetValue(MaxVerticalLinesProperty, value);
+        }
+
+        // MaxHorizontalLines:
+        public static readonly DependencyProperty MaxHorizontalLinesProperty = DependencyProperty.Register(
+            nameof(MaxHorizontalLines), typeof(int), typeof(MTLineChart),
+            new FrameworkPropertyMetadata(5, FrameworkPropertyMetadataOptions.AffectsRender)
+        );
+        public int MaxHorizontalLines
+        {
+            get => (int)GetValue(MaxHorizontalLinesProperty);
+            set => SetValue(MaxHorizontalLinesProperty, value);
+        }
+
         // Title (No bool for this one, we just set it as an empty string otherwise)
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
             nameof(Title), typeof(string), typeof(MTLineChart),
@@ -270,6 +292,18 @@ namespace MacroTrack.AppLibrary.Graphs
             set => SetValue(PlotMarginProperty, value);
         }
 
+        // DataMargin: (margin around the mins & maxs basically, so lines don't hit the very edge)
+        public static readonly DependencyProperty DataMarginProperty = DependencyProperty.Register(
+            nameof(DataMargin), typeof(Thickness), typeof(MTLineChart),
+            new FrameworkPropertyMetadata(new Thickness(5,5,5,5), FrameworkPropertyMetadataOptions.AffectsRender)
+        );
+        public Thickness DataMargin
+        {
+            get => (Thickness)GetValue(DataMarginProperty);
+            set => SetValue(DataMarginProperty, value);
+        }
+
+
         // Brushes:
         //Background Brush
         public static readonly DependencyProperty BackgroundBrushProperty = DependencyProperty.Register(
@@ -334,6 +368,11 @@ namespace MacroTrack.AppLibrary.Graphs
 
             if (plot.Width <= 0 || plot.Height <= 0) return; // No space, can't do anything.
 
+            Rect dataPlot = new Rect(
+                plot.Left + DataMargin.Left, plot.Top + DataMargin.Top,
+                Math.Max(0, plot.Width - DataMargin.Left - DataMargin.Right),
+                Math.Max(0, plot.Height - DataMargin.Top - DataMargin.Bottom)
+            );
 
             // Draw axes:
             var axisPen = new Pen(AxisBrush, 1);
@@ -357,7 +396,7 @@ namespace MacroTrack.AppLibrary.Graphs
             var ss = SeriesSet;
             if (ss == null || ss.Count == 0)
             { 
-                BlankPlot(dc, plot);
+                BlankPlot(dc, plot, dataPlot);
                 DrawErrorMessage("Null Series Set", dc, plot);
                 return; 
             } 
@@ -365,7 +404,7 @@ namespace MacroTrack.AppLibrary.Graphs
             if (allPoints.Count < 2) 
             {
                 // Actually maybe we should change this to just be 1 point? Idk
-                BlankPlot(dc, plot);
+                BlankPlot(dc, plot, dataPlot);
                 DrawErrorMessage("Not Enough Data", dc, plot);
                 return; 
             } 
@@ -380,28 +419,28 @@ namespace MacroTrack.AppLibrary.Graphs
             if (minY == maxY) maxY += 1;
 
             // Draw Gridlines & Axis Labels:
-            if (GridVerticalWeekly) DrawVerticalGridWeekly(dc, plot, minX, maxX);
-            else DrawVerticalGridInterval(dc, plot, minX, maxX);
-            DrawHorizontalGridLines(dc, plot, minY, maxY);
+            if (GridVerticalWeekly) DrawVerticalGridWeekly(dc, plot, dataPlot, minX, maxX);
+            else DrawVerticalGridInterval(dc, plot, dataPlot, minX, maxX);
+            DrawHorizontalGridLines(dc, plot, dataPlot, minY, maxY);
 
             // foreach frawseries
             foreach (var s in ss)
             {                
-                if (s.SeriesType == SeriesType.Line) DrawLineSeries(dc, plot, s, minX, maxX, minY, maxY);
-                if (s.SeriesType == SeriesType.TimePoints) DrawTimePointsSeries(dc, plot, s, minX, maxX, minY, maxY);
-                if (s.SeriesType == SeriesType.DaysBinary) DrawDaysBinarySeries(dc, plot, s, minX, maxX, minY, maxY);                
+                if (s.SeriesType == SeriesType.Line) DrawLineSeries(dc, dataPlot, s, minX, maxX, minY, maxY);
+                if (s.SeriesType == SeriesType.TimePoints) DrawTimePointsSeries(dc, plot, dataPlot, s, minX, maxX);
+                if (s.SeriesType == SeriesType.DaysBinary) DrawDaysBinarySeries(dc, plot, dataPlot, s, minX, maxX);                
             }
         }
 
-        private void BlankPlot(DrawingContext dc, Rect plot)
+        private void BlankPlot(DrawingContext dc, Rect plot, Rect dataPlot)
         {
             DateTime maxX = DateTime.Today.AddDays(1); // Tomorrow
             DateTime minX = maxX- XDefault;
             double minY = 0;
             double maxY = YDefault;
-            if (GridVerticalWeekly) DrawVerticalGridWeekly(dc, plot, minX, maxX);
-            else DrawVerticalGridInterval(dc, plot, minX, maxX);
-            DrawHorizontalGridLines(dc, plot, minY, maxY);
+            if (GridVerticalWeekly) DrawVerticalGridWeekly(dc, plot, dataPlot, minX, maxX);
+            else DrawVerticalGridInterval(dc, plot, dataPlot, minX, maxX);
+            DrawHorizontalGridLines(dc, plot, dataPlot, minY, maxY);
         }
 
         private void DrawErrorMessage(string Message, DrawingContext dc, Rect plot)
@@ -409,18 +448,18 @@ namespace MacroTrack.AppLibrary.Graphs
             // We'll use the title Font and Brush, because we don't want it to be too difficult to change everything.
             double dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
             Typeface errorTypeFace = new (TitleFont, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            double fontSize = Math.Min(ActualHeight * 0.1, ActualWidth * 0.05);
+            double fontSize = Math.Min(plot.Height * 0.2, plot.Width * 0.1);
             Brush brush = TitleBrush.Clone();
             brush.Opacity = ErrorMessageOpacity;
             FormattedText ft = new(Message, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, errorTypeFace, fontSize, brush, dpi);
             dc.DrawText(ft, new Point(
-                (ActualWidth / 2) - (ft.Width / 2),
-                (ActualHeight / 2) - (ft.Height / 2)
+                PlotMargin.Left + (plot.Width / 2) - (ft.Width / 2),
+                PlotMargin.Top + (plot.Height / 2) - (ft.Height / 2)
             ));
             
         }
 
-        private void DrawVerticalGridWeekly(DrawingContext dc, Rect plot, DateTime minX, DateTime maxX)
+        private void DrawVerticalGridWeekly(DrawingContext dc, Rect plot, Rect dataPlot, DateTime minX, DateTime maxX)
         {
             var pen = new Pen(GridBrush, 1);
             if (pen.CanFreeze) pen.Freeze();
@@ -436,7 +475,7 @@ namespace MacroTrack.AppLibrary.Graphs
             int count = 0;
             for (DateTime x = start; x <= maxX; x = x.AddDays(7))
             {
-                double px = MapX(x, plot, minX, maxX);
+                double px = MapX(x, dataPlot, minX, maxX);
                 if (ShowGrid)
                 {
                     dc.DrawLine(pen, new Point(px, plot.Top), new Point(px, plot.Bottom));
@@ -444,17 +483,16 @@ namespace MacroTrack.AppLibrary.Graphs
                 }
                 if (ShowXAxisLabels)
                 {
-                    string label = x.TimeOfDay == TimeSpan.Zero ? x.ToString("dd-MM") : x.ToString("HH:mm dd-MM");
+                    string Glabel = TimeOnly.FromDateTime(x) == TimeOnly.MinValue ? x.ToString("HH:mm") : x.ToString("dd-YY");
+                    string label = x.ToString("dd-MM");
                     var ft = new FormattedText(label, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeFace, AxisLabelFontSize, AxisBrush, dpi);
                     dc.DrawText(ft, new Point(px - ft.Width / 2, plot.Bottom + 2));
                 }
             }
         }
 
-        private void DrawVerticalGridInterval(DrawingContext dc, Rect plot, DateTime minX, DateTime maxX)
+        private void DrawVerticalGridInterval(DrawingContext dc, Rect plot, Rect dataPlot, DateTime minX, DateTime maxX)
         {
-            int MaxHorizontalLines = 6;
-
             var pen = new Pen(GridBrush, 1);
             if (pen.CanFreeze) pen.Freeze();
 
@@ -470,7 +508,7 @@ namespace MacroTrack.AppLibrary.Graphs
             int count = 0;
             for (DateTime x = start; x >= end; x -= interval)
             {
-                double px = MapX(x, plot, minX, maxX);
+                double px = MapX(x, dataPlot, minX, maxX);
                 if (ShowGrid)
                 {                    
                     dc.DrawLine(pen, new Point(px, plot.Top), new Point(px, plot.Bottom));
@@ -478,7 +516,7 @@ namespace MacroTrack.AppLibrary.Graphs
                 }
                 if (ShowXAxisLabels)
                 {
-                    string label = x.TimeOfDay == TimeSpan.Zero ? x.ToString("dd-MM") : x.ToString("HH:mm dd-MM");
+                    string label = x.ToString("dd-MM");
                     var ft = new FormattedText(label, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeFace, AxisLabelFontSize, AxisBrush, dpi);
                     dc.DrawText(ft, new Point(px - ft.Width / 2, plot.Bottom + 2));
                 }
@@ -502,10 +540,9 @@ namespace MacroTrack.AppLibrary.Graphs
             TimeSpan.FromDays(60), TimeSpan.FromDays(90), TimeSpan.FromDays(180), TimeSpan.FromDays(365)
         };
 
-        private void DrawHorizontalGridLines(DrawingContext dc, Rect plot, double minY, double maxY)
-        {
-            int MaxVerticalLines = 6; // make this a DP
 
+        private void DrawHorizontalGridLines(DrawingContext dc, Rect plot, Rect dataPlot, double minY, double maxY)
+        {
             var pen = new Pen(GridBrush, 1);
             if (pen.CanFreeze) pen.Freeze();
 
@@ -513,14 +550,15 @@ namespace MacroTrack.AppLibrary.Graphs
             var typeFace = new Typeface(AxisLabelFont, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
 
             double range = maxY - minY;
-            double interval = GetInterval(range, MaxVerticalLines);
+            double interval = GetInterval(range, MaxHorizontalLines);
             double start = Math.Floor(minY / interval) * interval;
             double end = Math.Ceiling(maxY / interval) * interval;
             int maxLines = 100; // to avoid infinite loops, will look odd, but still.
             int count = 0;
             for (double y = start; y <= end; y += interval)
             {
-                double py = MapY(y, plot, minY, maxY);
+                double py = MapY(y, dataPlot, minY, maxY);
+                if (py <= plot.Top || py >= plot.Bottom) continue;
                 if (ShowGrid)
                 {
                     dc.DrawLine(pen, new Point(plot.Left, py), new Point(plot.Right, py));
@@ -535,16 +573,6 @@ namespace MacroTrack.AppLibrary.Graphs
             }
         }
 
-        private static double GetInterval(double range, int maxVerticalLines)
-        {
-            if (range <= 0) return 1;
-            foreach (double step in IntervalList)
-            {
-                if (range / step <= maxVerticalLines) return step;
-            }
-            return IntervalList[^1];
-        }
-
         private static readonly double[] IntervalList =
         {
             0.1, 0.25, 0.5,
@@ -555,7 +583,18 @@ namespace MacroTrack.AppLibrary.Graphs
             10000, 25000, 50000
         };
 
-        private void DrawLineSeries(DrawingContext dc, Rect plot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
+        private static double GetInterval(double range, int maxVerticalLines)
+        {
+            if (range <= 0) return 1;
+            foreach (double step in IntervalList)
+            {
+                if (range / step <= maxVerticalLines) return step;
+            }
+            return IntervalList[^1];
+        }
+
+
+        private void DrawLineSeries(DrawingContext dc, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
         {
             var pts = s.DataPoints;
             if (pts is null || pts.Count < 2) return;
@@ -564,14 +603,14 @@ namespace MacroTrack.AppLibrary.Graphs
             var geo = new StreamGeometry();
             using (var ctx = geo.Open())
             {
-                ctx.BeginFigure(MapPoint(pts[0], plot, minX, maxX, minY, maxY), false, false);
-                for (int i = 1; i < pts.Count; i++) ctx.LineTo(MapPoint(pts[i], plot, minX, maxX, minY, maxY), true, false);
+                ctx.BeginFigure(MapPoint(pts[0], dataPlot, minX, maxX, minY, maxY), false, false);
+                for (int i = 1; i < pts.Count; i++) ctx.LineTo(MapPoint(pts[i], dataPlot, minX, maxX, minY, maxY), true, false);
             }
             if (geo.CanFreeze) geo.Freeze();
             dc.DrawGeometry(null, pen, geo);
         }
 
-        private void DrawTimePointsSeries(DrawingContext dc, Rect plot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
+        private void DrawTimePointsSeries(DrawingContext dc, Rect plot, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX)
         {
             var pts = s.DataPoints;
             if (pts is null) return;
@@ -583,13 +622,13 @@ namespace MacroTrack.AppLibrary.Graphs
             {
                 if (p.Value != 0)
                 {
-                    double x = MapX(p.Time, plot, minX, maxX);
+                    double x = MapX(p.Time, dataPlot, minX, maxX);
                     dc.DrawLine(pen, new Point(x, y0), new Point(x, y1));
                 }
             }
         }
 
-        private void DrawDaysBinarySeries(DrawingContext dc, Rect plot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
+        private void DrawDaysBinarySeries(DrawingContext dc, Rect plot, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX)
         {
             var pts = s.DataPoints;
             if (pts is null) return;
@@ -599,7 +638,7 @@ namespace MacroTrack.AppLibrary.Graphs
 
             double y = plot.Top;
             double h = plot.Height;
-            double w = XWidthFromTimeSpan(TimeSpan.FromDays(1), plot, minX, maxX);
+            double w = XWidthFromTimeSpan(TimeSpan.FromDays(1), dataPlot, minX, maxX);
             foreach (DataPoint p in pts)
             {
                 if (p.Value != 0)
@@ -607,7 +646,7 @@ namespace MacroTrack.AppLibrary.Graphs
                     // Get the date of the thing:
                     DateTime dayDate = p.Time.Date;
 
-                    dc.DrawRectangle(fillBrush, pen, new Rect(MapX(p.Time, plot, minX, maxX), y, w, h));
+                    dc.DrawRectangle(fillBrush, pen, new Rect(MapX(p.Time, dataPlot, minX, maxX), y, w, h));
                 }
             }
         }
@@ -642,32 +681,32 @@ namespace MacroTrack.AppLibrary.Graphs
             return brush;
         }
 
-        private static Point MapPoint(DataPoint p, Rect plot, DateTime minX, DateTime maxX, double minY, double maxY)
+        private static Point MapPoint(DataPoint p, Rect dataPlot, DateTime minX, DateTime maxX, double minY, double maxY)
         {
-            return new Point(MapX(p.Time, plot, minX, maxX), MapY(p.Value, plot, minY, maxY));
+            return new Point(MapX(p.Time, dataPlot, minX, maxX), MapY(p.Value, dataPlot, minY, maxY));
         }
 
-        private static double MapX(DateTime x, Rect plot, DateTime minX, DateTime maxX)
+        private static double MapX(DateTime x, Rect dataPlot, DateTime minX, DateTime maxX)
         {
             double total = (maxX - minX).TotalSeconds;
-            if (total <= 0) return plot.Left;
+            if (total <= 0) return dataPlot.Left;
             double t = (x - minX).TotalSeconds / total;
-            return plot.Left + t * plot.Width;
+            return dataPlot.Left + t * dataPlot.Width;
         }
 
-        private static double MapY(double y, Rect plot, double minY, double maxY)
+        private static double MapY(double y, Rect dataPlot, double minY, double maxY)
         {
             double total = (maxY - minY);
-            if (total == 0) return plot.Bottom;
-            var t = (y - minY) / total;
-            return plot.Bottom - t * plot.Height;
+            if (total == 0) return dataPlot.Bottom;
+            double t = (y - minY) / total;
+            return dataPlot.Bottom - t * dataPlot.Height;
         }
 
-        private static double XWidthFromTimeSpan(TimeSpan ts, Rect plot, DateTime minX, DateTime maxX)
+        private static double XWidthFromTimeSpan(TimeSpan ts, Rect dataPlot, DateTime minX, DateTime maxX)
         {
             double total = (maxX - minX).TotalSeconds;
             if (total <= 0) return 0;
-            return (ts.TotalSeconds / total) * plot.Width; 
+            return (ts.TotalSeconds / total) * dataPlot.Width; 
         }
     }
 

@@ -93,7 +93,10 @@
                         Margin="5"
                         Grid.Row="1">
                     <!--Graph is here:-->
-                    <graphs:MTLineChart x:Name="WeightGraph" YAxisSuffix="{Binding UnitLabel}" 
+                    <graphs:MTLineChart x:Name="WeightGraph" 
+                                        SeriesSet="{Binding GraphSeriesSet}"
+                                        YAxisSuffix="{Binding UnitLabel}" 
+                                        ShowZero="False"
                                         PlotMargin="32,8,8,16"
                                         Grid.Row="1"/>
                 </Border>

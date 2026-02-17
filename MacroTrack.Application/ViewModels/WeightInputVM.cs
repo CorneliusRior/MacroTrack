@@ -1,4 +1,5 @@
-﻿using MacroTrack.AppLibrary.Services;
+﻿using MacroTrack.AppLibrary.Graphs;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
@@ -18,8 +20,10 @@ namespace MacroTrack.AppLibrary.ViewModels
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-            EventSubscribe( AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => UpdateSettings()));
-            UpdateSettings();            
+            EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => UpdateSettings()));
+            EventSubscribe(AppServices!.AppEvents.Subscribe<WeightLogChanged>(_ => DrawGraph()));
+            UpdateSettings();
+            DrawGraph();
             TimeNow();
         }
 
@@ -97,6 +101,43 @@ namespace MacroTrack.AppLibrary.ViewModels
         public double? WeightLbs { get; private set; }
         public double? WeightSt { get; private set; }
 
+        // Graphing variables:
+        private DateTime _graphStartTime;
+        public DateTime GraphStartTime
+        {
+            get => _graphStartTime;
+            set
+            {
+                if (_graphStartTime == value) return;
+                _graphStartTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime _graphEndTime;
+        public DateTime GraphEndTime
+        {
+            get => _graphEndTime;
+            set
+            {
+                if (_graphEndTime == value) return;
+                _graphEndTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IReadOnlyList<PlotSeries>? _graphSeriesSet;
+        public IReadOnlyList<PlotSeries>? GraphSeriesSet
+        {
+            get => _graphSeriesSet;
+            set
+            {
+                if (_graphSeriesSet == value) return;
+                _graphSeriesSet = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void TimeNow()
         {
             Time = DateTime.Now;
@@ -159,9 +200,46 @@ namespace MacroTrack.AppLibrary.ViewModels
                 if (Services == null) throw new Exception("Null Services");
                 WeightEntry entry = Services.weightLogService.AddEntry(time, weight);
                 Log($"Added entry #{entry.Id}", LogLevel.Info);
+                if (AppServices == null) throw new Exception("NullAppServices");
+                AppServices.AppEvents.Publish(new WeightLogChanged());
                 Clear();
             }
             catch (Exception ex) { Log("Could not add entry", LogLevel.Error, ex); }
+        }
+
+        public void DrawGraph()
+        {
+            if (Services == null) throw new Exception("Null Services");
+            GraphStartTime = DateTime.Today.AddDays(-Services.SettingsService.Settings.WeightGraphLength);
+            GraphEndTime = DateTime.Today.AddDays(1);
+            List<WeightEntry> weightLog = Services.dataService.GetWeightEntries(GraphStartTime, GraphEndTime);
+            IReadOnlyList<DataPoint> weightDataPoints = ConvertToDataPoints(weightLog);
+
+            // use data to make trend line, draw that before WeightSeries.
+
+            PlotSeries WeightSeries = new()
+            {
+                SeriesType = SeriesType.Line,
+                DataPoints = weightDataPoints,
+                Stroke = Brushes.Black
+            };
+            /*
+            IReadOnlyList<PlotSeries> seriesSet =
+            [
+                WeightSeries
+            ];*/
+
+            IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries> { WeightSeries };
+            GraphSeriesSet = seriesSet;
+        }
+
+        private IReadOnlyList<DataPoint> ConvertToDataPoints(List<WeightEntry> weightLog)
+        {
+            if (Services == null) throw new Exception("Null Services");
+            List<DataPoint> dataPoints = new();
+            foreach (WeightEntry entry in weightLog) dataPoints.Add(new DataPoint { Time = entry.Time, Value = entry.Weight });
+            dataPoints = dataPoints.OrderBy(w => w.Time).ToList();
+            return dataPoints;
         }
     }
 }

@@ -30,5 +30,11 @@
     <SolidColorBrush x:Key="GraphColorFat" Color="#FF555555"/>
     <SolidColorBrush x:Key="GraphGridBrush" Color="#FFAAAAAA"/>
 
+    <!--Graph Series Parameters-->
+    <SolidColorBrush x:Key="LineSeriesBrush1" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="LineSeriesBrush2" Color="#FFFF0000"/>
+    <SolidColorBrush x:Key="LineSeriesBrush3" Color="#FF00AAFF"/>
+
+    <SolidColorBrush x:Key="DayBinarySeriesBrush1" Color="#FF00BB00"/>
 
 </ResourceDictionary>
