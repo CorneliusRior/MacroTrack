@@ -37,4 +37,6 @@
 
     <SolidColorBrush x:Key="DayBinarySeriesBrush1" Color="#FF00BB00"/>
 
+    <SolidColorBrush x:Key="HighlightBrush1" Color="#FFF1FF00"/>
+
 </ResourceDictionary>

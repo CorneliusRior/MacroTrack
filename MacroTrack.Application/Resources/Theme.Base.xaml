@@ -43,11 +43,16 @@
     <SolidColorBrush x:Key="GraphGridBrush" Color="Gray"/>
     
     <!--Graph Series Parameters-->
+    <SolidColorBrush x:Key="SeriesDefaultBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="SeriesErrorBrush" Color="#FFFF00FF"/>
+
     <SolidColorBrush x:Key="LineSeriesBrush1" Color="#FF000000"/>
     <SolidColorBrush x:Key="LineSeriesBrush2" Color="#FFFF0000"/>
     <SolidColorBrush x:Key="LineSeriesBrush3" Color="#FF0000FF"/>
 
     <SolidColorBrush x:Key="DayBinarySeriesBrush1" Color="#FF00BB00"/>
+
+    <SolidColorBrush x:Key="HighlightBrush1" Color="#FFF1FF00"/>
 
     <!--Other formatting-->
     <Thickness x:Key="BorderThickness">2</Thickness>

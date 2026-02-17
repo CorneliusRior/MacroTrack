@@ -22,5 +22,12 @@
 
     <!--Graphing Brushes-->
     <SolidColorBrush x:Key="GraphBackGroundBrush" Color="#FF000000"/>
-    
+
+    <!--Graph Series Parameters-->
+    <SolidColorBrush x:Key="SeriesDefaultBrush" Color="{DynamicResource ThemeCustomForeground}"/>
+
+    <SolidColorBrush x:Key="LineSeriesBrush1" Color="{DynamicResource ThemeCustomForeground}"/>
+    <SolidColorBrush x:Key="LineSeriesBrush2" Color="#FFFF0000"/>
+    <SolidColorBrush x:Key="LineSeriesBrush3" Color="#FF00AAFF"/>
+
 </ResourceDictionary>

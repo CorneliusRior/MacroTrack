@@ -171,6 +171,23 @@ public class GoalService : ServiceBase
         return _repo.GetGoalHistory();
     }
 
+    // Get activate goal history as tuple of activationdate and goal calories, used for WPF calGraph:
+    public List<(DateTime date, double cal)> GetTupleGoalHistory(DateTime startTime, DateTime endTime, bool clampStartTime = false)
+    {
+        // Get the data from repo:
+        var history = _repo.GetGoalHistoryInterval(startTime, endTime);
+        List<(DateTime date, double cal)> tupleList = new();
+        foreach (GoalActivation ga in history)
+        {
+            DateTime date = ga.ActivatedAt.ToDateTime(TimeOnly.MinValue);
+            if (clampStartTime && date < startTime) date = startTime;
+            Goal? g = _repo.GetGoal(ga.GoalId);
+            if (g is null) continue; // Goal has been deleted presumably.
+            tupleList.Add( (date, g.Calories) );
+        }
+        return tupleList;
+    }
+
     public MacroTotals GetMacroGoals(DateTime startTime, int timeFrame)
     {
         Log($"Requested from '{startTime}' for '{timeFrame}' days");

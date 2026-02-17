@@ -54,7 +54,29 @@ namespace MacroTrack.AppLibrary.Graphs
         {
             get => (TimeSpan)GetValue(XDefaultProperty);
             set => SetValue(XDefaultProperty, value);
-        }        
+        }
+
+        // XStart:
+        public static readonly DependencyProperty XStartProperty = DependencyProperty.Register(
+            nameof(XStart), typeof(DateTime?), typeof(MTLineChart),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender)
+            );
+        public DateTime? XStart
+        {
+            get => (DateTime?)GetValue(XStartProperty);
+            set => SetValue(XStartProperty, value);
+        }
+
+        // XEnd:
+        public static readonly DependencyProperty XEndProperty = DependencyProperty.Register(
+            nameof(XEnd), typeof(DateTime?), typeof(MTLineChart),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender)
+            );
+        public DateTime? XEnd
+        {
+            get => (DateTime?)GetValue(XEndProperty);
+            set => SetValue(XEndProperty, value);
+        }
 
         // YDefault
         public static readonly DependencyProperty YDefaultProperty = DependencyProperty.Register(
@@ -65,6 +87,28 @@ namespace MacroTrack.AppLibrary.Graphs
         {
             get => (double)GetValue(YDefaultProperty);
             set => SetValue(YDefaultProperty, value);
+        }
+
+        // YStart
+        public static readonly DependencyProperty YStartProperty = DependencyProperty.Register(
+            nameof(YStart), typeof(double?), typeof(MTLineChart),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender)
+        );
+        public double? YStart
+        {
+            get => (double?)GetValue(YStartProperty);
+            set => SetValue(YStartProperty, value);
+        }
+
+        // YEnd
+        public static readonly DependencyProperty YEndProperty = DependencyProperty.Register(
+            nameof(YEnd), typeof(double?), typeof(MTLineChart),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender)
+        );
+        public double? YEnd
+        {
+            get => (double?)GetValue(YEndProperty);
+            set => SetValue(YEndProperty, value);
         }
 
         // Styling DPs:
@@ -218,7 +262,6 @@ namespace MacroTrack.AppLibrary.Graphs
             nameof(TitleFontSize), typeof(double), typeof(MTLineChart),
             new FrameworkPropertyMetadata(16.0, FrameworkPropertyMetadataOptions.AffectsRender)
         );
-
         public double TitleFontSize
         {
             get => (double)GetValue(TitleFontSizeProperty);
@@ -230,7 +273,6 @@ namespace MacroTrack.AppLibrary.Graphs
             nameof(ErrorMessageOpacity), typeof(double), typeof(MTLineChart),
             new FrameworkPropertyMetadata(0.6, FrameworkPropertyMetadataOptions.AffectsRender)
         );
-
         public double ErrorMessageOpacity
         {
             get => (double)GetValue(ErrorMessageOpacityProperty);
@@ -352,6 +394,9 @@ namespace MacroTrack.AppLibrary.Graphs
             set => SetValue(AxisBrushProperty, value);
         }
 
+        // Could make this dependencyproperty tbh...
+        private Brush ErrorBrush = Brushes.Magenta;
+
         // Function:
         protected override void OnRender(DrawingContext dc)
         {
@@ -392,7 +437,7 @@ namespace MacroTrack.AppLibrary.Graphs
                 ));
             }
 
-            // Load SeriesSet, check that it's not null and has enough data:
+            // Load SeriesSet, check that it's not null:
             var ss = SeriesSet;
             if (ss == null || ss.Count == 0)
             { 
@@ -400,22 +445,15 @@ namespace MacroTrack.AppLibrary.Graphs
                 DrawErrorMessage("Null Series Set", dc, plot);
                 return; 
             } 
-            var allPoints = ss.SelectMany(s => s.DataPoints ?? Array.Empty<DataPoint>()).ToList();
-            if (allPoints.Count < 2) 
-            {
-                // Actually maybe we should change this to just be 1 point? Idk
-                BlankPlot(dc, plot, dataPlot);
-                DrawErrorMessage("Not Enough Data", dc, plot);
-                return; 
-            } 
             
             // Determine min & max X & Y:
-            DateTime minX = allPoints.Min(p => p.Time);
-            DateTime maxX = allPoints.Max(p => p.Time);
+            var allPoints = ss.SelectMany(s => s.DataPoints ?? Array.Empty<DataPoint>()).ToList();
+            DateTime minX = XStart ?? allPoints.Min(p => p.Time);
+            DateTime maxX = XEnd ?? allPoints.Max(p => p.Time);
             if (minX == maxX) maxX = maxX.AddDays(1); // This "Avoids divide by 0"
 
-            double minY = ShowZero ? 0 : allPoints.Min(p => p.Value);
-            double maxY = allPoints.Max(p => p.Value);
+            double minY = YStart ?? (ShowZero ? 0 : allPoints.Min(p => p.Value));
+            double maxY = YEnd ?? allPoints.Max(p => p.Value);
             if (minY == maxY) maxY += 1;
 
             // Draw Gridlines & Axis Labels:
@@ -426,9 +464,12 @@ namespace MacroTrack.AppLibrary.Graphs
             // foreach frawseries
             foreach (var s in ss)
             {                
-                if (s.SeriesType == SeriesType.Line) DrawLineSeries(dc, dataPlot, s, minX, maxX, minY, maxY);
+                if (s.SeriesType == SeriesType.LineContinuous) DrawLineSeries(dc, dataPlot, s, minX, maxX, minY, maxY);
+                if (s.SeriesType == SeriesType.LineDiscreteDaily) DrawLineDiscreteDailySeries(dc, dataPlot, s, minX, maxX, minY, maxY);
+                if (s.SeriesType == SeriesType.StepLine) DrawStepLineSeries(dc, dataPlot, s, minX, maxX, minY, maxY);
                 if (s.SeriesType == SeriesType.TimePoints) DrawTimePointsSeries(dc, plot, dataPlot, s, minX, maxX);
-                if (s.SeriesType == SeriesType.DaysBinary) DrawDaysBinarySeries(dc, plot, dataPlot, s, minX, maxX);                
+                if (s.SeriesType == SeriesType.DaysBinary) DrawDaysBinarySeries(dc, plot, dataPlot, s, minX, maxX);
+                if (s.SeriesType == SeriesType.Highlight) DrawHighlightSeries(dc, plot, dataPlot, s, minX, maxX);
             }
         }
 
@@ -596,9 +637,10 @@ namespace MacroTrack.AppLibrary.Graphs
 
         private void DrawLineSeries(DrawingContext dc, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
         {
+            Brush Stroke = GetSeriesStroke(s);
             var pts = s.DataPoints;
             if (pts is null || pts.Count < 2) return;
-            var pen = new Pen(s.Stroke, s.StrokeThickness);
+            var pen = new Pen(Stroke, s.StrokeThickness);
             if (pen.CanFreeze) pen.Freeze();
             var geo = new StreamGeometry();
             using (var ctx = geo.Open())
@@ -609,12 +651,42 @@ namespace MacroTrack.AppLibrary.Graphs
             if (geo.CanFreeze) geo.Freeze();
             dc.DrawGeometry(null, pen, geo);
         }
+        
+        private void DrawLineDiscreteDailySeries(DrawingContext dc, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
+        {
+
+        }
+
+        private void DrawStepLineSeries(DrawingContext dc, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
+        {
+            Brush Stroke = GetSeriesStroke(s);
+            var pts = s.DataPoints;
+            if (pts is null || pts.Count == 0) return; // We don't actually need 2, just one value really, can be just a horizontal line!
+            Pen pen = new(Stroke, s.StrokeThickness);
+            if (pen.CanFreeze) pen.Freeze();
+            StreamGeometry geo = new();
+            using (var ctx = geo.Open())
+            {
+                ctx.BeginFigure(MapPoint(pts[0], dataPlot, minX, maxX, minY, maxY), false, false);
+                for (int i = 1; i < pts.Count; i++)
+                {
+                    // Draw Horizontal Line:
+                    ctx.LineTo(new Point(MapX(pts[i].Time, dataPlot, minX, maxX),  MapY(pts[i-1].Value, dataPlot, minY, maxY)), true, false);
+                    // Draw Vertical Line
+                    ctx.LineTo(MapPoint(pts[i], dataPlot, minX, maxX, minY, maxY), true, false);
+                }
+                ctx.LineTo(new Point(MapX(maxX, dataPlot, minX, maxX), MapY(pts[^1].Value, dataPlot, minY, maxY)), true, false);
+            }
+            if (geo.CanFreeze) geo.Freeze();
+            dc.DrawGeometry(null, pen, geo);
+        }
 
         private void DrawTimePointsSeries(DrawingContext dc, Rect plot, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX)
         {
+            Brush Stroke = GetSeriesStroke(s);
             var pts = s.DataPoints;
             if (pts is null) return;
-            var pen = new Pen(s.Stroke, s.StrokeThickness);
+            var pen = new Pen(Stroke, s.StrokeThickness);
             if (pen.CanFreeze) pen.Freeze();
             double y0 = plot.Bottom;
             double y1 = plot.Top;
@@ -630,9 +702,10 @@ namespace MacroTrack.AppLibrary.Graphs
 
         private void DrawDaysBinarySeries(DrawingContext dc, Rect plot, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX)
         {
+            Brush Stroke = GetSeriesStroke(s);
             var pts = s.DataPoints;
             if (pts is null) return;
-            var pen = new Pen(s.Stroke, s.StrokeThickness);
+            var pen = new Pen(Stroke, s.StrokeThickness);
             if (pen.CanFreeze) pen.Freeze();
             Brush fillBrush = ApplyHatching(s);
 
@@ -651,13 +724,42 @@ namespace MacroTrack.AppLibrary.Graphs
             }
         }
 
+        private void DrawHighlightSeries(DrawingContext dc, Rect plot, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX)
+        {
+            Brush Stroke = GetSeriesStroke(s);
+            var pts = s.DataPoints;
+            if (pts is null || pts.Count < 2) return;
+            var pen = new Pen(Stroke, s.StrokeThickness);
+            if (pen.CanFreeze) pen.Freeze();
+            Brush fillBrush = Stroke.Clone();
+            fillBrush.Opacity = 0.4;
+
+            // Determine start & end dates. We will just take the first 2 dates, anything after is junk data:
+            DateTime startTime = pts[0].Time;
+            DateTime endTime = pts[1].Time;
+            double startPos = MapX(startTime, dataPlot, minX, maxX);
+            double endPos = MapX(endTime, dataPlot, minX, maxX);
+            double b = plot.Bottom;
+            double y = plot.Top;
+            double h = plot.Height;
+            double w = XWidthFromTimeSpan(endTime - startTime, dataPlot, minX, maxX);
+
+            // Draw rectangle first:
+            dc.DrawRectangle(fillBrush, null, new Rect(startPos, y, w, h));
+
+            //Then the vertical lines:
+            dc.DrawLine(pen, new Point(startPos, b), new Point(startPos, y));
+            dc.DrawLine(pen, new Point(endPos, b), new Point(endPos, y));
+        }
+
         private Brush ApplyHatching(PlotSeries s)
         {
-            Brush fillBrush = s.Stroke.Clone();
+            Brush Stroke = GetSeriesStroke(s);
+            Brush fillBrush = Stroke.Clone();
             fillBrush.Opacity = 0.4;
             if (!Hatch) return fillBrush;
             double tile = HatchSpacing * 2;
-            Pen stripePen = new Pen(s.Stroke, s.StrokeThickness);
+            Pen stripePen = new Pen(Stroke, s.StrokeThickness);
             if (stripePen.CanFreeze) stripePen.Freeze();
             GeometryGroup lines = new();
             for (double x = -tile; x <= tile * 2; x += HatchSpacing)
@@ -702,6 +804,12 @@ namespace MacroTrack.AppLibrary.Graphs
             return dataPlot.Bottom - t * dataPlot.Height;
         }
 
+        private Brush GetSeriesStroke(PlotSeries s)
+        {
+            if (s.StrokeOverride is not null) return s.StrokeOverride;
+            return (TryFindResource(s.SeriesColor.GetKey()) as Brush) ?? ErrorBrush;
+        }
+
         private static double XWidthFromTimeSpan(TimeSpan ts, Rect dataPlot, DateTime minX, DateTime maxX)
         {
             double total = (maxX - minX).TotalSeconds;
@@ -710,74 +818,75 @@ namespace MacroTrack.AppLibrary.Graphs
         }
     }
 
+
+    /// <summary>
+    /// Enum of types of Series we can use. Line is a classic line chart, TimePoints draws a vertical line at a particular time (continuous), DaysBinary draws a rectangle on single days (discrete) for which value = 1, or rather, value equal to anything other than 0.
+    /// </summary>
+    /// <remarks>
+    /// Add the following:
+    ///  - StepLine         (Changes in data are sudden, like for change in Goal or something)
+    ///  - Highlight        (Highlights a period between two places, basically a continuous rectangle with two TimePoints on it)
+    /// </remarks>
+    public enum SeriesType
+    { 
+        LineContinuous,
+        LineDiscreteDaily,
+        StepLine,
+        TimePoints,
+        DaysBinary,
+        Highlight
+    }
+
     public readonly record struct DataPoint
     {
         public DateTime Time { get; init; }
         public double Value { get; init; }
     }
 
-    public enum SeriesType
-    { 
-        Line,
-        TimePoints,
-        DaysBinary
+    /// <summary>
+    /// SeriesColor denotes a particular color which can be altered with themes, formatted this way so as to maintain consistency. Could call it SeriesColorGroup, but we should avoid using very long names like that.
+    /// </summary>
+    public enum SeriesColor
+    {
+        Default,
+        Error,
+
+        LineSeriesBrush1,
+        LineSeriesBrush2,
+        LineSeriesBrush3,
+
+        DayBinarySeriesBrush1,
+
+        HighLight1
+    }
+
+    public static class SeriesColorExtensions
+    {
+        public static string GetKey(this SeriesColor c)
+        {
+            return c switch
+            {
+                SeriesColor.Default                 => "SeriesDefaultBrush",
+                SeriesColor.Error                   => "SeriesErrorBrush",
+                SeriesColor.LineSeriesBrush1        => "LineSeriesBrush1",
+                SeriesColor.LineSeriesBrush2        => "LineSeriesBrush2",
+                SeriesColor.LineSeriesBrush3        => "LineSeriesBrush3",
+                SeriesColor.DayBinarySeriesBrush1   => "DayBinarySeriesBrush1",
+                SeriesColor.HighLight1              => "HighlightBrush1", 
+                _ => "SeriesErrorBrush" //"SeriesDefaultBrush" if you want to be more forgiving.
+            };
+        }
     }
 
     /// <summary>
     /// A class for giving data to MTChart. Contains parameters enum SeriesType, IReadOnlyList<DataPoint> DataPoints, Brush Stroke, and double StrokeThickness.
     /// </summary>
-    public sealed class PlotSeries : DependencyObject
+    public sealed class PlotSeries
     {
-        public static readonly DependencyProperty SeriesTypeProperty = DependencyProperty.Register(
-            nameof(SeriesType), typeof(SeriesType), typeof(PlotSeries),
-            new FrameworkPropertyMetadata(SeriesType.Line, FrameworkPropertyMetadataOptions.AffectsRender)
-        );
-        public SeriesType SeriesType
-        {
-            get => (SeriesType)GetValue(SeriesTypeProperty);
-            set => SetValue(SeriesTypeProperty, value);
-        }
-
-        // Datapoints
-        public static readonly DependencyProperty DataPointsProperty = DependencyProperty.Register(
-            nameof(DataPoints),
-            typeof(IReadOnlyList<DataPoint>),
-            typeof(PlotSeries),
-            new FrameworkPropertyMetadata(Array.Empty<DataPoint>(),
-                FrameworkPropertyMetadataOptions.AffectsRender)
-        );
-        public IReadOnlyList<DataPoint> DataPoints
-        {
-            get => (IReadOnlyList<DataPoint>)GetValue(DataPointsProperty);
-            set => SetValue(DataPointsProperty, value);
-        }
-
-        // Brush Stroke
-        public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register(
-            nameof(Stroke),
-            typeof(Brush),
-            typeof(PlotSeries),
-            new FrameworkPropertyMetadata(Brushes.DodgerBlue,
-                FrameworkPropertyMetadataOptions.AffectsRender)
-        );
-        public Brush Stroke
-        {
-            get => (Brush)GetValue(StrokeProperty);
-            set => SetValue(StrokeProperty, value);
-        }
-
-        // Stroke Thickness
-        public static readonly DependencyProperty StrokeThicknessProperty = DependencyProperty.Register(
-            nameof(StrokeThickness),
-            typeof(double),
-            typeof(PlotSeries),
-            new FrameworkPropertyMetadata(2.0,
-                FrameworkPropertyMetadataOptions.AffectsRender)
-        );
-        public double StrokeThickness
-        {
-            get => (double)GetValue(StrokeThicknessProperty);
-            set => SetValue(StrokeThicknessProperty, value);
-        }
+        public SeriesType SeriesType { get; init; }
+        public IReadOnlyList<DataPoint>? DataPoints { get; set; }
+        public SeriesColor SeriesColor { get; set; } = SeriesColor.Default;
+        public Brush? StrokeOverride { get; init; }
+        public double StrokeThickness { get; init; } = 2.0;        
     }
 }

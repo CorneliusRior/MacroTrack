@@ -1,4 +1,5 @@
 ﻿using MacroTrack.AppLibrary.Controls;
+using MacroTrack.AppLibrary.Graphs;
 using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Logging;
@@ -24,7 +25,6 @@ namespace MacroTrack.AppLibrary.ViewModels
                 if (_currentSummary == value) return;
                 _currentSummary = value;
                 OnPropertyChanged();
-                Log("Should have changed", LogLevel.Info);
                 Populate();
             }
         }
@@ -125,10 +125,55 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        // Graphing variables:
+        private DateTime _graphStartTime;
+        public DateTime GraphStartTime
+        {
+            get => _graphStartTime;
+            set
+            {
+                if (_graphStartTime == value) return;
+                _graphStartTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime _graphEndTime;
+        public DateTime GraphEndTime
+        {
+            get => _graphEndTime;
+            set
+            {
+                if (_graphEndTime == value) return;
+                _graphEndTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IReadOnlyList<PlotSeries>? _graphSeriesSet;
+        public IReadOnlyList<PlotSeries>? GraphSeriesSet
+        {
+            get => _graphSeriesSet;
+            set
+            {
+                if (_graphSeriesSet == value) return;
+                _graphSeriesSet = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Functions:
+        public override void Init(CoreServices services, AppServices appServices)
+        {
+            base.Init(services, appServices);
+            AppServices!.AppEvents.Subscribe<FoodLogChanged>(_ => DrawGraph()); // Just draws graph as the rest updates automatically.
+            Populate();
+            DrawGraph();
+            
+        }
+
         public void Populate()
         {
-            Log("We got here, print CurrentSummary things");
-            LogVars(new { CurrentSummary, CurrentSummary?.GoalName, CurrentSummary?.Target.Calories }, "This is from VM");
             if (CurrentSummary == null)
             {
                 CalSingle = new MacroSingleType(MacroType.Calories, 0, 0, 0, null, null);
@@ -139,8 +184,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
             else
             {
-                var a = CurrentSummary.GetSingle(MacroType.Calories);
-                LogVars(new { a }, "Before");
                 CalSingle = CurrentSummary.GetSingle(MacroType.Calories);
                 ProSingle = CurrentSummary.GetSingle(MacroType.Protein);
                 CarSingle = CurrentSummary.GetSingle(MacroType.Carbs);
@@ -152,6 +195,82 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        public void DrawGraph()
+        {
+            if (Services == null) throw new Exception("Null Services");
+            // Get data:
+            GraphStartTime = DateTime.Today.AddDays(-Services.SettingsService.Settings.CalGraphLength);
+            GraphEndTime = DateTime.Today.AddDays(1);
+            List<(DateTime date, double value)> actualCalList = Services.foodLogService.DailySumRange("Calories", GraphStartTime, GraphEndTime);
+            List<(DateTime date, double value)> goalCalList = Services.goalService.GetTupleGoalHistory(GraphStartTime, GraphEndTime, true);
+            LogVars(new { actualCalList, goalCalList }, "Got data (?), plotseries not generated.");
+            foreach (var t in actualCalList) Log($"ActualCalList item: {t}");
+            foreach (var t in goalCalList) Log($"GoalCalList item: {t}");
+
+            // Generate PlotSeries:
+            PlotSeries ActualSeries = new()
+            {
+                SeriesType = SeriesType.LineContinuous,
+                DataPoints = TupleToDataPoints(actualCalList),
+                SeriesColor = SeriesColor.LineSeriesBrush1
+            };
+            PlotSeries GoalSeries = new()
+            {
+                SeriesType = SeriesType.StepLine,
+                DataPoints = TupleToDataPoints(goalCalList),
+                SeriesColor = SeriesColor.LineSeriesBrush2
+            };
+
+            // Some test series:
+            IReadOnlyList<DataPoint> cheatList = new List<DataPoint>
+            {
+                new DataPoint { Time = DateTime.Parse("2026-02-03"), Value = 1 }
+            };
+            PlotSeries CheatSeries = new()
+            {
+                SeriesType = SeriesType.DaysBinary,
+                DataPoints = cheatList,
+                SeriesColor = SeriesColor.DayBinarySeriesBrush1
+            };
+
+            IReadOnlyList<DataPoint> HighLightlist = new List<DataPoint>
+            {
+                new DataPoint { Time = DateTime.Parse("2026-02-04 06:00"), Value = 1 },
+                new DataPoint { Time = DateTime.Parse("2026-02-09 00:00"), Value = 1 },
+                new DataPoint { Time = DateTime.Parse("2026-02-15 00:00"), Value = 1 },
+                new DataPoint { Time = DateTime.Parse("2026-02-16 06:00"), Value = 1 }
+            };
+            PlotSeries HighlightSeries = new()
+            { 
+                SeriesType = SeriesType.Highlight,
+                DataPoints = HighLightlist,
+                SeriesColor = SeriesColor.HighLight1
+            };
+
+
+
+            // Add to SeriesSet:
+            IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries>
+            { 
+                CheatSeries,
+                ActualSeries,
+                GoalSeries,
+                HighlightSeries
+            };
+            GraphSeriesSet = seriesSet;
+            LogVars(new { GraphSeriesSet }, "This is the GraphSeriesSet rn: ");
+        }
+
+        private IReadOnlyList<DataPoint> TupleToDataPoints(List<(DateTime time, double value)> tupleList)
+        {
+            if (Services == null) throw new Exception("Null Services");
+            List<DataPoint> dataPoints = new();
+            foreach (var t in tupleList) dataPoints.Add(new DataPoint { Time = t.time, Value = t.value });
+            dataPoints = dataPoints.OrderBy(p => p.Time).ToList();
+            
+            return dataPoints;
+        }
+
         private string FormatPct(double? actual, double? target)
         {
             if (actual == null || target == null || target == 0)
@@ -161,12 +280,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             return $"({((double)((actual / target) * 100)).ToString("0.0")}%)";
         }
 
-        public override void Init(CoreServices services, AppServices appServices)
-        {
-            base.Init(services, appServices);
-            Populate();
-            Log("Reached Init");
-            LogVars(new {CurrentSummary, CurrentSummary?.Actual.Calories});
-        }        
+              
     }
 }

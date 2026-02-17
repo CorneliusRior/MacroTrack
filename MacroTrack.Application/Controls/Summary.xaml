@@ -104,6 +104,9 @@
                     Background="{DynamicResource GraphBackGroundBrush}"
                     Grid.Row="1">
                 <graphs:MTLineChart x:Name="CalGraph" 
+                                    SeriesSet="{Binding GraphSeriesSet}"      
+                                    XStart="{Binding GraphStartTime}"
+                                    XEnd="{Binding GraphEndTime}"
                                     ShowYAxis="False"
                                     ShowYAxisLabels="False"
                                     PlotMargin="8,8,8,16"/>

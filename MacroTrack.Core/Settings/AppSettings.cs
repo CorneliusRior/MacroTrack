@@ -20,6 +20,7 @@ namespace MacroTrack.Core.Settings
         public int LogRetainAmount { get; set; } = 20;
         public LogLevel LogUILevel { get; set; } = LogLevel.Warning;
         public LogLevel LogFileLevel { get; set; } = LogLevel.Debug;
+        public int CalGraphLength { get; set; } = 30; // days, this being a month.
         public int WeightMode { get; set; } = 0; // 0: kg, 1: lbs, 2: st
         public WeightFormat WeightFormat { get; set; } = WeightFormat.Kg;
         public bool WeightGraphShowTrendLine { get; set; } = true;

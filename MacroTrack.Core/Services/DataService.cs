@@ -206,8 +206,6 @@ public class DataService : ServiceBase
             };
             CalSeries.Add(point);
         }
-
-
         return CalSeries;
     }
 

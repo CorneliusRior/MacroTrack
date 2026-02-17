@@ -132,6 +132,12 @@ public class FoodLogService : ServiceBase
         return totals;
     }
 
+    // Return list of parameter daily (tuple)
+    public List<(DateTime Day, double totalParemeter)> DailySumRange(string parameter, DateTime startDate, DateTime endDate)
+    {
+        return _repo.DailySumRange(parameter, startDate, endDate);
+    }
+
     // Edit
     public FoodEntry EditEntry(int id, DateTime time, string itemName, double amount, double calories, double protein, double carbs, double fat, string? category, string? notes)
     {

@@ -219,15 +219,10 @@ namespace MacroTrack.AppLibrary.ViewModels
 
             PlotSeries WeightSeries = new()
             {
-                SeriesType = SeriesType.Line,
+                SeriesType = SeriesType.LineContinuous,
                 DataPoints = weightDataPoints,
-                Stroke = Brushes.Black
+                SeriesColor = SeriesColor.LineSeriesBrush1
             };
-            /*
-            IReadOnlyList<PlotSeries> seriesSet =
-            [
-                WeightSeries
-            ];*/
 
             IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries> { WeightSeries };
             GraphSeriesSet = seriesSet;

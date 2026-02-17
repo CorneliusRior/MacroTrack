@@ -230,7 +230,6 @@ public class FoodLogRepo : RepoBase
     // Return list of parameter daily: 
     public List<(DateTime Day, double totalParameter)> DailySumRange(string parameter, DateTime startDate, DateTime endDate)
     {
-        endDate.AddDays(1);
         var results = new List<(DateTime, double)>();
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
