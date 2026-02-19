@@ -107,8 +107,10 @@
                                     SeriesSet="{Binding GraphSeriesSet}"      
                                     XStart="{Binding GraphStartTime}"
                                     XEnd="{Binding GraphEndTime}"
+                                    ClipToChartArea="True"
                                     ShowYAxis="False"
                                     ShowYAxisLabels="False"
+                                    Settings="{Binding GraphSettings}"
                                     PlotMargin="8,8,8,16"/>
             </Border>
             

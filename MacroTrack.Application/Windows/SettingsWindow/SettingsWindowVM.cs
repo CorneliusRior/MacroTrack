@@ -60,7 +60,16 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
         private void AddCategories()
         {
             Log();
+            /*
+            How to add new categories:
+             - Make a new WPF Usercontrol in Categories folder, copying format of others: Expenders &c.
+             - Make a corresponding VM of type CategoryVMBase, and a constructor like:
+                    "public CategoryVM(AppSettings settings) : base("CategoryTitle", settings)
+             - Add it to SettingsWindowVM.cs "AddCategories()"
+             - Add it to <MTWin:WindowBase.Resources> in SettingsWindow.xaml
+             */
             Categories.Add(new GeneralVM(SettingsEditable));
+            Categories.Add(new GraphSettingsVM(SettingsEditable));
             Categories.Add(new LoggingVM(SettingsEditable));
             Categories.Add(new FormattingVM(SettingsEditable));
         }
@@ -70,8 +79,6 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
             Log();
             Services.SettingsService.Set(SettingsEditable);
             AppServices.AppEvents.Publish(new SettingsChanged());
-            //ThemeManager.SetTheme(Services.SettingsService.Settings.Theme);
-            //RequestRefresh?.Invoke();
         }
 
         public void SetSelectedToDefault()

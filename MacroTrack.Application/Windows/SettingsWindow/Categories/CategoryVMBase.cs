@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -39,6 +41,11 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow.Categories
         public void SetToCurrent()
         {
             SettingsEditable = SettingsCurrent;
+        }
+
+        public static void p(string message, [CallerMemberName] string member = "", [CallerFilePath] string file = "", [CallerLineNumber] int line = 0)
+        {
+            Debug.WriteLine($"{Path.GetFileName(file)} line {line} {member}(): {message}");
         }
     }
 }

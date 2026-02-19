@@ -95,7 +95,10 @@
                     <!--Graph is here:-->
                     <graphs:MTLineChart x:Name="WeightGraph" 
                                         SeriesSet="{Binding GraphSeriesSet}"
+                                        XStart="{Binding GraphStartTime}"
+                                        XEnd="{Binding GraphEndTime}"
                                         YAxisSuffix="{Binding UnitLabel}" 
+                                        Settings="{Binding GraphSettings}"
                                         ShowZero="False"
                                         PlotMargin="32,8,8,16"
                                         Grid.Row="1"/>

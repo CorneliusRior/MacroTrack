@@ -8,7 +8,10 @@ using MacroTrack.Core.Logging;
 
 namespace MacroTrack.Core.Settings
 {
-    public class AppSettings
+    /// <summary>
+    /// Settings for use in MacroTrack apps. This is used throughout the entire solution, not just one app or another.
+    /// </summary>
+    public sealed class AppSettings
     {
         // When adding a new setting, be sure to put it both here and in the Clone() method at the bottom.
         public string Theme { get; set; } = "Light";
@@ -40,7 +43,8 @@ namespace MacroTrack.Core.Settings
         public bool TaskShowActive { get; set; } = true;
         public bool DiaryTimeIsLongFormat { get; set; } = true;
         public bool DiaryTimeIncludesTime { get; set; } = true;
-        public bool DiaryTimeIncludesSeconds { get; set; } = true;  
+        public bool DiaryTimeIncludesSeconds { get; set; } = true;
+        public GraphSettings GraphSettings { get; set; } = new GraphSettings();
 
         public AppSettings Clone()
         {
@@ -71,6 +75,7 @@ namespace MacroTrack.Core.Settings
                 DiaryTimeIsLongFormat = this.DiaryTimeIsLongFormat,
                 DiaryTimeIncludesTime = this.DiaryTimeIncludesTime,
                 DiaryTimeIncludesSeconds = this.DiaryTimeIncludesSeconds,
+                GraphSettings = this.GraphSettings.Clone()
             };
         }
 

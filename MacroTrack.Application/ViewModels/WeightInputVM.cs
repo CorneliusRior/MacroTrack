@@ -30,6 +30,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         private void UpdateSettings()
         {
             Format = Services!.SettingsService.Settings.WeightFormat;
+            GraphSettings = Services!.SettingsService.Settings.GraphSettings;
             UnitLabel = Format.ShortString();
             Convert();
         }
@@ -102,6 +103,18 @@ namespace MacroTrack.AppLibrary.ViewModels
         public double? WeightSt { get; private set; }
 
         // Graphing variables:
+        private GraphSettings? _graphSettings;
+        public GraphSettings? GraphSettings
+        {
+            get => _graphSettings;
+            set
+            {
+                if (_graphSettings == value) return;
+                _graphSettings = value;
+                OnPropertyChanged();
+            }
+        }
+
         private DateTime _graphStartTime;
         public DateTime GraphStartTime
         {
@@ -212,7 +225,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             if (Services == null) throw new Exception("Null Services");
             GraphStartTime = DateTime.Today.AddDays(-Services.SettingsService.Settings.WeightGraphLength);
             GraphEndTime = DateTime.Today.AddDays(1);
-            List<WeightEntry> weightLog = Services.dataService.GetWeightEntries(GraphStartTime, GraphEndTime);
+            List<WeightEntry> weightLog = Services.dataService.GetWeightEntries(GraphStartTime.AddDays(-5), GraphEndTime); // AddDays(-5) to have data before.
             IReadOnlyList<DataPoint> weightDataPoints = ConvertToDataPoints(weightLog);
 
             // use data to make trend line, draw that before WeightSeries.
@@ -221,7 +234,9 @@ namespace MacroTrack.AppLibrary.ViewModels
             {
                 SeriesType = SeriesType.LineContinuous,
                 DataPoints = weightDataPoints,
-                SeriesColor = SeriesColor.LineSeriesBrush1
+                SeriesColor = SeriesColor.LineSeriesBrush1,
+                ShowTrendline = true,
+                ShowTrendLineStdDev = true
             };
 
             IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries> { WeightSeries };

@@ -41,6 +41,7 @@
     <SolidColorBrush x:Key="MacroBrushNeutral" Color="Yellow"/>
     <SolidColorBrush x:Key="MacroBrushBad" Color="Red"/>
     <SolidColorBrush x:Key="GraphGridBrush" Color="Gray"/>
+    <SolidColorBrush x:Key="GraphTrendLineBrush" Color="Gray"/>
     
     <!--Graph Series Parameters-->
     <SolidColorBrush x:Key="SeriesDefaultBrush" Color="#FF000000"/>

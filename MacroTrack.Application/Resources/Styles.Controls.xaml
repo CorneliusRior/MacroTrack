@@ -426,6 +426,7 @@
         <Setter Property="TitleFont" Value="{DynamicResource UIFont}"/>
         <Setter Property="TitleFontSize" Value="{DynamicResource UITitleSize}"/>
         <Setter Property="GridBrush" Value="{DynamicResource GraphGridBrush}"/>
+        <Setter Property="TrendLineBrush" Value="{DynamicResource GraphTrendLineBrush}"/>
         <Setter Property="GridVerticalWeekly" Value="True"/>
         <Setter Property="PlotMargin" Value="20, 8, 8, 16"/>
     </Style>

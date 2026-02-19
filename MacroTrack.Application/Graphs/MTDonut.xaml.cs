@@ -296,7 +296,6 @@ namespace MacroTrack.AppLibrary.Graphs
             double p = totals.Protein;
             double c = totals.Carbs;
             double f = totals.Fat;
-            Debug.WriteLine($"p={p}, c={c}, f={f}");
 
             double pcf = p + c + f;
 

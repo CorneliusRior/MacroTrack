@@ -4,6 +4,7 @@ using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
+using MacroTrack.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
@@ -126,6 +128,18 @@ namespace MacroTrack.AppLibrary.ViewModels
         }
 
         // Graphing variables:
+        private GraphSettings? _graphSettings;
+        public GraphSettings? GraphSettings
+        {
+            get => _graphSettings;
+            set
+            {
+                if (_graphSettings == value) return;
+                _graphSettings = value;
+                OnPropertyChanged();
+            }
+        }
+
         private DateTime _graphStartTime;
         public DateTime GraphStartTime
         {
@@ -167,6 +181,13 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             base.Init(services, appServices);
             AppServices!.AppEvents.Subscribe<FoodLogChanged>(_ => DrawGraph()); // Just draws graph as the rest updates automatically.
+            AppServices!.AppEvents.Subscribe<SettingsChanged>(_ =>
+            {
+                GraphSettings = Services!.SettingsService.Settings.GraphSettings;
+                DrawGraph();
+            });
+            GraphSettings = Services!.SettingsService.Settings.GraphSettings;            
+            LogVars(new { GraphSettings, GraphSettings.LineTrendLineThickness });
             Populate();
             DrawGraph();
             
@@ -201,16 +222,13 @@ namespace MacroTrack.AppLibrary.ViewModels
             // Get data:
             GraphStartTime = DateTime.Today.AddDays(-Services.SettingsService.Settings.CalGraphLength);
             GraphEndTime = DateTime.Today.AddDays(1);
-            List<(DateTime date, double value)> actualCalList = Services.foodLogService.DailySumRange("Calories", GraphStartTime, GraphEndTime);
-            List<(DateTime date, double value)> goalCalList = Services.goalService.GetTupleGoalHistory(GraphStartTime, GraphEndTime, true);
-            LogVars(new { actualCalList, goalCalList }, "Got data (?), plotseries not generated.");
-            foreach (var t in actualCalList) Log($"ActualCalList item: {t}");
-            foreach (var t in goalCalList) Log($"GoalCalList item: {t}");
+            List<(DateTime date, double value)> actualCalList = Services.foodLogService.DailySumRange("Calories", GraphStartTime.AddDays(-1), GraphEndTime);
+            List<(DateTime date, double value)> goalCalList = Services.goalService.GetTupleGoalHistory(GraphStartTime.AddDays(-1), GraphEndTime, true);
 
             // Generate PlotSeries:
             PlotSeries ActualSeries = new()
             {
-                SeriesType = SeriesType.LineContinuous,
+                SeriesType = SeriesType.LineDiscreteDaily,
                 DataPoints = TupleToDataPoints(actualCalList),
                 SeriesColor = SeriesColor.LineSeriesBrush1
             };
@@ -219,43 +237,13 @@ namespace MacroTrack.AppLibrary.ViewModels
                 SeriesType = SeriesType.StepLine,
                 DataPoints = TupleToDataPoints(goalCalList),
                 SeriesColor = SeriesColor.LineSeriesBrush2
-            };
-
-            // Some test series:
-            IReadOnlyList<DataPoint> cheatList = new List<DataPoint>
-            {
-                new DataPoint { Time = DateTime.Parse("2026-02-03"), Value = 1 }
-            };
-            PlotSeries CheatSeries = new()
-            {
-                SeriesType = SeriesType.DaysBinary,
-                DataPoints = cheatList,
-                SeriesColor = SeriesColor.DayBinarySeriesBrush1
-            };
-
-            IReadOnlyList<DataPoint> HighLightlist = new List<DataPoint>
-            {
-                new DataPoint { Time = DateTime.Parse("2026-02-04 06:00"), Value = 1 },
-                new DataPoint { Time = DateTime.Parse("2026-02-09 00:00"), Value = 1 },
-                new DataPoint { Time = DateTime.Parse("2026-02-15 00:00"), Value = 1 },
-                new DataPoint { Time = DateTime.Parse("2026-02-16 06:00"), Value = 1 }
-            };
-            PlotSeries HighlightSeries = new()
-            { 
-                SeriesType = SeriesType.Highlight,
-                DataPoints = HighLightlist,
-                SeriesColor = SeriesColor.HighLight1
-            };
-
-
+            };           
 
             // Add to SeriesSet:
             IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries>
             { 
-                CheatSeries,
                 ActualSeries,
-                GoalSeries,
-                HighlightSeries
+                GoalSeries
             };
             GraphSeriesSet = seriesSet;
             LogVars(new { GraphSeriesSet }, "This is the GraphSeriesSet rn: ");
