@@ -140,6 +140,18 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        private TimePeriod? _previousPeriod;
+        public TimePeriod? PreviousPeriod
+        {
+            get => _previousPeriod;
+            set
+            {
+                if (_previousPeriod == value) return;
+                _previousPeriod = value;
+                OnPropertyChanged();
+            }
+        }
+
         private DateTime _graphStartTime;
         public DateTime GraphStartTime
         {
@@ -186,8 +198,7 @@ namespace MacroTrack.AppLibrary.ViewModels
                 GraphSettings = Services!.SettingsService.Settings.GraphSettings;
                 DrawGraph();
             });
-            GraphSettings = Services!.SettingsService.Settings.GraphSettings;            
-            LogVars(new { GraphSettings, GraphSettings.LineTrendLineThickness });
+            GraphSettings = Services!.SettingsService.Settings.GraphSettings;                        
             Populate();
             DrawGraph();
             
@@ -220,10 +231,19 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             if (Services == null) throw new Exception("Null Services");
             // Get data:
-            GraphStartTime = DateTime.Today.AddDays(-Services.SettingsService.Settings.CalGraphLength);
-            GraphEndTime = DateTime.Today.AddDays(1);
-            List<(DateTime date, double value)> actualCalList = Services.foodLogService.DailySumRange("Calories", GraphStartTime.AddDays(-1), GraphEndTime);
-            List<(DateTime date, double value)> goalCalList = Services.goalService.GetTupleGoalHistory(GraphStartTime.AddDays(-1), GraphEndTime, true);
+            if (PreviousPeriod is not null)
+            {
+                GraphStartTime = PreviousPeriod.StartTime.AddDays(-15);
+                GraphEndTime = PreviousPeriod.EndTime.AddDays(15);
+            }
+            else
+            {
+                GraphStartTime = DateTime.Today.AddDays(-Services.SettingsService.Settings.CalGraphLength);
+                GraphEndTime = DateTime.Today.AddDays(1);
+            }
+            
+            List<(DateTime date, double value)> actualCalList = Services.foodLogService.DailySumRange("Calories", GraphStartTime.AddDays(-1), GraphEndTime.AddDays(1));
+            List<(DateTime date, double value)> goalCalList = Services.goalService.GetTupleGoalHistory(GraphStartTime.AddDays(-1), GraphEndTime.AddDays(1), true);
 
             // Generate PlotSeries:
             PlotSeries ActualSeries = new()
@@ -237,15 +257,37 @@ namespace MacroTrack.AppLibrary.ViewModels
                 SeriesType = SeriesType.StepLine,
                 DataPoints = TupleToDataPoints(goalCalList),
                 SeriesColor = SeriesColor.LineSeriesBrush2
-            };           
+            };
+
+            // Make Highlight in case it is needed:
+            PlotSeries CurrentPeriodHighlight = new()
+            {
+                SeriesType = SeriesType.Highlight,
+                DataPoints = TimePeriodToDataPoints(PreviousPeriod),
+                SeriesColor = SeriesColor.HighLight1
+            };
 
             // Add to SeriesSet:
-            IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries>
-            { 
-                ActualSeries,
-                GoalSeries
-            };
-            GraphSeriesSet = seriesSet;
+            if (PreviousPeriod is null)
+            {
+                IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries>
+                {
+                    ActualSeries,
+                    GoalSeries
+                };
+                GraphSeriesSet = seriesSet;
+            }
+            else
+            {
+                IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries>
+                {
+                    CurrentPeriodHighlight,
+                    ActualSeries,
+                    GoalSeries
+                };
+                GraphSeriesSet = seriesSet;
+            }
+            
             LogVars(new { GraphSeriesSet }, "This is the GraphSeriesSet rn: ");
         }
 
@@ -256,6 +298,16 @@ namespace MacroTrack.AppLibrary.ViewModels
             foreach (var t in tupleList) dataPoints.Add(new DataPoint { Time = t.time, Value = t.value });
             dataPoints = dataPoints.OrderBy(p => p.Time).ToList();
             
+            return dataPoints;
+        }
+
+        private IReadOnlyList<DataPoint> TimePeriodToDataPoints(TimePeriod? period)
+        {
+            if (Services == null) throw new Exception("Null Services");
+            List<DataPoint> dataPoints = new();
+            if (period is null) return dataPoints;
+            dataPoints.Add(new DataPoint { Time = period.StartTime, Value = 1 });
+            dataPoints.Add(new DataPoint { Time = period.EndTime, Value = 1 });
             return dataPoints;
         }
 

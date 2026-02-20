@@ -144,21 +144,25 @@ namespace MacroTrack.Dashboard
         private void ButtonBannerYesterday_Click(object sender, RoutedEventArgs e)
         {
             Log();
+            _vm?.OpenPreviousPeriodYesterday();
         }
 
         private void ButtonBannerPreviousPeriods_Click(object sender, RoutedEventArgs e)
         {
             Log();
+            _vm?.OpenPreviousPeriodSelect();
         }
 
         private void BannerButtonSetGoal_Click(object sender, RoutedEventArgs e)
         {
             Log();
+            _vm?.OpenGoalSet();
         }
 
         private void BannerButtonNewGoal_Click(object sender, RoutedEventArgs e)
         {
             Log();
+            _vm?.OpenGoalNew();
         }
 
         private void ButtonBannerSettings_Click(object sender, RoutedEventArgs e)

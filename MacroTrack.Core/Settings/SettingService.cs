@@ -1,4 +1,5 @@
-﻿using MacroTrack.Core.Logging;
+﻿using MacroTrack.Core.DataModels;
+using MacroTrack.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -114,6 +115,16 @@ namespace MacroTrack.Core.Settings
             return Settings.DFormatShort.GetFormatString(dateSeperator ?? Settings.DateSeperator);
         }
 
+        public string GetTimeStringMinutes(string? timeSeperator = null)
+        {
+            return Settings.TimeFormat.GetFormatString(false, timeSeperator ?? Settings.TimeSeperator);
+        }
+
+        public string GetTimeStringSeconds(string? timeSeperator = null)
+        {
+            return Settings.TimeFormat.GetFormatString(true, timeSeperator ?? Settings.TimeSeperator);
+        }
+
         public string GetDateTimeString(bool longDate = false, bool showMinutes = true, bool showSeconds = true)
         {
             if (longDate)
@@ -126,6 +137,43 @@ namespace MacroTrack.Core.Settings
                 if (!showMinutes) return Settings.DFormatShort.GetFormatString(Settings.DateSeperator);
                 else return GetShortDateTimeString(false, showSeconds);
             }
+        }
+
+        /// <summary>
+        /// Resturns a string showing the time depicted in TimePeriod. Will only display time if the times are not midnight, and only show one date if the period is only 1 day long or less. 
+        /// </summary>
+        /// <param name="period"></param>
+        /// <param name="longFormat"></param>
+        /// <param name="inter"></param>
+        /// <param name="pre"></param>
+        /// <param name="post"></param>
+        /// <returns></returns>
+        public string TimePeriodToString(TimePeriod period, bool longFormat = true, string inter = " - ", string pre = "", string post = "")
+        {
+            TimeSpan span = period.GetTimeSpan();
+            DateTime startTime = period.StartTime;
+            DateTime endTime = period.EndTime;
+
+            if (span == TimeSpan.FromDays(1) && startTime.TimeOfDay == TimeSpan.Zero)
+            {   // Period is a single day, return a string only showing one date             
+                if (longFormat) return startTime.ToString(GetLongDateString());
+                return startTime.ToString(GetShortDateString());                
+            }
+            if (startTime.Date == endTime.Date)
+            {   // This period takes place within the one day, return a string with one date, time to time.
+                if (longFormat) return $"{startTime.ToString(GetLongDateString())}, from {startTime.ToString(GetTimeStringMinutes())} to {endTime.ToString(GetTimeStringMinutes())}";
+                return $"{startTime.ToString(GetShortDateString())}, from {startTime.ToString(GetTimeStringMinutes())} to {endTime.ToString(GetTimeStringMinutes())}";
+            }
+            if (period.StartTime.TimeOfDay == TimeSpan.Zero && period.EndTime.TimeOfDay == TimeSpan.Zero)
+            {   // Period is between distinct days, only return dates:
+                if (longFormat) return period.ToString(GetLongDateString());
+                return period.ToString(GetShortDateString());
+            }
+            // Period is between multiple dates and times, return dates and times:
+            if (longFormat) return period.ToString(GetLongDateTimeString());
+            return period.ToString(GetShortDateTimeString());
+
+
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace MacroTrack.AppLibrary.ViewModels
@@ -21,6 +22,20 @@ namespace MacroTrack.AppLibrary.ViewModels
         // Make these DP:
         private bool _filterActive = false;
         private bool _filterInactive = true;
+
+        private DateTime? _date;
+        public DateTime? Date
+        {
+            get => _date;
+            set
+            {
+                if (_date == value) return;
+                _date = value;
+                OnPropertyChanged();
+                Populate();
+            }
+        }
+
 
         // Commands:
         public ICommand ToggleCompleteCommand { get; }
@@ -53,7 +68,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             Log();
             if (Services == null) throw new Exception("Null Services");
-            List<DailyTask> tasksRaw = Services.taskService.GetAllStreaks(DateTime.Now, _filterActive, _filterInactive);
+            List<DailyTask> tasksRaw = Services.taskService.GetAllStreaks(Date ?? DateTime.Now, _filterActive, _filterInactive);
             Tasks.Clear();
             foreach (DailyTask t in tasksRaw) Tasks.Add(t);
         }
@@ -67,10 +82,11 @@ namespace MacroTrack.AppLibrary.ViewModels
                 return;
             }
             int id = task.Id;
-            if (task.Completed) Services.taskService.SetComplete(id);
-            else Services.taskService.SetIncomplete(id);
+            if (task.Completed) Services.taskService.SetComplete(id, Date);
+            else Services.taskService.SetIncomplete(id, Date);
 
-                Log($"Task #{id} completion changed from '{!task.Completed}' to '{task.Completed}'", LogLevel.Info);
+            Log($"Task #{id} completion changed from '{!task.Completed}' to '{task.Completed}'", LogLevel.Info);
+            AppServices?.AppEvents.Publish(new TaskCompletionChanged());
             Populate();
         }
     }

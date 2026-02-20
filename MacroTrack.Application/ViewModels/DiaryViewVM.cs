@@ -1,6 +1,7 @@
 ﻿using MacroTrack.AppLibrary.Commands;
 using MacroTrack.AppLibrary.Models;
 using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using Microsoft.VisualBasic;
@@ -73,6 +74,19 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        private TimePeriod? _previousPeriod;
+        public TimePeriod? PreviousPeriod
+        {
+            get => _previousPeriod;
+            set
+            {
+                if (_previousPeriod == value) return;
+                _previousPeriod = value;
+                OnPropertyChanged();
+                Populate();
+            }
+        }
+
         // Commands:
         public ICommand ViewDayCommand { get; }
         public ICommand EditEntryCommand { get; }
@@ -109,16 +123,22 @@ namespace MacroTrack.AppLibrary.ViewModels
             // TimeFrame Logic:
             DateTime StartTime;
             DateTime EndTime;
-            if (TimeFrame != DefaultTimeFrame.Custom)
+            if (PreviousPeriod is not null)
             {
-                EndTime = DateTime.Today.AddDays(1);
-                StartTime = TimeFrame.GetStartDate();
+                StartTime = PreviousPeriod.StartTime;
+                EndTime = PreviousPeriod.EndTime;
             }
-            else
+            else if (TimeFrame == DefaultTimeFrame.Custom)
             {
                 EndTime = _customEndTime;
                 StartTime = _customStartTime;
             }
+            else
+            {
+                EndTime = DateTime.Today.AddDays(1);
+                StartTime = TimeFrame.GetStartDate();
+            }
+            Log($"Getting diary entries, startdate: {StartTime}, endtime: {EndTime}");
 
             // Get list and add it w/ date formatting
             List<DiaryEntry> diary = Services.diaryService.FromTimes(StartTime, EndTime);

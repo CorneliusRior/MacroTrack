@@ -41,6 +41,26 @@ namespace MacroTrack.AppLibrary.Controls
             set => SetValue(CurrentSummaryProperty, value);
         }
 
+        public static readonly DependencyProperty ShowTimeFrameCBProperty = DependencyProperty.Register(
+            nameof(ShowTimeFrameCB), typeof(bool), typeof(Summary),
+            new PropertyMetadata(true)
+        );
+        public bool ShowTimeFrameCB
+        {
+            get => (bool)GetValue(ShowTimeFrameCBProperty);
+            set => SetValue(ShowTimeFrameCBProperty, value);
+        }
+
+        public static readonly DependencyProperty CenterCurrentPeriodProperty = DependencyProperty.Register(
+            nameof(CenterCurrentPeriod), typeof(bool), typeof(Summary),
+            new PropertyMetadata(false)
+        );
+        public bool CenterCurrentPeriod
+        {
+            get => (bool)GetValue(CenterCurrentPeriodProperty);
+            set => SetValue(CenterCurrentPeriodProperty, value);
+        }
+
         private static void OnCurrentSummaryChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var view = (Summary)d;
@@ -61,55 +81,24 @@ namespace MacroTrack.AppLibrary.Controls
             get => (SummaryTimeFrame)GetValue(TimeFrameProperty);
             set => SetValue(TimeFrameProperty, value);
         }
-        /*
-        public static readonly DependencyProperty CalPctProperty = DependencyProperty.Register(
-            nameof(CalPct),
-            typeof(string),
-            typeof(Summary),
-            new PropertyMetadata("(-%)")
+
+        public static readonly DependencyProperty PreviousPeriodProperty = DependencyProperty.Register(
+            nameof(PreviousPeriod), typeof(TimePeriod), typeof(Summary),
+            new PropertyMetadata(null, OnPeriodChanged)
         );
-        public string CalPct
+        public TimePeriod? PreviousPeriod
         {
-            get => (string)GetValue(CalPctProperty); 
-            set => SetValue(CalPctProperty, value);
+            get => (TimePeriod?)GetValue(PreviousPeriodProperty);
+            set => SetValue(PreviousPeriodProperty, value);
         }
 
-        public static readonly DependencyProperty ProPctProperty = DependencyProperty.Register(
-            nameof(ProPct),
-            typeof(string),
-            typeof(Summary),
-            new PropertyMetadata("(-%)")
-        );
-        public string ProPct
+        private static void OnPeriodChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            get => (string)GetValue(ProPctProperty);
-            set => SetValue(ProPctProperty, value);
+            var view = (Summary)d;
+            view.Vm.PreviousPeriod = (TimePeriod?)e.NewValue;
+            view.Vm.DrawGraph();
         }
 
-        public static readonly DependencyProperty CarPctProperty = DependencyProperty.Register(
-            nameof(CarPct),
-            typeof(string),
-            typeof(Summary),
-            new PropertyMetadata("(-%)")
-        );
-        public string CarPct
-        {
-            get => (string)GetValue(CarPctProperty);
-            set => SetValue(CarPctProperty, value);
-        }
-
-        public static readonly DependencyProperty FatPctProperty = DependencyProperty.Register(
-            nameof(FatPct),
-            typeof(string),
-            typeof(Summary),
-            new PropertyMetadata("(-%)")
-        );
-        public string FatPct
-        {
-            get => (string)GetValue(FatPctProperty);
-            set => SetValue(FatPctProperty, value);
-        }
-        */
         // Constructor & logic:
 
         public Summary()

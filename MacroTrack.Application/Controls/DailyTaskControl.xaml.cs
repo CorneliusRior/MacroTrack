@@ -26,6 +26,17 @@ namespace MacroTrack.AppLibrary.Controls
     public partial class DailyTaskControl : ControlBase
     {
         private readonly DailyTaskVM _vm = new();
+
+        public static readonly DependencyProperty DateProperty = DependencyProperty.Register(
+            nameof(Date), typeof(DateTime?), typeof(DailyTaskControl),
+            new PropertyMetadata(null, OnDateChanged)
+            );
+        public DateTime? Date
+        {
+            get => (DateTime?)GetValue(DateProperty);
+            set => SetValue(DateProperty, value);                
+        }
+
         public DailyTaskControl()
         {
             InitializeComponent();
@@ -36,12 +47,19 @@ namespace MacroTrack.AppLibrary.Controls
         {
             base.Init(services, appServices);
             _vm.Init(services, appServices);
+            _vm.Date = Date;
         }
 
         protected override void OnUnloaded(object sender, RoutedEventArgs e)
         {
             base.OnUnloaded(sender, e);
             _vm.OnClose();
+        }
+
+        private static void OnDateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {                        
+            var view = (DailyTaskControl)d;
+            view._vm.Date = (DateTime?)e.NewValue;
         }
 
         public void Refresh()
@@ -51,7 +69,7 @@ namespace MacroTrack.AppLibrary.Controls
 
         private void buttonNewTask_Click(object sender, RoutedEventArgs e)
         {
-
+            Log($"Date={Date}");
         }
 
         private void btManageTasks_Click(object sender, RoutedEventArgs e)

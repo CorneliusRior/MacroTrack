@@ -11,6 +11,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <conv:EnumDateTimeConverter x:Key="DateFmt"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}"
             BorderBrush="{DynamicResource BorderBrush}"
@@ -56,6 +57,7 @@
                         CommandParameter="{Binding}"/>
                 <Button x:Name="PART_ButtonEdit"
                         Content="Edit"
+                        Visibility="{Binding ShowViewDay, RelativeSource={RelativeSource AncestorType=local:DiaryViewControl}, Converter={StaticResource BoolToVis}}"
                         Command="{Binding DataContext.EditEntryCommand,
                                   RelativeSource={RelativeSource AncestorType=local:DiaryViewControl}}"
                         CommandParameter="{Binding}"/>

@@ -141,6 +141,7 @@ namespace MacroTrack.Dashboard
             PrintCommand = new RelayCommand(() => RequestPrint?.Invoke(""));
             OpenSettingsCommand = new RelayCommand(() => RequestOpenSettings?.Invoke());
 
+
             // Event Subscriptions:
             IDisposable _subSettingsChanged = AppServices.AppEvents.Subscribe<SettingsChanged>(_ =>
             {
@@ -182,6 +183,8 @@ namespace MacroTrack.Dashboard
             else ClockFormat = Services.SettingsService.GetShortDateTimeString();
             ClockString = DateTime.Now.ToString(ClockFormat);
         }
+
+
 
         // Log & REPL handling:
         private void Log(string message = "Called", LogLevel level = LogLevel.Debug, Exception? ex = null, [CallerMemberName] string caller = "")
@@ -265,9 +268,29 @@ namespace MacroTrack.Dashboard
             AppServices.AppEvents.Publish(new SummaryChanged(CurrentSummary));
         }
 
+        // Button functionality / Windows
+        public void OpenPreviousPeriodYesterday()
+        {
+            AppServices?.WindowService.Show(WindowType.PreviousPeriod, new TimePeriod(DateTime.Today.AddDays(-1), DateTime.Today));
+        }
+
+        public void OpenPreviousPeriodSelect()
+        {
+
+        }
+
+        public void OpenGoalSet()
+        {
+
+        }
+
+        public void OpenGoalNew()
+        {
+            
+        }
+
         public void OpenSettings()
         {
-            //OpenSettingsCommand.Execute(this);
             AppServices.WindowService.Show(WindowType.Settings);
         }
 

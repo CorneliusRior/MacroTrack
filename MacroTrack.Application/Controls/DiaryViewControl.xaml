@@ -15,6 +15,7 @@
                 <scm:SortDescription PropertyName="Time" Direction="Descending"/>
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </local:ControlBase.Resources>
 
     <Grid>
@@ -23,7 +24,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Background="{DynamicResource PanelBackGroundBrush}" Grid.Row="0">
+        <Border Background="{DynamicResource PanelBackGroundBrush}" Grid.Row="0"
+                Visibility="{Binding ShowTopRibbon, RelativeSource={RelativeSource AncestorType=local:ControlBase}, Converter={StaticResource BoolToVis}}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>

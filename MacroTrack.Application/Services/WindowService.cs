@@ -1,5 +1,6 @@
 ﻿using MacroTrack.AppLibrary.Windows;
 using MacroTrack.AppLibrary.Windows.SettingsWindow;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 
@@ -15,6 +16,18 @@ namespace MacroTrack.AppLibrary.Services
 {
     internal class WindowService : IWindowService
     {
+        /* How to make a new window "Cool":
+         *  - Make a new WPF Window in the namespace MacroTrack.AppLibrary.Windows (Directory AppLibrary/Windows), name it "CoolWindow.xaml".
+         *  - Leave it blank (or w/ message textblock). Change the opening and closing tags from "Window" to "local:WindowBase".
+         *  - Open CoolWindow.xaml.cs, change it from "CoolWindow : Window" to "CoolWindow : WindowBase".
+         *  - Give constructor "(CoreServices services, AppServices appServices) : base(services, appServices)".
+         *  - Go to MacroTrack.AppLibrary.WindowType, add the window name, keeping it in alphabetical order except for "Settings".
+         *  - Go to MacroTrack.AppLibrary.WindowService (here), scroll to the bottom and create a new method "CreateCoolWindow", copying format of the others.
+         *  - Go to the function CreateWindow() and add it to the switch, copying format of others.
+         *  - Now, anywhere with access to AppServices can call this window with AppServices.WindowService.Show(WindowType.Cool).
+         *  - If you want it to have parameters, have CreateWindow() pass it, check that it's the right type, then pass it. 
+         *  - Make a new class in the same directory as Cool.xaml called CoolVM.cs if it does anything other than just host a single control.
+         */
         private readonly CoreServices _services;
         private readonly AppServices _appServices;
         private readonly Dispatcher _dispatcher;
@@ -81,6 +94,7 @@ namespace MacroTrack.AppLibrary.Services
                 WindowType.DiaryView => CreateDiaryViewWindow(o),
                 WindowType.DiaryEdit => CreateDiaryEditWindow(o, parameter),
                 WindowType.FoodLogEdit => CreateFoodLogEditWindow(o, parameter),
+                WindowType.PreviousPeriod => CreatePreviousPeriodWindow(o, parameter),
                 WindowType.TaskView => CreateTaskViewWindow(o),
                 _ => throw new NotSupportedException($"Unknown window type '{type}'")
             };
@@ -141,6 +155,16 @@ namespace MacroTrack.AppLibrary.Services
             }
             else throw new InvalidOperationException();
         }
+
+        private Window CreatePreviousPeriodWindow(Window? owner, object? parameter)
+        {
+            if (parameter is TimePeriod timePeriod)
+            {
+                return new PreviousPeriodWindow(_services, _appServices, timePeriod) { Owner = owner };
+            }
+            else throw new InvalidOperationException();
+        }
+
         private Window CreateTaskViewWindow(Window? owner) { throw new NotImplementedException(); }
     }
 }

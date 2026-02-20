@@ -13,6 +13,7 @@ namespace MacroTrack.AppLibrary.Services
         DiaryView,
         DiaryEdit,
         FoodLogEdit,
+        PreviousPeriod,
         TaskView
     }
 }

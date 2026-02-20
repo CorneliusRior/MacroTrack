@@ -9,6 +9,9 @@
                    xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
                    mc:Ignorable="d"
                    d:DesignHeight="300" d:DesignWidth="700">
+    <local:ControlBase.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </local:ControlBase.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}">
         <Grid Margin="10" DataContext="{Binding Vm, RelativeSource={RelativeSource AncestorType=local:Summary}}">
             <Grid.RowDefinitions>
@@ -44,6 +47,7 @@
                            Content="{Binding CurrentSummary.GoalName, RelativeSource={RelativeSource AncestorType=local:ControlBase}, TargetNullValue='No Goal Selected'}"
                            Style="{DynamicResource Label.Title}"/>
                     <ComboBox x:Name="cbTimeFrame"
+                              Visibility="{Binding ShowTimeFrameCB, RelativeSource={RelativeSource AncestorType=local:ControlBase}, Converter={StaticResource BoolToVis}}"
                               Template="{DynamicResource MTComboBoxTemplate}"
                               ItemsSource="{x:Static models:SummaryTimeFrameValues.List}"
                               DisplayMemberPath="Display"
