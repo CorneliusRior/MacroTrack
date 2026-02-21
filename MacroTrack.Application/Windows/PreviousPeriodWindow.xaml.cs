@@ -42,8 +42,10 @@ namespace MacroTrack.AppLibrary.Windows
 
         private void WireUpControls()
         {
-            DailyTasks.Init(Services, AppServices);
             Summary.Init(Services, AppServices);
+            DailyTasks.Init(Services, AppServices);
+            History.Init(Services, AppServices);
+            WeightView.Init(Services, AppServices);
             DiaryView.Init(Services, AppServices);
         }
 

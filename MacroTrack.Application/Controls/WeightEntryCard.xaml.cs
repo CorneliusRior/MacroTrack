@@ -1,4 +1,5 @@
 ﻿using MacroTrack.Core.Models;
+using MacroTrack.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,27 +18,22 @@ using System.Windows.Shapes;
 namespace MacroTrack.AppLibrary.Controls
 {
     /// <summary>
-    /// Interaction logic for DiaryEntryCard.xaml
+    /// Interaction logic for WeightEntryCard.xaml
     /// </summary>
-    public partial class DiaryEntryCard : UserControl
+    public partial class WeightEntryCard : UserControl
     {
-        // DPs:
         public static readonly DependencyProperty EntryProperty = DependencyProperty.Register(
-            nameof(Entry),
-            typeof(DiaryEntry),
-            typeof(DiaryEntryCard), 
+            nameof(Entry), typeof(WeightEntry), typeof(WeightEntryCard),
             new PropertyMetadata(null)
         );
-        public DiaryEntry? Entry
+        public WeightEntry Entry
         {
-            get => (DiaryEntry?)GetValue(EntryProperty);
+            get => (WeightEntry)GetValue(EntryProperty);
             set => SetValue(EntryProperty, value);
         }
 
         public static readonly DependencyProperty TimeFormatProperty = DependencyProperty.Register(
-            nameof(TimeFormat),
-            typeof(string),
-            typeof(DiaryEntryCard),
+            nameof(TimeFormat), typeof(string), typeof(WeightEntryCard),
             new PropertyMetadata("yyyy/M/d - HH:mm")
         );
         public string TimeFormat
@@ -45,19 +41,20 @@ namespace MacroTrack.AppLibrary.Controls
             get => (string)GetValue(TimeFormatProperty);
             set => SetValue(TimeFormatProperty, value);
         }
-        
-        public static readonly DependencyProperty ShowViewDayProperty = DependencyProperty.Register(
-            nameof(ShowViewDay), typeof(bool), typeof(DiaryEntryCard),
-            new PropertyMetadata(false)
+
+        public static readonly DependencyProperty UnitLabelProperty = DependencyProperty.Register(
+            nameof(UnitLabel), typeof(string), typeof(WeightEntryCard),
+            new PropertyMetadata("")
         );
-        public bool ShowViewDay
+        public string UnitLabel
         {
-            get => (bool)GetValue(ShowViewDayProperty);
-            set => SetValue(ShowViewDayProperty, value);
+            get => (string)GetValue(UnitLabelProperty);
+            set => SetValue(UnitLabelProperty, value);
         }
 
-        // Functions:
-        public DiaryEntryCard()
+        public bool IsSelected;
+
+        public WeightEntryCard()
         {
             InitializeComponent();
         }

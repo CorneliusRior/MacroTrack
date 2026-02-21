@@ -115,20 +115,20 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="0">
-                    <controls:HistoryControl x:Name="History"/>
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="0" Padding="5">
+                    <controls:HistoryControl x:Name="History" Period="{Binding DataContext.Period, RelativeSource={RelativeSource AncestorType={x:Type local:PreviousPeriodWindow}}}"/>
                 </Border>
 
                 <GridSplitter Grid.Column="1"/>
 
                 <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="2">
-
+                    <controls:WeightViewControl x:Name="WeightView" Period="{Binding DataContext.Period, RelativeSource={RelativeSource AncestorType={x:Type local:PreviousPeriodWindow}}}"/> 
                 </Border>
 
                 <GridSplitter Grid.Column="3"/>
 
                 <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="4">
-                    <controls:DiaryViewControl x:Name="DiaryView" ShowTopRibbon="False"
+                    <controls:DiaryViewControl x:Name="DiaryView" ShowTopRibbon="False" ShowViewDay="False"
                                                PreviousPeriod="{Binding DataContext.Period, RelativeSource={RelativeSource AncestorType={x:Type local:PreviousPeriodWindow}}}"/>
                 </Border>
 

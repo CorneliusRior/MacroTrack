@@ -226,6 +226,12 @@ namespace MacroTrack.AppLibrary.ViewModels
             GraphStartTime = DateTime.Today.AddDays(-Services.SettingsService.Settings.WeightGraphLength);
             GraphEndTime = DateTime.Today.AddDays(1);
             List<WeightEntry> weightLog = Services.dataService.GetWeightEntries(GraphStartTime.AddDays(-5), GraphEndTime); // AddDays(-5) to have data before.
+            // Convert if needs be:
+            if (Format != WeightFormat.Kg)
+            {
+                foreach (WeightEntry entry in weightLog) entry.Weight = WeightFormat.Kg.ConvertTo(Format, entry.Weight);
+            }
+            // I'm not testing that, it might work, it might not, I don't care.
             IReadOnlyList<DataPoint> weightDataPoints = ConvertToDataPoints(weightLog);
 
             // use data to make trend line, draw that before WeightSeries.

@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:set="clr-namespace:MacroTrack.Core.Settings;assembly=MacroTrack.Core"
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Windows.SettingsWindow.Categories"
+             xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="450">
     <Border Background="{DynamicResource PanelBackGroundBrush}">
@@ -45,7 +46,16 @@
                                   IsChecked="{Binding SettingsEditable.DiaryViewIsLongFormat, Mode=TwoWay}"/>
                     </StackPanel>
                 </Expander>
-                
+
+                <Expander Header="Food History" IsExpanded="True">
+                    <StackPanel Orientation="Vertical">
+                        <controls:LabelledNumericInput LabelText="History length" UnitLabelText="days"
+                                                       Min="1"
+                                                       Value="{Binding SettingsEditable.HistoryLength, Mode=TwoWay}"/>
+                        <CheckBox Content="Show future food entries"
+                                  IsChecked="{Binding SettingsEditable.HistoryShowFuture, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Expander>
             </StackPanel>
         </ScrollViewer>
     </Border>

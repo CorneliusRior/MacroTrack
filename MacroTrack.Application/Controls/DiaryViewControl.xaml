@@ -73,7 +73,8 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <local:DiaryEntryCard Entry="{Binding}"
-                                                  TimeFormat="{Binding DataContext.TimeFormat, ElementName=DiaryItems}"/>
+                                                  TimeFormat="{Binding DataContext.TimeFormat, ElementName=DiaryItems}"
+                                                  ShowViewDay="{Binding ShowViewDay,RelativeSource={RelativeSource AncestorType=local:ControlBase}}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

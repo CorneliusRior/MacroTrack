@@ -1,6 +1,7 @@
 ﻿using MacroTrack.AppLibrary.Commands;
 using MacroTrack.AppLibrary.Controls;
 using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
@@ -32,6 +33,17 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        private TimePeriod? _period;
+        public TimePeriod? Period
+        {
+            get => _period;
+            set
+            {
+                _period = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand DeleteEntryCommand { get; }
         public ICommand EditEntryCommand { get; }
 
@@ -53,9 +65,26 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public void Populate()
         {
-            Log();
+            Log($"Populating, Period={(Period is null ? "Null" : Period.StartTime)}-{(Period is null ? "Null" : Period.EndTime)}");
             if (Services == null) throw new Exception("Null Services");
-            List<FoodEntry> HistoryList = Services.foodLogService.FromTimes(DateTime.Now.Date.AddDays(-3), DateTime.Now.Date.AddDays(3));
+            List<FoodEntry> HistoryList;
+            if (Period is not null)
+            {
+                HistoryList = Services.foodLogService.FromTimes(Period.StartTime, Period.EndTime);
+            }
+            else
+            {
+                int days = Services.SettingsService.Settings.HistoryLength;
+                if (Services.SettingsService.Settings.HistoryShowFuture)
+                {
+                    HistoryList = Services.foodLogService.FromTimes(DateTime.Today.AddDays(-days), DateTime.Today.AddDays(days));
+                }
+                else
+                {
+                    HistoryList = Services.foodLogService.FromTimes(DateTime.Today.AddDays(-days), DateTime.Today.AddDays(1));
+                }                
+            }
+            
             Entries.Clear();
             TimeFormat = Services.SettingsService.GetDTFormatShortString();
             foreach (var entry in HistoryList) Entries.Add(entry);

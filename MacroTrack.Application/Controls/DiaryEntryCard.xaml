@@ -52,12 +52,12 @@
             <StackPanel Style="{DynamicResource StackPanel.Footer}" Grid.Row="2">
                 <Button x:Name="PART_ButtonViewDay"
                         Content="View Day"
+                        Visibility="{Binding ShowViewDay, ElementName=Root, Converter={StaticResource BoolToVis}}"
                         Command="{Binding DataContext.ViewDayCommand,
                                   RelativeSource={RelativeSource AncestorType=local:DiaryViewControl}}"
                         CommandParameter="{Binding}"/>
                 <Button x:Name="PART_ButtonEdit"
                         Content="Edit"
-                        Visibility="{Binding ShowViewDay, RelativeSource={RelativeSource AncestorType=local:DiaryViewControl}, Converter={StaticResource BoolToVis}}"
                         Command="{Binding DataContext.EditEntryCommand,
                                   RelativeSource={RelativeSource AncestorType=local:DiaryViewControl}}"
                         CommandParameter="{Binding}"/>

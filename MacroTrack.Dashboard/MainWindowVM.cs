@@ -1,8 +1,14 @@
 ﻿using MacroTrack.AppLibrary.Commands;
+using MacroTrack.AppLibrary.Controls;
+using MacroTrack.AppLibrary.Graphs;
+using MacroTrack.AppLibrary.Models;
+using MacroTrack.AppLibrary.Resources;
+using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
-using MacroTrack.Core.Settings;
 using MacroTrack.Core.Services;
+using MacroTrack.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,14 +16,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
-using MacroTrack.AppLibrary.Resources;
-using MacroTrack.AppLibrary.Graphs;
-using MacroTrack.Core.DataModels;
-using MacroTrack.AppLibrary.Models;
-using MacroTrack.AppLibrary.Controls;
 using System.Windows.Threading;
-using MacroTrack.AppLibrary.Services;
 
 namespace MacroTrack.Dashboard
 {
@@ -123,6 +124,18 @@ namespace MacroTrack.Dashboard
             }
         }
 
+        // History string
+        private string _historyString = "Recent Entries (3 days)";
+        public string HistoryString
+        {
+            get => _historyString;
+            set
+            {
+                _historyString = value;
+                OnPropertyChanged();
+            }
+        }
+
         //private bool _updatingClock = false;
 
         private readonly DispatcherTimer _clockTimer;
@@ -147,6 +160,7 @@ namespace MacroTrack.Dashboard
             {
                 SetClockFormat();
                 ApplyTheme();
+                SetHistoryString();
             });
             _subscriptions.Add(_subSettingsChanged);
             IDisposable _foodLogChanged = AppServices.AppEvents.Subscribe<FoodLogChanged>(_ =>
@@ -168,6 +182,8 @@ namespace MacroTrack.Dashboard
                 ClockString = CurrentTime.ToString(ClockFormat);
             };
             _clockTimer.Start();
+
+            SetHistoryString();
         }
 
         public void OnClose()
@@ -184,6 +200,10 @@ namespace MacroTrack.Dashboard
             ClockString = DateTime.Now.ToString(ClockFormat);
         }
 
+        private void SetHistoryString()
+        {
+            HistoryString = $"Recent Entries ({Services.SettingsService.Settings.HistoryLength} days)";
+        }
 
 
         // Log & REPL handling:

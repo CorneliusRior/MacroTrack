@@ -230,7 +230,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-                    <Label Content="Recent Entries (3 days)"
+                    <Label Content="{Binding HistoryString}"
                            Style="{DynamicResource Label.Title}"
                            Grid.Column="0"/>
                     <Button Content="Refresh"

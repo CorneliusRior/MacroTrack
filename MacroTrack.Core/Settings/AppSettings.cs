@@ -23,6 +23,8 @@ namespace MacroTrack.Core.Settings
         public int LogRetainAmount { get; set; } = 20;
         public LogLevel LogUILevel { get; set; } = LogLevel.Warning;
         public LogLevel LogFileLevel { get; set; } = LogLevel.Debug;
+        public int HistoryLength { get; set; } = 3; // How many days are shown in food history.
+        public bool HistoryShowFuture { get; set; } = true; // Whether entries with timestamp after today are shown.
         public int CalGraphLength { get; set; } = 30; // days, this being a month.
         public int WeightMode { get; set; } = 0; // 0: kg, 1: lbs, 2: st
         public WeightFormat WeightFormat { get; set; } = WeightFormat.Kg;
@@ -55,6 +57,8 @@ namespace MacroTrack.Core.Settings
                 LogRetainAmount = this.LogRetainAmount,
                 LogFileLevel = this.LogFileLevel,
                 LogUILevel = this.LogUILevel,
+                HistoryLength = this.HistoryLength,
+                HistoryShowFuture = this.HistoryShowFuture,
                 WeightMode = this.WeightMode,
                 WeightFormat = this.WeightFormat,
                 WeightGraphLength = this.WeightGraphLength,

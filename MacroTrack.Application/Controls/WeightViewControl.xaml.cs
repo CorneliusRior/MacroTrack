@@ -1,7 +1,6 @@
 ﻿using MacroTrack.AppLibrary.Services;
 using MacroTrack.AppLibrary.ViewModels;
 using MacroTrack.Core.DataModels;
-using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -21,17 +20,17 @@ using System.Windows.Shapes;
 namespace MacroTrack.AppLibrary.Controls
 {
     /// <summary>
-    /// Interaction logic for HistoryControl.xaml
+    /// Interaction logic for WeightViewControl.xaml
     /// </summary>
-    public partial class HistoryControl : ControlBase
+    public partial class WeightViewControl : ControlBase
     {
-        private readonly HistoryVM _vm = new();
+        private readonly WeightViewVM _vm = new();
 
         public static readonly DependencyProperty PeriodProperty = DependencyProperty.Register(
-            nameof(Period), typeof(TimePeriod), typeof(HistoryControl),
+            nameof(Period), typeof(TimePeriod), typeof(WeightViewControl),
             new PropertyMetadata(null, OnPeriodChanged)
         );
-        public TimePeriod? Period
+        public TimePeriod Period
         {
             get => (TimePeriod)GetValue(PeriodProperty);
             set => SetValue(PeriodProperty, value);
@@ -39,15 +38,17 @@ namespace MacroTrack.AppLibrary.Controls
 
         private static void OnPeriodChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var view = (HistoryControl)d;
-            view.Log($"Period Changed, was {e.OldValue}, now {e.NewValue} ({(TimePeriod?)e.NewValue})");
-            view._vm.Period = (TimePeriod?)e.NewValue;
-            view._vm.Populate();            
+            var view = (WeightViewControl)d;
+            view.Log($"Period Changed, was {e.OldValue}, now {e.NewValue} ({(TimePeriod)e.NewValue})");
+            view._vm.Period = (TimePeriod)e.NewValue;
+            view._vm.Populate();
+            view._vm.DrawGraph();
         }
 
-        public HistoryControl()
+        public WeightViewControl()
         {
             InitializeComponent();
+            _vm.Period = Period;
             DataContext = _vm;
         }
 
@@ -59,13 +60,13 @@ namespace MacroTrack.AppLibrary.Controls
 
         protected override void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            base.OnUnloaded(sender, e);
             _vm.OnClose();
+            base.OnUnloaded(sender, e);
         }
 
-        public void Refresh()
+        private void buttonDelete_Click(object sender, RoutedEventArgs e)
         {
-            _vm.Populate();
+            _vm.DeleteSelected();
         }
     }
 }
