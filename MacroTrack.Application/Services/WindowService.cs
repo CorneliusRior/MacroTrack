@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace MacroTrack.AppLibrary.Services
@@ -95,6 +96,7 @@ namespace MacroTrack.AppLibrary.Services
                 WindowType.DiaryEdit => CreateDiaryEditWindow(o, parameter),
                 WindowType.FoodLogEdit => CreateFoodLogEditWindow(o, parameter),
                 WindowType.PreviousPeriod => CreatePreviousPeriodWindow(o, parameter),
+                WindowType.PreviousPeriodSelect => CreatePreviousPeriodSelectWindow(o, parameter),
                 WindowType.TaskView => CreateTaskViewWindow(o),
                 _ => throw new NotSupportedException($"Unknown window type '{type}'")
             };
@@ -161,6 +163,15 @@ namespace MacroTrack.AppLibrary.Services
             if (parameter is TimePeriod timePeriod)
             {
                 return new PreviousPeriodWindow(_services, _appServices, timePeriod) { Owner = owner };
+            }
+            else throw new InvalidOperationException();
+        }
+
+        private Window CreatePreviousPeriodSelectWindow(Window? owner, object? parameter)
+        {
+            if (parameter is ICommand openCommand)
+            {
+                return new PreviousPeriodSelectWindow(_services, _appServices, openCommand) { Owner = owner };
             }
             else throw new InvalidOperationException();
         }

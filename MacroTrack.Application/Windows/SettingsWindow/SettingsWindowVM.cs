@@ -69,6 +69,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
              - Add it to <MTWin:WindowBase.Resources> in SettingsWindow.xaml
              */
             Categories.Add(new GeneralVM(SettingsEditable));
+            Categories.Add(new FileVM(SettingsEditable, Services));
             Categories.Add(new GraphSettingsVM(SettingsEditable));
             Categories.Add(new LoggingVM(SettingsEditable));
             Categories.Add(new FormattingVM(SettingsEditable));

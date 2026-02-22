@@ -62,6 +62,15 @@ namespace MacroTrack.AppLibrary.Windows
             }
         }
 
+        // Cheat Day Button:
+        private bool _isCheatDay;
+        public string DeclareCheatString
+        {
+            get => _isCheatDay ? "Revoke Cheat Day" : "Declare Cheat Day";
+        }
+
+        public bool IsDay;
+
         // Function:
         public PreviousPeriodWindowVM(CoreServices services, AppServices appServices, TimePeriod period)
         {
@@ -69,7 +78,8 @@ namespace MacroTrack.AppLibrary.Windows
             Logger = services.Logger;
             AppServices = appServices;
             _period = period;
-            
+
+            IsDay = period.GetTimeSpan() == TimeSpan.FromDays(1) && period.StartTime.TimeOfDay == TimeSpan.Zero;
             Populate();
         }
 
@@ -78,13 +88,26 @@ namespace MacroTrack.AppLibrary.Windows
             Log($"Populate called for {Period.ToString("yyyy-MM-dd HH:mm")}", LogLevel.Info);
             DateString = Services.SettingsService.TimePeriodToString(Period);
             CurrentSummary = Services.dataService.GetMacroSummary(StartTime, EndTime);
+            _isCheatDay = Services.taskService.GetIsCheatDay(Period.StartTime);
+            OnPropertyChanged(nameof(DeclareCheatString));
+        }
+
+        public void DeclareCheatDay()
+        {
+            Services.taskService.SetCheatDay(Period.StartTime, !_isCheatDay);
+            _isCheatDay = Services.taskService.GetIsCheatDay(Period.StartTime);
+            AppServices.AppEvents.Publish(new SummaryChanged(CurrentSummary!));
+            OnPropertyChanged(nameof(DeclareCheatString));
+            OnPropertyChanged(nameof(StartTime));
+            OnPropertyChanged(nameof(EndTime));
+            Populate();
         }
 
         public void Previous()
         {
             Period = Period.StepBack();
             OnPropertyChanged(nameof(StartTime));
-            OnPropertyChanged(nameof(StartTime));
+            OnPropertyChanged(nameof(EndTime));
             Populate();
         }
 
@@ -92,7 +115,7 @@ namespace MacroTrack.AppLibrary.Windows
         {
             Period = Period.StepForward();
             OnPropertyChanged(nameof(StartTime));
-            OnPropertyChanged(nameof(StartTime));
+            OnPropertyChanged(nameof(EndTime));
             Populate();
         }
 

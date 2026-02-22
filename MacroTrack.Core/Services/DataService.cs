@@ -209,6 +209,7 @@ public class DataService : ServiceBase
         return CalSeries;
     }
 
+
     // Get Goal series:
     public List<GoalSeriesPoint> GetGoalSeries(DateTime startTime, DateTime endTime)
     {

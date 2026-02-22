@@ -73,11 +73,13 @@ namespace MacroTrack.AppLibrary.Graphs
     {
         public SeriesType SeriesType { get; init; }
         public IReadOnlyList<DataPoint>? DataPoints { get; set; }
+        public IReadOnlyList<DataPoint>? ExcludedPoints { get; set; } = null;
         public SeriesColor SeriesColor { get; set; } = SeriesColor.Default;
         public DashStyle SeriesDashStyle { get; set; } = DashStyles.Solid;
         public Brush? StrokeOverride { get; init; }
         public double StrokeThickness { get; init; } = 2.0;
         public bool ShowTrendline { get; init; } = false;
         public bool ShowTrendLineStdDev { get; init; } = false;
+        public bool Enabled { get; set; } = true;
     }
 }

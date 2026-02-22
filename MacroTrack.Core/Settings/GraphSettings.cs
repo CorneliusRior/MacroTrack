@@ -12,12 +12,14 @@ namespace MacroTrack.Core.Settings
     public sealed class GraphSettings
     {
         public double LineTrendLineThickness { get; set; } = 1;
+        public bool LineDiscreteOffsetToMid { get; set; } = true;
 
         public GraphSettings Clone()
         {
             return new GraphSettings
             {
-                LineTrendLineThickness = this.LineTrendLineThickness
+                LineTrendLineThickness = this.LineTrendLineThickness,
+                LineDiscreteOffsetToMid = this.LineDiscreteOffsetToMid
             };
         }
     }

@@ -23,6 +23,30 @@ public class TaskService : ServiceBase
         _repo = repo;
     }
 
+    // Cheat Days:
+    public void SetCheatDay(DateTime date, bool isCheatDay)
+    {
+        _repo.SetCheatDay(date, isCheatDay);
+    }
+
+    public bool GetIsCheatDay(DateTime date)
+    {
+        return _repo.GetIsCheatDay(date);
+    }
+
+    public List<DateTime> GetCheatDayRange(DateTime startTime, DateTime endTime)
+    {
+        return _repo.GetCheatDayRange(startTime, endTime);
+    }
+
+    public List<(DateTime date, double value)> GetCheatDayTupleRange(DateTime startTime, DateTime endTime)
+    {
+        List<(DateTime date, double value)> returnList = new();
+        List<DateTime> range = _repo.GetCheatDayRange(startTime, endTime);
+        foreach (var t in range) returnList.Add((t, 1));
+        return returnList;
+    }
+
     // Add
     public DailyTask AddTask(string name, string? description = null)
     {

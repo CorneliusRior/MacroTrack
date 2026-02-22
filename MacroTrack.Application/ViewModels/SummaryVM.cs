@@ -198,6 +198,7 @@ namespace MacroTrack.AppLibrary.ViewModels
                 GraphSettings = Services!.SettingsService.Settings.GraphSettings;
                 DrawGraph();
             });
+            AppServices.AppEvents.Subscribe<SummaryChanged>(_ => DrawGraph());
             GraphSettings = Services!.SettingsService.Settings.GraphSettings;                        
             Populate();
             DrawGraph();
@@ -230,6 +231,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         public void DrawGraph()
         {
             if (Services == null) throw new Exception("Null Services");
+            bool excludeCheatDays = true; // make this a Settings Property
             // Get data:
             if (PreviousPeriod is not null)
             {
@@ -244,19 +246,29 @@ namespace MacroTrack.AppLibrary.ViewModels
             
             List<(DateTime date, double value)> actualCalList = Services.foodLogService.DailySumRange("Calories", GraphStartTime.AddDays(-1), GraphEndTime.AddDays(1));
             List<(DateTime date, double value)> goalCalList = Services.goalService.GetTupleGoalHistory(GraphStartTime.AddDays(-1), GraphEndTime.AddDays(1), true);
+            List<(DateTime date, double value)> cheatDays = Services.taskService.GetCheatDayTupleRange(GraphStartTime.AddDays(-1), GraphEndTime.AddDays(1));
+            // When you get back apply cheat by adding "excluded dates" to PlotSeries.
 
             // Generate PlotSeries:
             PlotSeries ActualSeries = new()
             {
                 SeriesType = SeriesType.LineDiscreteDaily,
                 DataPoints = TupleToDataPoints(actualCalList),
-                SeriesColor = SeriesColor.LineSeriesBrush1
+                SeriesColor = SeriesColor.LineSeriesBrush1,
+                ExcludedPoints = excludeCheatDays ? TupleToDataPoints(cheatDays) : null
             };
             PlotSeries GoalSeries = new()
             {
                 SeriesType = SeriesType.StepLine,
                 DataPoints = TupleToDataPoints(goalCalList),
                 SeriesColor = SeriesColor.LineSeriesBrush2
+            };
+            PlotSeries CheatSeries = new()
+            {
+                SeriesType = SeriesType.DaysBinary,
+                DataPoints = TupleToDataPoints(cheatDays),
+                SeriesColor = SeriesColor.DayBinarySeriesBrush1,
+                Enabled = excludeCheatDays
             };
 
             // Make Highlight in case it is needed:
@@ -273,7 +285,8 @@ namespace MacroTrack.AppLibrary.ViewModels
                 IReadOnlyList<PlotSeries> seriesSet = new List<PlotSeries>
                 {
                     ActualSeries,
-                    GoalSeries
+                    GoalSeries,
+                    CheatSeries
                 };
                 GraphSeriesSet = seriesSet;
             }
@@ -283,7 +296,8 @@ namespace MacroTrack.AppLibrary.ViewModels
                 {
                     CurrentPeriodHighlight,
                     ActualSeries,
-                    GoalSeries
+                    GoalSeries,
+                    CheatSeries
                 };
                 GraphSeriesSet = seriesSet;
             }

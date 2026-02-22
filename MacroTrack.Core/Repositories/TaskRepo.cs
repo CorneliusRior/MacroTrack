@@ -64,6 +64,49 @@ public class TaskRepo : RepoBase
         cmd3.ExecuteNonQuery();
     }
 
+    // Cheat Day:
+    public void SetCheatDay(DateTime date, bool isCheatDay)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        string sql = @"
+            INSERT INTO TaskLog (LogDate, Cheat) 
+            VALUES ($logDate, $cheat)
+            ON CONFLICT(LogDate)
+            DO UPDATE SET Cheat = excluded.Cheat
+        ";
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue("$logDate", date.ToString("yyyy-MM-dd"));
+        cmd.Parameters.AddWithValue("$cheat", isCheatDay? 1 : 0);
+        cmd.ExecuteNonQuery();
+    }
+
+    public bool GetIsCheatDay(DateTime date)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        string sql = "SELECT Cheat FROM TaskLog WHERE LogDate = $logDate";
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue("$logDate", date.ToString("yyyy-MM-dd"));
+        using var reader = cmd.ExecuteReader();
+        if (!reader.Read()) return false;
+        return reader.GetInt32(0) == 1 ? true : false;
+    }
+
+    public List<DateTime> GetCheatDayRange(DateTime startTime, DateTime endTime)
+    {
+        List<DateTime> cheatList = new();
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        string sql = "SELECT LogDate FROM TaskLog WHERE LogDate >= $startTime AND LogDate <= $endTime AND Cheat = 1 ORDER BY LogDate";
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue("$startTime", startTime.ToString("yyyy-MM-dd"));
+        cmd.Parameters.AddWithValue("$endTime", endTime.ToString("yyyy-MM-dd"));
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read()) cheatList.Add(DateTime.Parse(reader.GetString(0)));
+        return cheatList;
+    }
+
     // New
     public void AddTask(DailyTask entry)
     {

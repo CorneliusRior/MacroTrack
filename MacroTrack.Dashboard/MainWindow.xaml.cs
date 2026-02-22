@@ -59,14 +59,6 @@ namespace MacroTrack.Dashboard
 
 
             _vm.RequestPrint += text => Print(text);
-            /*
-            _vm.RequestOpenSettings += () =>
-            {
-                var w = new SettingsWindow(Services, AppServices) { Owner = this };
-                w.Show();
-            };
-            //_vm.RequestRefreshAll += RefreshAll;
-            */
 
             Log("Main window opened.", LogLevel.Info);
             WireUpControls();            
@@ -181,6 +173,12 @@ namespace MacroTrack.Dashboard
         {
             Log();
             Logger.OpenLogDir();
+        }
+
+        private void BannerButtonCheatDay_Click(object sender, RoutedEventArgs e)
+        {
+            Log();
+            _vm?.DeclareCheatDayToday();
         }
     }
 }

@@ -24,11 +24,11 @@ namespace MacroTrack.AppLibrary.Windows
     public partial class PreviousPeriodWindow : WindowBase
     {
         private readonly PreviousPeriodWindowVM _vm;
-        public TimePeriod Timep { get; set; }
+        public TimePeriod Period { get; set; }
         public PreviousPeriodWindow(CoreServices services, AppServices appServices, TimePeriod timePeriod) : base(services, appServices)
         {
             InitializeComponent();
-            Timep = timePeriod;
+            Period = timePeriod;
             _vm = new PreviousPeriodWindowVM(services, appServices, timePeriod);
             DataContext = _vm;
             WireUpControls();
@@ -63,6 +63,11 @@ namespace MacroTrack.AppLibrary.Windows
         {
             if (e.Key == Key.Left) { _vm.Previous(); e.Handled = true; }
             if (e.Key == Key.Right) { _vm.Next(); e.Handled = true; }
+        }
+
+        private void buttonCheatDay_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.DeclareCheatDay();
         }
     }
 }

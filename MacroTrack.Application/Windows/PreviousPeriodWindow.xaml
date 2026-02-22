@@ -11,6 +11,9 @@
                   
                   KeyDown="WindowBase_KeyDown"
                   Background="{DynamicResource AppBackGroundBrush}">
+    <local:WindowBase.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </local:WindowBase.Resources>
     
     <!--Banner Separator-->
     <Grid>
@@ -29,6 +32,8 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Button x:Name="buttonPrevious"
@@ -41,12 +46,16 @@
                            Style="{DynamicResource TextBlock.MidTitle}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Grid.Column="1"/>
-
+                           Grid.Column="2"/>
+                <Button x:Name="buttonCheatDay"
+                        Content="{Binding DeclareCheatString}"
+                        Visibility="{Binding IsDay, Converter={StaticResource BoolToVis}}"
+                        Click="buttonCheatDay_Click"
+                        Grid.Column="3"/>
                 <Button x:Name="buttonNext"
                         Content="Next"
                         Click="buttonNext_Click"
-                        Grid.Column="2"/>
+                        Grid.Column="4"/>
             </Grid>
         </Border>
         

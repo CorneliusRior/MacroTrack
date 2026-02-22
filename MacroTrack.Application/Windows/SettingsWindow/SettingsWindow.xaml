@@ -14,6 +14,9 @@
         <DataTemplate DataType="{x:Type cat:GeneralVM}">
             <cat:General/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type cat:FileVM}">
+            <cat:File/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type cat:GraphSettingsVM}">
             <cat:GraphSettings/>
         </DataTemplate>

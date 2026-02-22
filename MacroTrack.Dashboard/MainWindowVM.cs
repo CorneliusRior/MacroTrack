@@ -32,14 +32,7 @@ namespace MacroTrack.Dashboard
 
         public ICommand PrintCommand { get; }
         public event Action<string>? RequestPrint;
-
-        public ICommand OpenSettingsCommand { get; }
-        public event Action? RequestOpenSettings;
-
-        // Get rid of these once events are implemented:
-        //public ICommand RefreshSummaryCommand { get; }
-
-        //public Action? RequestRefreshAll;
+        public ICommand OpenPreviousPeriodCommand { get; }
 
         // Event Subscriptions:
         private List<IDisposable> _subscriptions = new List<IDisposable>();
@@ -136,7 +129,13 @@ namespace MacroTrack.Dashboard
             }
         }
 
-        //private bool _updatingClock = false;
+        // Cheat Day Button String:
+
+        private bool _isCheatDay;
+        public string DeclareCheatString
+        {
+            get => _isCheatDay ? "Revoke Cheat Day" : "Declare Cheat Day";
+        }
 
         private readonly DispatcherTimer _clockTimer;
 
@@ -152,8 +151,7 @@ namespace MacroTrack.Dashboard
             // Commands (some might be redundant)
             //RefreshSummaryCommand = new RelayCommand(RefreshSummary);
             PrintCommand = new RelayCommand(() => RequestPrint?.Invoke(""));
-            OpenSettingsCommand = new RelayCommand(() => RequestOpenSettings?.Invoke());
-
+            OpenPreviousPeriodCommand = new RelayCommand<TimePeriod>(OpenPreviousPeriod);
 
             // Event Subscriptions:
             IDisposable _subSettingsChanged = AppServices.AppEvents.Subscribe<SettingsChanged>(_ =>
@@ -166,6 +164,10 @@ namespace MacroTrack.Dashboard
             IDisposable _foodLogChanged = AppServices.AppEvents.Subscribe<FoodLogChanged>(_ =>
             {
                 RefreshSummary();
+            });
+            IDisposable _subPreviousPeriodRequested = AppServices.AppEvents.Subscribe<PreviousPeriodRequested>(msg =>
+            {
+                OpenPreviousPeriod(msg.period);
             });
 
             // Clock logic:      
@@ -184,6 +186,7 @@ namespace MacroTrack.Dashboard
             _clockTimer.Start();
 
             SetHistoryString();
+            _isCheatDay = Services.taskService.GetIsCheatDay(DateTime.Today);
         }
 
         public void OnClose()
@@ -288,15 +291,22 @@ namespace MacroTrack.Dashboard
             AppServices.AppEvents.Publish(new SummaryChanged(CurrentSummary));
         }
 
+        public void OpenPreviousPeriod(TimePeriod? period)
+        {
+            if (period is null) period = new TimePeriod(DateTime.Today, DateTime.Today.AddDays(1));
+            AppServices.WindowService.Show(WindowType.PreviousPeriod, period);
+        }
+
         // Button functionality / Windows
         public void OpenPreviousPeriodYesterday()
         {
-            AppServices?.WindowService.Show(WindowType.PreviousPeriod, new TimePeriod(DateTime.Today.AddDays(-1), DateTime.Today));
+            //AppServices?.WindowService.Show(WindowType.PreviousPeriod, new TimePeriod(DateTime.Today.AddDays(-1), DateTime.Today));
+            OpenPreviousPeriod(new TimePeriod(DateTime.Today.AddDays(-1), DateTime.Today));
         }
 
         public void OpenPreviousPeriodSelect()
         {
-
+            AppServices.WindowService.Show(WindowType.PreviousPeriodSelect, OpenPreviousPeriodCommand);
         }
 
         public void OpenGoalSet()
@@ -307,6 +317,14 @@ namespace MacroTrack.Dashboard
         public void OpenGoalNew()
         {
             
+        }
+
+        public void DeclareCheatDayToday()
+        {
+            Services.taskService.SetCheatDay(DateTime.Today, !_isCheatDay);
+            _isCheatDay = !_isCheatDay;
+            RefreshSummary();
+            OnPropertyChanged(nameof(DeclareCheatString));
         }
 
         public void OpenSettings()

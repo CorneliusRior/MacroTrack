@@ -123,7 +123,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
             ClearError(propName);
             return true;
-
         }
     }
 }

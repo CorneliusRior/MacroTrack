@@ -113,7 +113,8 @@ namespace MacroTrack.AppLibrary.Graphs
 
             // Foreach DrawSeries
             foreach (var s in ss)
-            {                
+            {
+                if (!s.Enabled) continue;
                 if (s.SeriesType == SeriesType.LineContinuous) DrawLineSeries(dc, dataPlot, s, minX, maxX, minY, maxY);
                 if (s.SeriesType == SeriesType.LineDiscreteDaily) DrawLineDiscreteDailySeries(dc, dataPlot, s, minX, maxX, minY, maxY);
                 if (s.SeriesType == SeriesType.StepLine) DrawStepLineSeries(dc, dataPlot, s, minX, maxX, minY, maxY);
@@ -290,6 +291,8 @@ namespace MacroTrack.AppLibrary.Graphs
 
         private void DrawLineSeries(DrawingContext dc, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
         {
+            HashSet<DateTime> exclusionHash = new();
+            if (s.ExcludedPoints != null && s.ExcludedPoints.Count > 0) exclusionHash = GetExclusionHash(s.ExcludedPoints);
             if (s.ShowTrendline) DrawTrendLine(dc, dataPlot, s, minX, maxX, minY, maxY);
             Brush Stroke = GetSeriesStroke(s);
             var pts = s.DataPoints;
@@ -301,12 +304,12 @@ namespace MacroTrack.AppLibrary.Graphs
             using (var ctx = geo.Open())
             {
                 ctx.BeginFigure(MapPoint(pts[0], dataPlot, minX, maxX, minY, maxY), false, false);
-                for (int i = 1; i < pts.Count; i++) ctx.LineTo(MapPoint(pts[i], dataPlot, minX, maxX, minY, maxY), true, false);
+                for (int i = 1; i < pts.Count; i++) if (!exclusionHash.Contains(pts[i].Time.Date)) ctx.LineTo(MapPoint(pts[i], dataPlot, minX, maxX, minY, maxY), true, false); 
             }
             if (geo.CanFreeze) geo.Freeze();
             dc.DrawGeometry(null, pen, geo);
         }
-        
+
         private void DrawLineDiscreteDailySeries(DrawingContext dc, Rect dataPlot, PlotSeries s, DateTime minX, DateTime maxX, double minY, double maxY)
         {
             // FIx up data:
@@ -314,15 +317,18 @@ namespace MacroTrack.AppLibrary.Graphs
             DateTime endDate = maxX;
             var lookUp = s.DataPoints?.ToDictionary(p => p.Time.Date) ?? new Dictionary<DateTime, DataPoint>();
             List<DataPoint> pts = new();
+            HashSet<DateTime> exclusionHash = new();
+            if (s.ExcludedPoints != null && s.ExcludedPoints.Count > 0) exclusionHash = GetExclusionHash(s.ExcludedPoints);
 
             // Draw day before if present and that option is on, then define the data.
             if (DrawOneDayBefore) if (lookUp.TryGetValue(startDate.AddDays(-1), out var dp)) pts.Add(dp);
             for (DateTime i = startDate; i < endDate; i = i.AddDays(1))
             {
+                if (exclusionHash.Contains(i)) continue;
                 if (lookUp.TryGetValue(i, out var dp)) pts.Add(dp);
                 else pts.Add(new DataPoint { Time = i, Value = 0 });
             }
-
+            
             if (s.ShowTrendline) DrawTrendLine(dc, dataPlot, s, minX, maxX, minY, maxY);
 
             // Draw the series (copy of DrawLineSeries really):
@@ -331,10 +337,11 @@ namespace MacroTrack.AppLibrary.Graphs
             pen.DashStyle = s.SeriesDashStyle;
             if (pen.CanFreeze) pen.Freeze();
             var geo = new StreamGeometry();
+            TimeSpan? nudge = Settings.LineDiscreteOffsetToMid ? TimeSpan.FromHours(12) : null;
             using (var ctx = geo.Open())
             {
-                ctx.BeginFigure(MapPoint(pts[0], dataPlot, minX, maxX, minY, maxY), false, false);
-                for (int i = 1; i < pts.Count; i++) ctx.LineTo(MapPoint(pts[i], dataPlot, minX, maxX, minY, maxY), true, false);
+                ctx.BeginFigure(MapPoint(pts[0], dataPlot, minX, maxX, minY, maxY, nudge), false, false);
+                for (int i = 1; i < pts.Count; i++) ctx.LineTo(MapPoint(pts[i], dataPlot, minX, maxX, minY, maxY, nudge), true, false);
             }
             if (geo.CanFreeze) geo.Freeze();
             dc.DrawGeometry(null, pen, geo);
@@ -527,9 +534,9 @@ namespace MacroTrack.AppLibrary.Graphs
             return brush;
         }
 
-        private static Point MapPoint(DataPoint p, Rect dataPlot, DateTime minX, DateTime maxX, double minY, double maxY)
+        private static Point MapPoint(DataPoint p, Rect dataPlot, DateTime minX, DateTime maxX, double minY, double maxY, TimeSpan? nudgeX = null, double? nudgeY = null)
         {
-            return new Point(MapX(p.Time, dataPlot, minX, maxX), MapY(p.Value, dataPlot, minY, maxY));
+            return new Point(MapX(p.Time, dataPlot, minX, maxX, nudgeX), MapY(p.Value, dataPlot, minY, maxY, nudgeY));
         }
 
         private static Point MapPointFromElements(DateTime x, double y, Rect dataPlot, DateTime minX, DateTime maxX, double minY, double maxY)
@@ -537,18 +544,20 @@ namespace MacroTrack.AppLibrary.Graphs
             return new Point(MapX(x, dataPlot, minX, maxX), MapY(y, dataPlot, minY, maxY));
         }
 
-        private static double MapX(DateTime x, Rect dataPlot, DateTime minX, DateTime maxX)
+        private static double MapX(DateTime x, Rect dataPlot, DateTime minX, DateTime maxX, TimeSpan? nudgeX = null)
         {
             double total = (maxX - minX).TotalSeconds;
             if (total <= 0) return dataPlot.Left;
+            if (nudgeX is not null) x += nudgeX.Value;
             double t = (x - minX).TotalSeconds / total;
             return dataPlot.Left + t * dataPlot.Width;
         }
 
-        private static double MapY(double y, Rect dataPlot, double minY, double maxY)
+        private static double MapY(double y, Rect dataPlot, double minY, double maxY, double? nudgeY = null)
         {
             double total = (maxY - minY);
             if (total == 0) return dataPlot.Bottom;
+            if (nudgeY is not null) y += nudgeY.Value;
             double t = (y - minY) / total;
             return dataPlot.Bottom - t * dataPlot.Height;
         }
@@ -571,6 +580,17 @@ namespace MacroTrack.AppLibrary.Graphs
         {
             if (s.StrokeOverride is not null) return s.StrokeOverride;
             return (TryFindResource(s.SeriesColor.GetKey()) as Brush) ?? ErrorBrush;
+        }
+
+        private HashSet<DateTime> GetExclusionHash(IReadOnlyList<DataPoint> excludedPoints)
+        {
+            HashSet<DateTime> exclusionHash = new();
+            foreach (DataPoint p in excludedPoints)
+            {
+                exclusionHash.Add(p.Time);
+            }
+            return exclusionHash;
+            
         }
     }    
 }

@@ -14,9 +14,14 @@
             <StackPanel Orientation="Vertical"
                         Margin="10">
                 <Expander Header="Line Graph" IsExpanded="True">
-                    <c:LabelledNumericInput LabelText="Trend line thickness"
-                        Value="{Binding SettingsEditable.GraphSettings.LineTrendLineThickness, Mode=TwoWay}"
-                        Min="0"/>
+                    <StackPanel Orientation="Vertical">
+                        <c:LabelledNumericInput LabelText="Trend line thickness"
+                                                Value="{Binding SettingsEditable.GraphSettings.LineTrendLineThickness, Mode=TwoWay}"
+                                                Min="0"/>
+                        <CheckBox Content="Offset Discrete line to mid-region (midday)"
+                                  IsChecked="{Binding SettingsEditable.GraphSettings.LineDiscreteOffsetToMid, Mode=TwoWay}"/>
+                    </StackPanel>
+                    
                 </Expander>
 
                 <Expander Header="Donut Graph" IsExpanded="True">

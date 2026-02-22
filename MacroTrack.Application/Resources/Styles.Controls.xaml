@@ -11,6 +11,12 @@
         <Setter Property="FontFamily" Value="{DynamicResource UIFont}"/>
         <Setter Property="FontSize" Value="{DynamicResource UINormalSize}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Opacity" Value="1"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
     
     <!--Title (what you get in windows, UI)-->
@@ -106,6 +112,10 @@
 
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ButtonPressedBrush}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.56"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

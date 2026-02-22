@@ -71,12 +71,9 @@
                         <Button Content="Settings"
                                 Name="ButtonBannerSettings"
                                 Click="ButtonBannerSettings_Click"/>
-                        <Button Content="Open Log"
-                                Name="ButtonBannerOpenLog"
-                                Click="ButtonBannerOpenLog_Click"/>
-                        <Button Content="Open Log Directory"
-                                Name="ButtonBannerLogDirectory"
-                                Click="ButtonBannerLogDirectory_Click"/>
+                        <Button Content="{Binding DeclareCheatString}"                                
+                                Name="BannerButtonCheatDay"
+                                Click="BannerButtonCheatDay_Click"/>
 
                     </StackPanel>
 

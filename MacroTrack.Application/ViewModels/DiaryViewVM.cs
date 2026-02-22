@@ -2,6 +2,7 @@
 using MacroTrack.AppLibrary.Models;
 using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.DataModels;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using Microsoft.VisualBasic;
@@ -159,7 +160,14 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public void ViewDay(DiaryEntry? entry)
         {
-            MessageBox.Show("Not yet implemented :)");
+            if (AppServices == null) throw new Exception();
+            if (entry == null)
+            {
+                Log("Attempted to retrieve entry, but entry was null.", LogLevel.Warning);
+                MessageBox.Show($"Error: Null entry. Was probably deleted without updating DiaryView. Please use PreviousPeriods to view day.", "Null Entry", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            AppServices.AppEvents.Publish(new PreviousPeriodRequested(new TimePeriod(entry.Time.Date, TimeSpan.FromDays(1))));
         }
 
         public void EditEntry(DiaryEntry? entry)
@@ -169,8 +177,30 @@ namespace MacroTrack.AppLibrary.ViewModels
         }
 
         public void DeleteEntry(DiaryEntry? entry) 
-        { 
-            MessageBox.Show("Not yet implemented :)"); 
+        {
+            if (Services == null) throw new Exception("Null Services");
+            if (entry == null)
+            {
+                Log("Attempted to delete entry, but entry was null.", LogLevel.Warning);
+                MessageBox.Show($"Error: Null entry. Was probably deleted without updating DiaryView, refreshing.", "Null Entry", MessageBoxButton.OK, MessageBoxImage.Error);
+                Populate();
+                return;
+            }
+            MessageBoxResult response = MessageBox.Show($"Delete diary entry #{entry.Id} ({entry.Time.ToString(TimeFormat)})?\n\nThis cannot be undone.", "Delete Diary Entry", MessageBoxButton.YesNo);
+            if (response == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    DiaryEntry deleted = Services.diaryService.DeleteEntry(entry.Id);
+                    Log($"Deleted diary entry #{entry.Id}, populating.", LogLevel.Info);
+                    Populate();
+                }
+                catch (Exception ex)
+                {
+                    Log("Error deleting entry.", LogLevel.Warning, ex);
+                    MessageBox.Show($"Error deleting entry, returning:\n\n{ex.Message}", "Error Deleting Entry", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
         }
     }
 }
