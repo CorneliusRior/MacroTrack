@@ -38,7 +38,9 @@ namespace MacroTrack.AppLibrary.Services
         private static readonly HashSet<WindowType> _singleInstanceTypes = new()
         {
             WindowType.Settings,
-            WindowType.AddPreset
+            WindowType.AddPreset,
+            WindowType.GoalNew,
+            WindowType.GoalSet
         };
 
         public WindowService(CoreServices services, AppServices appServices)
@@ -95,6 +97,8 @@ namespace MacroTrack.AppLibrary.Services
                 WindowType.DiaryView => CreateDiaryViewWindow(o),
                 WindowType.DiaryEdit => CreateDiaryEditWindow(o, parameter),
                 WindowType.FoodLogEdit => CreateFoodLogEditWindow(o, parameter),
+                WindowType.GoalNew => CreateGoalNewWindow(o),
+                WindowType.GoalSet => CreateGoalSetWindow(o),
                 WindowType.PreviousPeriod => CreatePreviousPeriodWindow(o, parameter),
                 WindowType.PreviousPeriodSelect => CreatePreviousPeriodSelectWindow(o, parameter),
                 WindowType.TaskView => CreateTaskViewWindow(o),
@@ -156,6 +160,16 @@ namespace MacroTrack.AppLibrary.Services
                 return new FoodLogEditWindow(_services, _appServices, entry) { Owner = owner };
             }
             else throw new InvalidOperationException();
+        }
+
+        private Window CreateGoalNewWindow(Window? owner)
+        {
+            return new GoalNewWindow(_services, _appServices);
+        }
+
+        private Window CreateGoalSetWindow(Window? owner)
+        {
+            return new GoalSetWindow(_services, _appServices);
         }
 
         private Window CreatePreviousPeriodWindow(Window? owner, object? parameter)

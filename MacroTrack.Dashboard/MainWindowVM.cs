@@ -311,12 +311,12 @@ namespace MacroTrack.Dashboard
 
         public void OpenGoalSet()
         {
-
+            AppServices.WindowService.Show(WindowType.GoalSet);
         }
 
         public void OpenGoalNew()
         {
-            
+            AppServices.WindowService.Show(WindowType.GoalNew);
         }
 
         public void DeclareCheatDayToday()

@@ -1,0 +1,30 @@
+﻿<local:ControlBase x:Class="MacroTrack.AppLibrary.Controls.GoalNewControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Border Background="{DynamicResource PanelBackGroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TextBlock Text="Add New Goal" Style="{DynamicResource TextBlock.MidTitle}"/>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <!--Main content-->
+            </Grid>
+
+            <StackPanel Style="{DynamicResource StackPanel.Footer}" Grid.Row="2">
+                <Button x:Name="Cancel" Content="Cancel" Command="{Binding CancelCommand}"/>
+                <Button x:Name="Add" Content="Add" Command="{Binding AddCommand}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</local:ControlBase>
