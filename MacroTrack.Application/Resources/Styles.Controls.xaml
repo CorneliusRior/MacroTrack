@@ -440,5 +440,11 @@
         <Setter Property="GridVerticalWeekly" Value="True"/>
         <Setter Property="PlotMargin" Value="20, 8, 8, 16"/>
     </Style>
+    
+    <!--DataGrids-->
+    <Style TargetType="DataGrid">
+        <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+    </Style>
 
 </ResourceDictionary>

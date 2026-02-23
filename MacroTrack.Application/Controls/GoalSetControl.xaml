@@ -4,6 +4,7 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                    xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+                   xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs"
                    mc:Ignorable="d" 
                    d:DesignHeight="450" d:DesignWidth="800">
     <Border Background="{DynamicResource PanelBackGroundBrush}">
@@ -20,6 +21,96 @@
 
             <Grid Grid.Row="1">
                 <!--Main body here.-->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Margin="5" Grid.Column="0">
+                    <StackPanel Orientation="Vertical" DataContext="{Binding SelectedGoal}">
+                        <!--Summary of selected:-->
+                        <TextBlock Text="{Binding GoalName}" Style="{DynamicResource TextBlock.SmallTitle}"/>
+                        <graphs:MTDonut x:Name="donutSelected"/>
+                        <TextBlock Text="{Binding Id}" Style="{DynamicResource TextBlock.SingleLine}"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!--Defined by column:-->
+                            <!--Column 0:-->
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="0" Text=""/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="0" Text="Calories:"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="0" Text="Protein:"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="0" Text="Carbs:"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="0" Text="Fat:"/>
+
+                            <!--Column 1:-->
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="1" Text="g:" HorizontalAlignment="Right"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="1" Text="{Binding Calories}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="1" Text="{Binding Protein}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="1" Text="{Binding Carbs}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="1" Text="{Binding Fat}"/>
+                            
+                            <!--Column 2:-->
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="2" Text="%:" HorizontalAlignment="Right"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="2" Text=""/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="2" Text=""/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="2" Text=""/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="2" Text=""/>
+                            
+                            <!--Column 3:-->
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="3" Text="Min:" HorizontalAlignment="Right"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="3" Text="{Binding MinCal}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="3" Text="{Binding MinPro}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="3" Text="{Binding MinCar}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="3" Text="{Binding MinFat}"/>
+
+                            <!--Column 3:-->
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="4" Text="Max:" HorizontalAlignment="Right"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="4" Text="{Binding MaxCal}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="4" Text="{Binding MaxPro}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="4" Text="{Binding MaxCar}"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="4" Text="{Binding MaxFat}"/>
+                        </Grid>
+                        <TextBlock Style="{DynamicResource TextBlock.Base}" Text="{Binding Notes}"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <GridSplitter Grid.Column="1"/>
+
+                <DataGrid Template="{DynamicResource MTDataGrid}" ItemsSource="{Binding GoalList}" 
+                          SelectedItem="{Binding SelectedGoal}" 
+                          IsReadOnly="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          AutoGenerateColumns="False" 
+                          Grid.Column="2">
+                    
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" SortMemberPath="Id"/>
+                        <DataGridTextColumn Header="Name" Binding="{Binding GoalName}" SortMemberPath="GoalName"/>
+                        <DataGridTextColumn Header="Type"/>
+                        <DataGridTextColumn Header="Calories" Binding="{Binding Calories}" SortMemberPath="Calories"/>
+                        <DataGridTextColumn Header="Protein" Binding="{Binding Protein}" SortMemberPath="Protein"/>
+                        <DataGridTextColumn Header="Carbs" Binding="{Binding Carbs}" SortMemberPath="Carbs"/>
+                        <DataGridTextColumn Header="Fat" Binding="{Binding Fat}" SortMemberPath="Fat"/>
+                        <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" SortMemberPath="Notes"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
             </Grid>
             
             <StackPanel Style="{DynamicResource StackPanel.Footer}" Grid.Row="2">
