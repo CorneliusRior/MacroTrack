@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace MacroTrack.AppLibrary.ViewModels
@@ -27,6 +28,56 @@ namespace MacroTrack.AppLibrary.ViewModels
                 if (_selectedGoal == value) return;
                 _selectedGoal = value;
                 OnPropertyChanged();
+                CalculatePct();
+            }
+        }
+
+        private DateTime _date;
+        private DateTime Date
+        {
+            get => _date;
+            set
+            {
+                if (_date == value) return;
+                _date = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Percentage strings:
+        private string _proPct = "(-%)";
+        public string ProPct
+        {
+            get => _proPct;
+            set
+            {
+                if (_proPct == value) return;
+                _proPct = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _carPct = "(-%)";
+        public string CarPct
+        {
+            get => _carPct;
+            set
+            {
+                if (_carPct == value) return;
+                _carPct = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _fatPct = "(-%)";
+        public string FatPct
+        {
+            get => _fatPct;
+            set
+            {
+                if (_fatPct == value) return;
+                _fatPct = value;
+                OnPropertyChanged();
             }
         }
 
@@ -40,6 +91,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             CloseCommand = new RelayCommand(() => RequestClose?.Invoke(false));
             DeleteCommand = new RelayCommand(() => Delete());
             SetCommand = new RelayCommand(() => Set());
+            Date = DateTime.Today;
         }
 
         public override void Init(CoreServices services, AppServices appServices)
@@ -58,6 +110,31 @@ namespace MacroTrack.AppLibrary.ViewModels
             
         }
 
+        public void CalculatePct()
+        {
+            if (Services == null) throw new Exception("Null Services");
+            if (_selectedGoal is null)
+            {
+                ProPct = "(-%)";
+                // ...
+                return;
+            }
+            if (Services.SettingsService.Settings.GoalPctOfCalories)
+            {
+                double cal = _selectedGoal.Calories;
+                ProPct = $"({(_selectedGoal.Protein * 400 / cal).ToString("0.#")}%)";
+                CarPct = $"({(_selectedGoal.Carbs * 400 / cal).ToString("0.#")}%)";
+                FatPct = $"({(_selectedGoal.Fat * 900 / cal).ToString("0.#")}%)";
+            }
+            else
+            {
+                double total = _selectedGoal.Protein + _selectedGoal.Carbs + _selectedGoal.Fat;
+                ProPct = $"({(_selectedGoal.Protein / total).ToString("0.#")}%)";
+                CarPct = $"({(_selectedGoal.Carbs/ total).ToString("0.#")}%)";
+                FatPct = $"({(_selectedGoal.Fat / total).ToString("0.#")}%)";
+            }
+        }
+
         private void Delete()
         {
             
@@ -65,7 +142,13 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         private void Set()
         {
-            
+            // If nothing is selected, do nothing:
+            if (_selectedGoal is null) return;
+            if (Services == null) throw new Exception("Null Services");
+            if (AppServices == null) throw new Exception("Null AppServices");
+            Services.goalService.ActivateGoal(_selectedGoal.Id, DateOnly.FromDateTime(Date));
+            AppServices.AppEvents.Publish(new GoalChanged());
+            RequestClose?.Invoke(true);
         }
     }
 }

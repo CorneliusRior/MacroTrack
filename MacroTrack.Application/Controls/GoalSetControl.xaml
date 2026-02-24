@@ -28,11 +28,32 @@
                 </Grid.ColumnDefinitions>
 
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Margin="5" Grid.Column="0">
-                    <StackPanel Orientation="Vertical" DataContext="{Binding SelectedGoal}">
+                    <StackPanel Orientation="Vertical">
                         <!--Summary of selected:-->
-                        <TextBlock Text="{Binding GoalName}" Style="{DynamicResource TextBlock.SmallTitle}"/>
-                        <graphs:MTDonut x:Name="donutSelected"/>
-                        <TextBlock Text="{Binding Id}" Style="{DynamicResource TextBlock.SingleLine}"/>
+                        <TextBlock Text="{Binding SelectedGoal.GoalName, FallbackValue='[No Goal Selected]'}" Style="{DynamicResource TextBlock.SmallTitle}"/>
+                        <Grid x:Name="donutHost">
+                            <Border x:Name="borderDonut" 
+                                    BorderBrush="{DynamicResource BorderBrush}" 
+                                    BorderThickness="{DynamicResource BorderThickness}" 
+                                    MaxWidth="225"
+                                    MaxHeight="225"
+                                    HorizontalAlignment="Left"
+                                    Height="{Binding ActualWidth, ElementName=donutHost}"    
+                                    Width="{Binding ActualHeight, ElementName=donutHost}"
+                                    Margin="5">
+                                <graphs:MTDonut x:Name="donutSelected"
+                                    Summary="{Binding CurrentSummary}"
+                                    Style="{DynamicResource MTDonutBase}"
+                                    TotalType="Target"/>
+                            </Border>
+                        </Grid>
+                        
+
+
+                            <WrapPanel Orientation="Horizontal">
+                            <Label Content="{Binding SelectedGoal.Id, FallbackValue='-'}" Style="{DynamicResource Label.SmallTitle}" ContentStringFormat="#{0}:"/>
+                            <Label Content="{Binding SelectedGoal.Calories, FallbackValue='-'}" Style="{DynamicResource Label.SmallTitle}" ContentStringFormat="{}{0:N0} Kcal"/>
+                        </WrapPanel>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
@@ -58,40 +79,40 @@
                             <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="0" Text="Fat:"/>
 
                             <!--Column 1:-->
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="1" Text="g:" HorizontalAlignment="Right"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="1" Text="{Binding Calories}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="1" Text="{Binding Protein}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="1" Text="{Binding Carbs}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="1" Text="{Binding Fat}"/>
+                            <Label Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Content="Target:"/>
+                            <Label Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" ContentStringFormat="{}{0:N0} Kcal" Content="{Binding SelectedGoal.Calories, FallbackValue='-'}"/>
+                            <Label Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"    Content="{Binding SelectedGoal.Protein, FallbackValue='-'}"/>
+                            <Label Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"    Content="{Binding SelectedGoal.Carbs, FallbackValue='-'}"/>
+                            <Label Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"    Content="{Binding SelectedGoal.Fat, FallbackValue='-'}"/>
                             
                             <!--Column 2:-->
                             <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="2" Text="%:" HorizontalAlignment="Right"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="2" Text=""/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="2" Text=""/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="2" Text=""/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="2" Text=""/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="2" Text="" HorizontalAlignment="Right"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="2" Text="{Binding ProPct}" HorizontalAlignment="Right"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="2" Text="{Binding CarPct}" HorizontalAlignment="Right"/>
+                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="2" Text="{Binding FatPct}" HorizontalAlignment="Right"/>
                             
                             <!--Column 3:-->
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="3" Text="Min:" HorizontalAlignment="Right"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="3" Text="{Binding MinCal}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="3" Text="{Binding MinPro}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="3" Text="{Binding MinCar}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="3" Text="{Binding MinFat}"/>
+                            <Label Grid.Row="0" Grid.Column="3" Content="Min:" HorizontalAlignment="Right"/>
+                            <Label Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" ContentStringFormat="{}{0:N0} Kcal"  Content="{Binding SelectedGoal.MinCal}"/>
+                            <Label Grid.Row="2" Grid.Column="3" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"     Content="{Binding SelectedGoal.MinPro}"/>
+                            <Label Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"     Content="{Binding SelectedGoal.MinCar}"/>
+                            <Label Grid.Row="4" Grid.Column="3" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"     Content="{Binding SelectedGoal.MinFat}"/>
 
                             <!--Column 3:-->
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="0" Grid.Column="4" Text="Max:" HorizontalAlignment="Right"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="1" Grid.Column="4" Text="{Binding MaxCal}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="2" Grid.Column="4" Text="{Binding MaxPro}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="3" Grid.Column="4" Text="{Binding MaxCar}"/>
-                            <TextBlock Style="{DynamicResource TextBlock.SingleLine}" Grid.Row="4" Grid.Column="4" Text="{Binding MaxFat}"/>
+                            <Label Grid.Row="0" Grid.Column="4" Content="Max:" HorizontalAlignment="Right"/>
+                            <Label Grid.Row="1" Grid.Column="4" HorizontalAlignment="Right" ContentStringFormat="{}{0:N0} Kcal" Content="{Binding SelectedGoal.MaxCal}"/>
+                            <Label Grid.Row="2" Grid.Column="4" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"    Content="{Binding SelectedGoal.MaxPro}"/>
+                            <Label Grid.Row="3" Grid.Column="4" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"    Content="{Binding SelectedGoal.MaxCar}"/>
+                            <Label Grid.Row="4" Grid.Column="4" HorizontalAlignment="Right" ContentStringFormat="{}{0:0.#}g"    Content="{Binding SelectedGoal.MaxFat}"/>
                         </Grid>
-                        <TextBlock Style="{DynamicResource TextBlock.Base}" Text="{Binding Notes}"/>
+                        <TextBlock Style="{DynamicResource TextBlock.Base}" Text="{Binding SelectedGoal.Notes}"/>
                     </StackPanel>
                 </ScrollViewer>
 
                 <GridSplitter Grid.Column="1"/>
 
-                <DataGrid Template="{DynamicResource MTDataGrid}" ItemsSource="{Binding GoalList}" 
+                <DataGrid RowHeaderStyle="{DynamicResource MTDataGridRowHeaderStyle}" Template="{DynamicResource MTDataGrid}" ItemsSource="{Binding GoalList}" 
                           SelectedItem="{Binding SelectedGoal}" 
                           IsReadOnly="True"
                           CanUserResizeColumns="True"
@@ -100,14 +121,55 @@
                           Grid.Column="2">
                     
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" SortMemberPath="Id"/>
-                        <DataGridTextColumn Header="Name" Binding="{Binding GoalName}" SortMemberPath="GoalName"/>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id, StringFormat={}#{0:N0}}" SortMemberPath="Id"/>
+                        <DataGridTextColumn Header="Name" Binding="{Binding GoalName}" SortMemberPath="GoalName" Width="125">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                         <DataGridTextColumn Header="Type"/>
-                        <DataGridTextColumn Header="Calories" Binding="{Binding Calories}" SortMemberPath="Calories"/>
-                        <DataGridTextColumn Header="Protein" Binding="{Binding Protein}" SortMemberPath="Protein"/>
-                        <DataGridTextColumn Header="Carbs" Binding="{Binding Carbs}" SortMemberPath="Carbs"/>
-                        <DataGridTextColumn Header="Fat" Binding="{Binding Fat}" SortMemberPath="Fat"/>
-                        <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" SortMemberPath="Notes"/>
+                        <DataGridTextColumn Header="Calories" Binding="{Binding Calories, StringFormat={}{0:N0} kcal}" SortMemberPath="Calories">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Protein" Binding="{Binding Protein, StringFormat={}{0:0.#}g}" SortMemberPath="Protein">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Carbs" Binding="{Binding Carbs, StringFormat={}{0:0.#}g}" SortMemberPath="Carbs">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Fat" Binding="{Binding Fat, StringFormat={}{0:0.#}g}" SortMemberPath="Fat">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" SortMemberPath="Notes" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    <Setter Property="ToolTip" Value="{Binding Notes}"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
 

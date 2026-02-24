@@ -165,6 +165,10 @@ namespace MacroTrack.Dashboard
             {
                 RefreshSummary();
             });
+            IDisposable _subGoalChanged = AppServices.AppEvents.Subscribe<GoalChanged>(_ =>
+            {
+                RefreshSummary();
+            });
             IDisposable _subPreviousPeriodRequested = AppServices.AppEvents.Subscribe<PreviousPeriodRequested>(msg =>
             {
                 OpenPreviousPeriod(msg.period);

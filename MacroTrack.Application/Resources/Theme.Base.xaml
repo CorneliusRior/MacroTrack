@@ -30,6 +30,8 @@
     <SolidColorBrush x:Key="HoverBorderBrush" Color="#FF888888"/>
     <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FF000000"/>
 
+    <!--DataGrid Brushes (use for other things too, just accents really)-->
+    <SolidColorBrush x:Key="GridLineBrush" Color="#FF888888"/>
 
     <!--Graphing Parameters-->
     <SolidColorBrush x:Key="GraphBackGroundBrush" Color="#FFFFFFFF"/>

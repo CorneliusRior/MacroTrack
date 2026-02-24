@@ -46,6 +46,7 @@ namespace MacroTrack.Core.Settings
         public bool DiaryTimeIsLongFormat { get; set; } = true;
         public bool DiaryTimeIncludesTime { get; set; } = true;
         public bool DiaryTimeIncludesSeconds { get; set; } = true;
+        public bool GoalPctOfCalories { get; set; } = true; // Whether the "%" you get in goal view displays proportion of calories or mass. Also apply this to donut charts!
         public GraphSettings GraphSettings { get; set; } = new GraphSettings();
 
         public AppSettings Clone()
@@ -79,6 +80,7 @@ namespace MacroTrack.Core.Settings
                 DiaryTimeIsLongFormat = this.DiaryTimeIsLongFormat,
                 DiaryTimeIncludesTime = this.DiaryTimeIncludesTime,
                 DiaryTimeIncludesSeconds = this.DiaryTimeIncludesSeconds,
+                GoalPctOfCalories = this.GoalPctOfCalories,
                 GraphSettings = this.GraphSettings.Clone()
             };
         }

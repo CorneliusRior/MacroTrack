@@ -30,6 +30,9 @@
     <SolidColorBrush x:Key="GraphColorFat" Color="#FF555555"/>
     <SolidColorBrush x:Key="GraphGridBrush" Color="#FFAAAAAA"/>
     <SolidColorBrush x:Key="GraphTrendLineBrush" Color="#FFAAAAAA"/>
+    
+    <!--DataGrid Brushes-->
+    <SolidColorBrush x:Key="GridLineBrush" Color="#FF222222"/>
 
     <!--Graph Series Parameters-->
     <SolidColorBrush x:Key="LineSeriesBrush1" Color="#FFFFFFFF"/>

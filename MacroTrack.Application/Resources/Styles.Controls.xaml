@@ -445,6 +445,13 @@
     <Style TargetType="DataGrid">
         <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="ColumnHeaderStyle" Value="{DynamicResource MTDataGridColumnHeader}"/>
+        <Setter Property="CellStyle" Value="{DynamicResource MTDataGridCellStyle}"/>
+        <Setter Property="GridLinesVisibility" Value="All"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource GridLineBrush}"/>
+        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource GridLineBrush}"/>
+        <Setter Property="RowHeaderWidth" Value="0"/>
+        <Setter Property="RowBackground" Value="{DynamicResource TextBoxBackgroundBrush}"/>
     </Style>
 
 </ResourceDictionary>
