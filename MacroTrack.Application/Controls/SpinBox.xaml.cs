@@ -88,6 +88,16 @@ namespace MacroTrack.AppLibrary.Controls
             set => SetValue(SmallStepProperty, value);
         }
 
+        public static readonly DependencyProperty FormatStringProperty = DependencyProperty.Register(
+            nameof(FormatString), typeof(string), typeof(SpinBox),
+            new PropertyMetadata("0.00")            
+        );
+        public string FormatString
+        {
+            get => (string)GetValue(FormatStringProperty);
+            set => SetValue(FormatStringProperty, value);
+        }
+
         // Formatting values:
         public static readonly DependencyProperty OuterBorderThicknessProperty =
             DependencyProperty.Register(
@@ -175,7 +185,7 @@ namespace MacroTrack.AppLibrary.Controls
         {
             if (_updating) return;
             if (!double.TryParse(tbValue.Text, out var value)) return;
-            tbValue.Text = value.ToString("0.00");
+            tbValue.Text = value.ToString(FormatString);
             tbValue.CaretIndex = tbValue.Text.Length;
             
         }
@@ -217,7 +227,7 @@ namespace MacroTrack.AppLibrary.Controls
             // Method to get number length, converts double n into a formatted string, if we want to change formate we need to change this.
             int GetNumberLength(double n)
             {
-                string s = n.ToString("0.00");
+                string s = n.ToString(FormatString);
                 int count = 0;
                 for (int i = 0; i < s.Length; i++)
                 {

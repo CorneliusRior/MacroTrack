@@ -6,6 +6,6 @@
                   xmlns:local="clr-namespace:MacroTrack.AppLibrary.Windows"
                   xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls"
                   mc:Ignorable="d"
-                  Title="GoalNewWindow" Height="450" Width="800">
+                  Title="GoalNewWindow" Height="700" Width="550">
     <controls:GoalNewControl x:Name="ControlGoalNew"/>
 </local:WindowBase>
