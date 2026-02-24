@@ -1,5 +1,6 @@
 ﻿using MacroTrack.AppLibrary.Commands;
 using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using System;
@@ -28,7 +29,19 @@ namespace MacroTrack.AppLibrary.ViewModels
                 if (_selectedGoal == value) return;
                 _selectedGoal = value;
                 OnPropertyChanged();
-                CalculatePct();
+                UpdateSelected();
+            }
+        }
+
+        private MacroTotals? _selectedTotals;
+        public MacroTotals? SelectedTotals
+        {
+            get => _selectedTotals;
+            set
+            {
+                if (_selectedTotals == value) return;
+                _selectedTotals = value;
+                OnPropertyChanged();
             }
         }
 
@@ -110,10 +123,10 @@ namespace MacroTrack.AppLibrary.ViewModels
             
         }
 
-        public void CalculatePct()
+        public void UpdateSelected()
         {
             if (Services == null) throw new Exception("Null Services");
-            if (_selectedGoal is null)
+            if (SelectedGoal is null)
             {
                 ProPct = "(-%)";
                 // ...
@@ -121,23 +134,45 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
             if (Services.SettingsService.Settings.GoalPctOfCalories)
             {
-                double cal = _selectedGoal.Calories;
-                ProPct = $"({(_selectedGoal.Protein * 400 / cal).ToString("0.#")}%)";
-                CarPct = $"({(_selectedGoal.Carbs * 400 / cal).ToString("0.#")}%)";
-                FatPct = $"({(_selectedGoal.Fat * 900 / cal).ToString("0.#")}%)";
+                double cal = SelectedGoal.Calories;
+                ProPct = $"({(SelectedGoal.Protein * 400 / cal).ToString("0.#")}%)";
+                CarPct = $"({(SelectedGoal.Carbs * 400 / cal).ToString("0.#")}%)";
+                FatPct = $"({(SelectedGoal.Fat * 900 / cal).ToString("0.#")}%)";
             }
             else
             {
-                double total = _selectedGoal.Protein + _selectedGoal.Carbs + _selectedGoal.Fat;
-                ProPct = $"({(_selectedGoal.Protein / total).ToString("0.#")}%)";
-                CarPct = $"({(_selectedGoal.Carbs/ total).ToString("0.#")}%)";
-                FatPct = $"({(_selectedGoal.Fat / total).ToString("0.#")}%)";
+                double total = SelectedGoal.Protein + SelectedGoal.Carbs + SelectedGoal.Fat;
+                ProPct = $"({(SelectedGoal.Protein / total).ToString("0.#")}%)";
+                CarPct = $"({(SelectedGoal.Carbs/ total).ToString("0.#")}%)";
+                FatPct = $"({(SelectedGoal.Fat / total).ToString("0.#")}%)";
             }
+
+            SelectedTotals = new MacroTotals(SelectedGoal.Calories, SelectedGoal.Protein, SelectedGoal.Carbs, SelectedGoal.Fat);
         }
 
         private void Delete()
         {
-            
+            if (SelectedGoal is null) return;
+            if (Services is null) throw new Exception("Null Services");
+            if (AppServices is null) throw new Exception("Null Services");
+            List<GoalActivation> goalActivations = Services.goalService.GetActivationsOfGoal(SelectedGoal.Id);
+            string guiltString =  $"Are you sure you want to delete Goal #{SelectedGoal.Id} '{SelectedGoal.GoalName}'? This cannot be undone. This Goal has ";
+            if (goalActivations.Count == 0) guiltString += "never been used.";
+            else
+            {
+                string fmt = Services.SettingsService.GetLongDateString();
+                guiltString += $"been used {goalActivations.Count} time{(goalActivations.Count == 1 ? ":" : "s:")}\n\n";
+                foreach (GoalActivation ga in goalActivations)
+                {
+                    guiltString += $" - {ga.ActivatedAt.ToDateTime(TimeOnly.MinValue).ToString(fmt)} to {ga.DeactivatedAt.ToDateTime(TimeOnly.MinValue).ToString(fmt)}\n";
+                }
+                guiltString += $"\nDeleting a goal which has been used before can cause historical data to become inaccurate. Unless there was a mistake, this is not recommended.";
+            }
+            MessageBoxResult result = MessageBox.Show(guiltString, "Delete Goal", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes) Services.goalService.DeleteGoal(SelectedGoal.Id);
+            SelectedGoal = null;
+            SelectedTotals = null;
+            Populate();
         }
 
         private void Set()

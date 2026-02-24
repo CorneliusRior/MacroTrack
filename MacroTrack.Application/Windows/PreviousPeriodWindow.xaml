@@ -84,14 +84,12 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <graphs:MTDonut x:Name="DonutPresent"
-                                        Summary="{Binding CurrentSummary}"
-                                        Style="{DynamicResource MTDonutBase}"
-                                        TotalType="Actual"
+                                        Totals="{Binding CurrentSummary.Actual}"
+                                        Style="{DynamicResource MTDonutBase}"                                        
                                         Grid.Column="0"/>
                         <graphs:MTDonut x:Name="DonutGoal"
-                                        Summary="{Binding CurrentSummary}"
-                                        Style="{DynamicResource MTDonutBase}"
-                                        TotalType="Target"
+                                        Totals="{Binding CurrentSummary.Target}"
+                                        Style="{DynamicResource MTDonutBase}"                                        
                                         Grid.Column="1"/>
                     </Grid>
                 </Border>

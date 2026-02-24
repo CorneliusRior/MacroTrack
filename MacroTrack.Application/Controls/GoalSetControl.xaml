@@ -42,9 +42,8 @@
                                     Width="{Binding ActualHeight, ElementName=donutHost}"
                                     Margin="5">
                                 <graphs:MTDonut x:Name="donutSelected"
-                                    Summary="{Binding CurrentSummary}"
-                                    Style="{DynamicResource MTDonutBase}"
-                                    TotalType="Target"/>
+                                    Totals="{Binding SelectedTotals}"
+                                    Style="{DynamicResource MTDonutBase}"/>
                             </Border>
                         </Grid>
                         

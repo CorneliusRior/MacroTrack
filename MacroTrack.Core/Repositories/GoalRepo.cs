@@ -2,6 +2,7 @@
 
 namespace MacroTrack.Core.Repositories;
 
+using DocumentFormat.OpenXml.Office2010.Excel;
 using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
@@ -282,6 +283,47 @@ public class GoalRepo : RepoBase
         {
             return new GoalActivation(Id, GoalId, ActivatedAt, DateOnly.Parse(reader.GetString(3)));
         }
+    }
+
+    /// <summary>
+    /// Returns every instance of given Goal (id) being activated. Useful if you want to know if a goal has been used before deleting it.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public List<GoalActivation> GetActivationsOfGoal(int id)
+    {
+        List<GoalActivation> activationList = new();
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        string sql = "SELECT * FROM GoalHistory WHERE GoalId = $goalId";
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue($"goalId", id);
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            if (reader.IsDBNull(3))
+            {
+                activationList.Add(
+                    new GoalActivation(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1),
+                        DateOnly.Parse(reader.GetString(2))
+                    )
+                );
+            }
+            else
+            {
+                activationList.Add(
+                    new GoalActivation(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1),
+                        DateOnly.Parse(reader.GetString(2)),
+                        DateOnly.Parse(reader.GetString(3))
+                    )
+                );
+            }
+        }
+        return activationList;
     }
 
     // Return last Activation

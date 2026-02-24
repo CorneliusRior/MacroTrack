@@ -238,4 +238,9 @@ public class GoalService : ServiceBase
         );
         return totals;
     }
+
+    public List<GoalActivation> GetActivationsOfGoal(int id)
+    {
+        return _repo.GetActivationsOfGoal(id);
+    }
 }

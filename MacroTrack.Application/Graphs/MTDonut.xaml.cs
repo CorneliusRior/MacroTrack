@@ -33,7 +33,7 @@ namespace MacroTrack.AppLibrary.Graphs
         }
 
         // Dependencies:
-
+        /*
         public static readonly DependencyProperty SummaryProperty = DependencyProperty.Register(
                 nameof(Summary),
                 typeof(MacroSummary),
@@ -44,8 +44,20 @@ namespace MacroTrack.AppLibrary.Graphs
         {
             get => (MacroSummary?)GetValue(SummaryProperty);
             set => SetValue(SummaryProperty, value);
+        }*/
+
+        // Replacing summary with this basically:
+        public static readonly DependencyProperty TotalsProperty = DependencyProperty.Register(
+            nameof(Totals), typeof(MacroTotals), typeof(MTDonut),
+            new PropertyMetadata(null, (d, e) => ((MTDonut)d).Redraw())
+        );
+        public MacroTotals? Totals
+        {
+            get => (MacroTotals?)GetValue(TotalsProperty);
+            set => SetValue(TotalsProperty, value);
         }
 
+        /*
         public static readonly DependencyProperty TotalTypeProperty = DependencyProperty.Register(
             nameof(TotalType),
             typeof(string),
@@ -56,7 +68,7 @@ namespace MacroTrack.AppLibrary.Graphs
         {
             get => (String)GetValue(TotalTypeProperty);
             set => SetValue(TotalTypeProperty, value);
-        }
+        }*/
 
         public static readonly DependencyProperty CenterTextProperty = DependencyProperty.Register(
                 nameof(CenterText),
@@ -271,19 +283,9 @@ namespace MacroTrack.AppLibrary.Graphs
 
             
 
-            if (Summary != null)
+            if (Totals != null)
             {
-                if (Summary.NoGoal)
-                {
-                    GrayRing();
-                    CenterText = "No goal";
-                    CenterValue = "selected";
-                    return;
-                }
-                if (TotalType == "Target") totals = Summary.Target;
-                else if (TotalType == "Actual") totals = Summary.Actual;
-                else if (TotalType == "Remaining") totals = Summary.Remaining;
-                else throw new Exception($"Invalid totaltype '{TotalType}', must be 'Target', 'Actual', or 'Remaining'");
+                totals = Totals;
             }
             else
             {
