@@ -3,9 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                   xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="500">
+    <local:ControlBase.Resources>
+        <conv:AndBoolConverter x:Key="AndBool"/>
+        <conv:InverseBoolConverter x:Key="InverseBool"/>
+    </local:ControlBase.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}">
         <Grid>
             <Grid.RowDefinitions>
@@ -62,12 +67,39 @@
                         <Label Content="Protein:" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"/>
                         <Label Content="Carbs:" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="2"/>
                         <Label Content="Fat:" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="3"/>
-                        
-                        
 
-                        <Slider Orientation="Vertical" Value="{Binding ProProp}" Minimum="0" Maximum="1" x:Name="sliderPro" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center"/>
-                        <Slider Orientation="Vertical" Value="{Binding CarProp}" Minimum="0" Maximum="1" x:Name="sliderCar" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center"/>
-                        <Slider Orientation="Vertical" Value="{Binding FatProp}" Minimum="0" Maximum="1" x:Name="sliderFat" Grid.Row="2" Grid.Column="3" HorizontalAlignment="Center"/>
+
+
+                        <Slider Orientation="Vertical" Value="{Binding ProProp}" Minimum="0" 
+                                Maximum="1" x:Name="sliderPro" HorizontalAlignment="Center" 
+                                Grid.Row="2" Grid.Column="1">
+                            <Slider.IsEnabled>
+                                <MultiBinding Converter="{StaticResource AndBool}">
+                                    <Binding Path="CanSetPro"/>
+                                    <Binding Path="SetProEnabled" Converter="{StaticResource InverseBool}"/>
+                                </MultiBinding>
+                            </Slider.IsEnabled>
+                        </Slider>
+                        <Slider Orientation="Vertical" Value="{Binding CarProp}"
+                                Minimum="0" Maximum="1" x:Name="sliderCar" HorizontalAlignment="Center" 
+                                Grid.Row="2" Grid.Column="2">
+                            <Slider.IsEnabled>
+                                <MultiBinding Converter="{StaticResource AndBool}">
+                                    <Binding Path="CanSetCar"/>
+                                    <Binding Path="SetCarEnabled" Converter="{StaticResource InverseBool}"/>
+                                </MultiBinding>
+                            </Slider.IsEnabled>
+                        </Slider>
+                        <Slider Orientation="Vertical" Value="{Binding FatProp}"
+                                Minimum="0" Maximum="1" x:Name="sliderFat" HorizontalAlignment="Center"
+                                Grid.Row="2" Grid.Column="3">
+                            <Slider.IsEnabled>
+                                <MultiBinding Converter="{StaticResource AndBool}">
+                                    <Binding Path="CanSetFat"/>
+                                    <Binding Path="SetFatEnabled" Converter="{StaticResource InverseBool}"/>
+                                </MultiBinding>
+                            </Slider.IsEnabled>
+                        </Slider>
 
                         <Grid Grid.Row="3" Grid.Column="1">
                             <Grid.ColumnDefinitions>
@@ -85,7 +117,7 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding SetProEnabled}" Content="Set" x:Name="cbxProSet" Margin="2" Grid.Column="0"/>
+                            <CheckBox IsChecked="{Binding SetProEnabled}" IsEnabled="{Binding CanSetPro}" Content="Set" x:Name="cbxProSet" Margin="2" Grid.Column="0"/>
                             <local:SpinBox Value="{Binding Protein}" IsEnabled="{Binding SetProEnabled}" 
                                            FormatString="0.##" Step="10" SmallStep="1" 
                                            Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
@@ -119,7 +151,7 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding SetCarEnabled}" Content="Set" x:Name="cbxCarSet" Margin="2" Grid.Column="0"/>
+                            <CheckBox IsChecked="{Binding SetCarEnabled}" IsEnabled="{Binding CanSetCar}" Content="Set" x:Name="cbxCarSet" Margin="2" Grid.Column="0"/>
                             <local:SpinBox Value="{Binding Carbs}" IsEnabled="{Binding SetCarEnabled}" 
                                            FormatString="0.##" Step="10" SmallStep="1" 
                                            Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
@@ -153,8 +185,8 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding SetFatEnabled}" Content="Set" x:Name="cbxFatSet" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding Fatbs}" IsEnabled="{Binding SetFatEnabled}" 
+                            <CheckBox IsChecked="{Binding SetFatEnabled}" IsEnabled="{Binding CanSetFat}" Content="Set" x:Name="cbxFatSet" Margin="2" Grid.Column="0"/>
+                            <local:SpinBox Value="{Binding Fat}" IsEnabled="{Binding SetFatEnabled}" 
                                            FormatString="0.##" Step="10" SmallStep="1" 
                                            Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
                                            Grid.Column="1"/>
@@ -172,7 +204,7 @@
                         </Grid>
                     </Grid>
                     <Label Content="Notes:" Grid.Row="4"/>
-                    <TextBox x:Name="tbNotes" Grid.Row="5"/>
+                    <TextBox x:Name="tbNotes" Text="{Binding Notes}" TextWrapping="Wrap" VerticalContentAlignment="Top" Grid.Row="5"/>
                 </Grid>
             </ScrollViewer>
 

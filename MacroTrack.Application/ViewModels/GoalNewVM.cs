@@ -1,6 +1,9 @@
-﻿using MacroTrack.AppLibrary.Commands;
+﻿using DocumentFormat.OpenXml.ExtendedProperties;
+using MacroTrack.AppLibrary.Commands;
 using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +20,30 @@ namespace MacroTrack.AppLibrary.ViewModels
         public ICommand AddCommand { get; }
 
         // Variables:
+
+        private string _goalName = "";
+        public string GoalName
+        {
+            get => _goalName;
+            set
+            {
+                _goalName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _notes = "";
+        public string Notes
+        {
+            get => _notes;
+            set
+            {
+                _notes = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         private double _calories = 2000;
         public double Calories
         {
@@ -35,36 +62,21 @@ namespace MacroTrack.AppLibrary.ViewModels
         public double Protein
         {
             get => _protein;
-            set
-            {
-                if (_protein == value) return;
-                _protein = value;
-                OnPropertyChanged();
-            }
+            set => SetGram(ref _protein, value, nameof(Protein));
         }
 
         private double _carbs;
         public double Carbs
         {
             get => _carbs;
-            set
-            {
-                if (_carbs == value) return;
-                _carbs = value;
-                OnPropertyChanged();
-            }
+            set => SetGram(ref _carbs, value, nameof(Carbs));
         }
 
         private double _fat;
         public double Fat
         {
             get => _fat;
-            set
-            {
-                if (_fat == value) return;
-                _fat = value;
-                OnPropertyChanged();
-            }
+            set => SetGram(ref _fat, value, nameof(Fat));
         }
 
         private double _minCal = 1900;
@@ -172,6 +184,9 @@ namespace MacroTrack.AppLibrary.ViewModels
                 if (_maxProEnabled == value) return;
                 _maxProEnabled = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CanSetPro));
+                OnPropertyChanged(nameof(CanSetCar));
+                OnPropertyChanged(nameof(CanSetFat));
             }
         }
 
@@ -196,6 +211,9 @@ namespace MacroTrack.AppLibrary.ViewModels
                 if (_setCarEnabled == value) return;
                 _setCarEnabled = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CanSetPro));
+                OnPropertyChanged(nameof(CanSetCar));
+                OnPropertyChanged(nameof(CanSetFat));
             }
         }
 
@@ -220,6 +238,9 @@ namespace MacroTrack.AppLibrary.ViewModels
                 if (_minCarEnabled == value) return;
                 _minCarEnabled = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CanSetPro));
+                OnPropertyChanged(nameof(CanSetCar));
+                OnPropertyChanged(nameof(CanSetFat));
             }
         }
 
@@ -295,46 +316,34 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        private int _lockCount => (SetProEnabled ? 1 : 0) + (SetCarEnabled ? 1 : 0) + (SetFatEnabled ? 1 : 0);
+        public bool CanSetPro => SetProEnabled || _lockCount < 2;
+        public bool CanSetCar => SetCarEnabled || _lockCount < 2;
+        public bool CanSetFat => SetFatEnabled || _lockCount < 2;
+
         private double _proProp = 0.2;
         public double ProProp
         {
             get => _proProp;
-            set
-            {
-                if (_proProp == value) return;
-                _proProp = Math.Min(1, value);
-                if(!_propUpdating) OnProPropChanged();
-                OnPropertyChanged();
-            }
+            set => SetProp(ref _proProp, value, nameof(ProProp));
         }
 
         private double _carProp = 0.3;
         public double CarProp
         {
             get => _carProp;
-            set
-            {
-                if (_carProp == value) return;
-                _carProp = Math.Min(1, value);
-                if (!_propUpdating) OnCarPropChanged();
-                OnPropertyChanged();
-            }
+            set => SetProp(ref _carProp, value, nameof(CarProp));
         }
 
         private double _fatProp = 0.5;
         public double FatProp
         {
             get => _fatProp;
-            set
-            {
-                if (_fatProp == value) return;
-                _fatProp = Math.Min(1, value);
-                if (!_propUpdating) OnFatPropChanged();
-                OnPropertyChanged();
-            }
+            set => SetProp(ref _fatProp, value, nameof(FatProp));
         }
 
         private bool _propUpdating = false;
+        private bool _gramUpdating = false;
 
         public GoalNewVM()
         {
@@ -353,75 +362,150 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         }
 
-        // Data/Binding handling:
-        private void OnCaloriesChanged(double d)
-        {
-            if (MaxCalEnabled) MaxCal = Math.Max(MaxCal, Calories);
-            else MaxCal += d;
-            if (MinCalEnabled) MinCal = Math.Min(MinCal, Calories);
-            else MinCal += d;
-            PropToGram();
+        // Proportion handling &c.:
+        private void OnCaloriesChanged(double d) 
+        { 
+            if (MaxCalEnabled) MaxCal = Math.Max(MaxCal, Calories); 
+            else MaxCal += d; 
+            if (MinCalEnabled) MinCal = Math.Min(MinCal, Calories); 
+            else MinCal += d; PropToGram(); 
         }
 
-        private void OnProPropChanged()
+        private void SetProp(ref double backing, double value, string changedName)
         {
+            value = Clamp01(value);
+            if (Math.Abs(backing - value) < 1e-9) return;
+            backing = value;
+            OnPropertyChanged(changedName);
+            if (_propUpdating) return;
             _propUpdating = true;
-            // See which of them have their values clamped. First, both:
-            if (SetCarEnabled && SetFatEnabled) ProProp = 1 - CarProp - FatProp;
-            else if (SetCarEnabled || CarProp == 0) FatProp = 1 - CarProp - ProProp;
-            else if (SetFatEnabled || FatProp == 0) CarProp = 1 - FatProp - ProProp;
+            try
+            {
+                NormalizeProps(changedName);
+                PropToGram();
+            }
+            finally
+            {
+                _propUpdating = false;
+                Notes = $"Calories='{Calories} / {_calories}', Protein='{Math.Round(Protein, 4)} / {Math.Round(Protein, 4)}', Carbs='{Math.Round(Carbs, 4)} / {Math.Round(_carbs, 4)}', Fat='{Math.Round(Fat, 4)} / {Math.Round(_fat, 4)}', Proptions P/C/F='{Math.Round(ProProp, 4)}/{Math.Round(CarProp, 4)}/{Math.Round(FatProp, 4)}', CalCum={Math.Round((Protein * 4) + (Carbs * 4) + (Fat * 9), 2)}, propsum='{Math.Round(ProProp + CarProp + FatProp, 4)}'";
+            }
+        }
+
+        private void NormalizeProps(string changedName)
+        {
+            // Set up variables:
+            bool lockP = SetProEnabled, lockC = SetCarEnabled, lockF = SetFatEnabled;
+            double p = Clamp01(ProProp), c = Clamp01(CarProp), f = Clamp01(FatProp);
+
+            // Changed: (which one user is changing)
+            bool changedP = changedName == nameof(ProProp);
+            bool changedC = changedName == nameof(CarProp);
+            bool changedF = changedName == nameof(FatProp);
+
+            // Adjustable: (neither locked nor being changed)
+            bool adjP = !lockP && !changedP;
+            bool adjC = !lockC && !changedC;
+            bool adjF = !lockF && !changedF;
+
+            // Weights: 
+            double wP = adjP ? p : 0;
+            double wC = adjC ? c : 0;
+            double wF = adjF ? f : 0;
+            double wSum = wP + wC + wF;
+
+            // Locked Sum & Free Space:
+            double lockedSum = (lockP ? p : 0) + (lockC ? c : 0) + (lockF ? f : 0);
+            double free = Clamp01(1.0 - lockedSum);
+
+            // FixedSum: Total we cannot change (locked & user-changed)
+            double fixedSum = lockedSum + (!lockP && changedP ? p : 0)
+                                        + (!lockC && changedC ? c : 0)
+                                        + (!lockF && changedF ? f : 0);
+            
+            // Vacuum: (everything we can and must change)
+            double v = Clamp01(1.0 - fixedSum);
+            
+            // Adjustment:
+            if (adjP || adjC || adjF)
+            {
+                if (wSum < 1e-9)
+                {
+                    // If adjustables are 0 (or close enough), adjust evenly:
+                    int n = (adjP ? 1 : 0) + (adjC ? 1 : 0) + (adjF ? 1 : 0);
+                    if (adjP) p = v / n;
+                    if (adjC) c = v / n;
+                    if (adjF) f = v / n;
+                }
+                else
+                {
+                    // Otherwise distribute proprtional to current value:
+                    if (adjP) p = v * (wP / wSum);
+                    if (adjC) c = v * (wC / wSum);
+                    if (adjF) f = v * (wF / wSum);
+                }
+            }
             else
             {
-                // Get vacuum:
-                double v = 1 - ProProp - CarProp - FatProp;
-                CarProp = CarProp += v * (CarProp / (CarProp + FatProp));
-                FatProp = FatProp += v * (FatProp / (CarProp + FatProp));
+                // None are adjustable, enforce lock (hopefully this shouldn't happen, hence log):
+                Log("User attempted to adjust with no adjustable macros: This shouldn't be possible!", LogLevel.Error);
+                if (changedP && lockP) p = free;
+                if (changedC && lockC) c = free;
+                if (changedF && lockF) f = free;
             }
-            PropToGram();
+
+            if (Math.Abs(_proProp - p) > 1e-9) { _proProp = p; OnPropertyChanged(nameof(ProProp)); }
+            if (Math.Abs(_carProp - c) > 1e-9) { _carProp = c; OnPropertyChanged(nameof(CarProp)); }
+            if (Math.Abs(_fatProp - f) > 1e-9) { _fatProp = f; OnPropertyChanged(nameof(FatProp)); }
+
+            
+        }
+
+        private void PropToGram() 
+        { 
+            if (!SetProEnabled) _protein = Math.Round((Calories * ProProp) / 4, 2); 
+            if (!SetCarEnabled) _carbs = Math.Round((Calories * CarProp) / 4, 2); 
+            if (!SetFatEnabled) _fat = Math.Round((Calories * FatProp) / 9, 2);
+            OnPropertyChanged(nameof(Protein));
+            OnPropertyChanged(nameof(Carbs));
+            OnPropertyChanged(nameof(Fat));
+        }
+
+        private void SetGram(ref double backing, double value, string changedName)
+        {
+            if (changedName == nameof(Fat)) value = ClampF(value);
+            else value = ClampPC(value);
+            if (_gramUpdating) return;
+            _gramUpdating = true;
+            backing = value;
+            try
+            {
+                if (Math.Abs(backing - value) < 1e-9) return;
+                OnPropertyChanged(changedName);
+
+                if (changedName == nameof(Protein)) ProProp = (value * 4) / Calories;
+                if (changedName == nameof(Carbs)) CarProp = (value * 4) / Calories;
+                if (changedName == nameof(Fat)) FatProp = (value * 9) / Calories;
+                PropToGram();
+            }
+            finally 
+            {
+                _gramUpdating = false;
+            };
+        }
+
+        private void GramToProp()
+        {
+            if (_propUpdating) return;
+            _propUpdating = true;
+
+
+
             _propUpdating = false;
         }
 
-        private void OnCarPropChanged()
-        {
-            _propUpdating = true;
-            // See which of them have their values clamped. First, both:
-            if (SetProEnabled && SetFatEnabled) CarProp = 1 - ProProp - FatProp;
-            else if (SetProEnabled || ProProp == 0) FatProp = 1 - ProProp - CarProp;
-            else if (SetFatEnabled || FatProp == 0) ProProp = 1 - FatProp - CarProp;
-            else
-            {
-                // Get vacuum:
-                double v = 1 - ProProp - CarProp - FatProp;
-                ProProp = ProProp += v * (ProProp / (ProProp + FatProp));
-                FatProp = FatProp += v * (FatProp / (ProProp + FatProp));
-            }
-            PropToGram();
-            _propUpdating = false;
-        }
+        private static double Clamp01(double n) => n < 0 ? 0 : (n > 1 ? 1 : n);
 
-        private void OnFatPropChanged()
-        {
-            _propUpdating = true;
-            // See which of them have their values clamped. First, both:
-            if (SetCarEnabled && SetFatEnabled) FatProp = 1 - ProProp - CarProp;
-            else if (SetProEnabled || ProProp == 0) CarProp = 1 - ProProp - FatProp;
-            else if (SetCarEnabled || CarProp == 0) ProProp = 1 - CarProp - FatProp;
-            else
-            {
-                // Get vacuum:
-                double v = 1 - ProProp - CarProp - FatProp;
-                ProProp = ProProp += v * (ProProp / (ProProp + CarProp));
-                CarProp = CarProp += v * (CarProp / (ProProp + CarProp));
-            }
-            PropToGram();
-            _propUpdating = false;
-        }
-
-        private void PropToGram()
-        {
-            if (!SetProEnabled) Protein = Math.Round((Calories * ProProp) / 4, 2);
-            if (!SetCarEnabled) Carbs = Math.Round((Carbs * CarProp) / 4, 2);
-            if (!SetFatEnabled) Fat = Math.Round((Fat * CarProp) / 9, 2);
-        }
+        private double ClampPC(double n) => n < 0 ? 0 : (n * 4 > Calories ? Calories / 4 : n);
+        private double ClampF(double n) => n < 0 ? 0 : (n * 9 > Calories ? Calories / 9 : n);
     }
 }
