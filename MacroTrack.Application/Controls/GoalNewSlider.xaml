@@ -45,25 +45,25 @@
             <!--Max-->
             <CheckBox Content="Max" IsChecked="{Binding MaxEnabled, Mode=TwoWay}"
                   Grid.Row="0" Grid.Column="0"/>
-            <local:SpinBox Value="{Binding Max, Mode=TwoWay}" IsEnabled="{Binding MaxEnabled}" 
+            <local:SpinBox Value="{Binding Max, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding MaxEnabled}" 
                            Step="10" SmallStep="1"
-                           Width="50" ButtonWidth="12" FormatString="0.##" Margin="2" 
+                           Width="50" ButtonWidth="12" FormatString="0.#" Margin="2" 
                            Grid.Row="0" Grid.Column="1"/>
 
             <!--Set-->
             <CheckBox Content="Set" IsChecked="{Binding IsLocked, Mode=TwoWay}"
                   Grid.Row="1" Grid.Column="0"/>
-            <local:SpinBox Value="{Binding Grams, Mode=TwoWay}" IsEnabled="{Binding IsLocked}"
+            <local:SpinBox Value="{Binding Grams, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsLocked}"
                            Step="10" SmallStep="1"
-                           Width="50" ButtonWidth="12" FormatString="0.##" Margin="2" 
+                           Width="50" ButtonWidth="12" FormatString="0.#" Margin="2" 
                            Grid.Row="1" Grid.Column="1"/>
 
             <!--Min-->
             <CheckBox Content="Min" IsChecked="{Binding MinEnabled, Mode=TwoWay}"
                   Grid.Row="2" Grid.Column="0"/>
-            <local:SpinBox Value="{Binding Min, Mode=TwoWay}" IsEnabled="{Binding MinEnabled}" 
+            <local:SpinBox Value="{Binding Min, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding MinEnabled}" 
                            Step="10" SmallStep="1"
-                           Width="50" ButtonWidth="12" FormatString="0.##" Margin="2"
+                           Width="50" ButtonWidth="12" FormatString="0.#" Margin="2"
                            Grid.Row="2" Grid.Column="1"/>
 
         </Grid>

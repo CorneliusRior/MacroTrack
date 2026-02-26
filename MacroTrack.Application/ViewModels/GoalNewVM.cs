@@ -128,6 +128,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             P.Prop = 0.4;
             C.Prop = 0.3;
             F.Prop = 0.3;
+            foreach (NGMacroState m in Macros) m.AutoSetMinMax(50);
         }
 
         public override void Init(CoreServices services, AppServices appServices)
@@ -277,16 +278,16 @@ namespace MacroTrack.AppLibrary.ViewModels
 
             string? GoalType = null;
             string? notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
-            double? minCal = MinCalEnabled ? MinCal : null;
-            double? maxCal = MaxCalEnabled ? MaxCal : null;
-            double? minPro = P.MinEnabled ? P.Min : null;
-            double? maxPro = P.MaxEnabled ? P.Max : null;
-            double? minCar = C.MinEnabled ? C.Min : null;
-            double? maxCar = C.MaxEnabled ? C.Max : null;
-            double? minFat = F.MinEnabled ? F.Min : null;
-            double? maxFat = F.MaxEnabled ? F.Max : null;
+            double? minCal = MinCalEnabled ? Math.Round(MinCal, 1) : null;
+            double? maxCal = MaxCalEnabled ? Math.Round(MaxCal, 1) : null;
+            double? minPro = P.MinEnabled ? Math.Round(P.Min, 1) : null;
+            double? maxPro = P.MaxEnabled ? Math.Round(P.Max, 1) : null;
+            double? minCar = C.MinEnabled ? Math.Round(C.Min, 1) : null;
+            double? maxCar = C.MaxEnabled ? Math.Round(C.Max, 1) : null;
+            double? minFat = F.MinEnabled ? Math.Round(F.Min, 1) : null;
+            double? maxFat = F.MaxEnabled ? Math.Round(F.Max, 1) : null;
 
-            Services.goalService.AddGoal(GoalName, Calories, P.Grams, C.Grams, F.Grams, GoalType, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
+            Services.goalService.AddGoal(GoalName, Math.Round(Calories, 1), Math.Round(P.Grams, 1), Math.Round(C.Grams, 1), Math.Round(F.Grams, 1), GoalType, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
             AppServices.AppEvents.Publish(new GoalAdded());
         }
     }

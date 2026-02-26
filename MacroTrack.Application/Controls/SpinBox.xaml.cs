@@ -58,7 +58,7 @@ namespace MacroTrack.AppLibrary.Controls
             );
         public double? DefaultValue
         {
-            get => (double)GetValue(DefaultProperty);
+            get => (double?)GetValue(DefaultProperty);
             set => SetValue(DefaultProperty, value);
         }
 
@@ -168,8 +168,10 @@ namespace MacroTrack.AppLibrary.Controls
         private static void OnValueChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
         {
             var sb = (SpinBox)d;
+            if (sb._updating) return;
             sb._updating = true;
-            if (sb.Value != 0) sb.tbValue.Text = e.NewValue?.ToString() ?? "";
+            if (e.NewValue is double newVal) sb.tbValue.Text = newVal.ToString(sb.FormatString);
+            else sb.tbValue.Text = "";
             sb._updating = false;
             if (!sb.tbValue.IsFocused) sb.OnExitFormat();
         }

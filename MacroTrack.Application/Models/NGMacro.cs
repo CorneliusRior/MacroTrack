@@ -71,11 +71,16 @@ namespace MacroTrack.AppLibrary.Models
         {
             get => _grams;
             set 
-            { 
+            {
+                double delta = value - _grams;
                 if (SetProperty(ref _grams, Math.Max(value, 0)))
                 {
                     OnPropertyChanged(nameof(DisplayGrams));
                     OnPropertyChanged(nameof(ThisCalories));
+                    if (!MinEnabled) Min += delta;
+                    else OnPropertyChanged(nameof(Min));
+                    if (!MaxEnabled) Max += delta;
+                    else OnPropertyChanged(nameof(Min));
                 }
             }
         }
@@ -84,7 +89,7 @@ namespace MacroTrack.AppLibrary.Models
         public double Min
         {
             get => _min;
-            set => SetProperty(ref _min, Math.Min(value, Grams));
+            set => SetProperty(ref _min, Math.Max(0, Math.Min(value, Grams)));
         }
 
         private double _max;
@@ -127,6 +132,12 @@ namespace MacroTrack.AppLibrary.Models
         {
             if (Grams < 0) Grams = 0;
             if (ThisCalories > totalCal) Grams = totalCal / CaloriesPerGram;
+        }
+
+        public void AutoSetMinMax(double margin)
+        {
+            Min = Grams - margin;
+            Max = Grams + margin;
         }
     }
 }
