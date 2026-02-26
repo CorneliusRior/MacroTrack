@@ -41,5 +41,56 @@ namespace MacroTrack.Core.Models
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
+
+        public static GoalType ToGoalType(this string input)
+        {
+            return input.ToLowerInvariant().Trim() switch
+            {
+                // actual strings:
+                "none" => GoalType.None,
+                "custom" => GoalType.Custom,
+                "cut" => GoalType.Cut,
+                "maintenance" => GoalType.Maintenance,
+                "bulk" => GoalType.Bulk,
+                
+                // other strings:
+                "default" => GoalType.None,
+                "userdefined" => GoalType.Custom,
+                "deficit" => GoalType.Cut,
+                "maintain" => GoalType.Maintenance,
+                "surplus" => GoalType.Bulk,
+
+                // numbers:
+                "0" => GoalType.None,
+                "1" => GoalType.Custom,
+                "2" => GoalType.Cut,
+                "3" => GoalType.Maintenance,
+                "4" => GoalType.Bulk,
+
+                _ => throw new ArgumentException()
+            };
+        }
+    }
+
+    public sealed record GoalTypeListItem(GoalType Value, string DisplayName);
+
+    public static class GoalTypeList
+    {
+        public static readonly IReadOnlyList<GoalTypeListItem> NoCustom =
+        [
+            new(GoalType.None, "(None)"),
+            new(GoalType.Cut, "Cut"),
+            new(GoalType.Maintenance, "Maintenance"),
+            new(GoalType.Bulk, "Bulk")
+        ];
+
+        public static readonly IReadOnlyList<GoalTypeListItem> WithCustom =
+        [
+            new(GoalType.None, "(None)"),
+            new(GoalType.Custom, "Custom"),
+            new(GoalType.Cut, "Cut"),
+            new(GoalType.Maintenance, "Maintenance"),
+            new(GoalType.Bulk, "Bulk")
+        ];
     }
 }

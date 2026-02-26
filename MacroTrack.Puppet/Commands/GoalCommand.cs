@@ -13,15 +13,17 @@ public class GoalCommand : ICommand
     public string Usage => "goal [activate/add/deleteactivation/delete/edit/getcurrent/history/list] (other arguments)";
     public string LongHelp => @"Command set for interfacing with GoalRegistry and GoalHistory. Subcommands are:
      - goal activate [ID] (date)            - Activates given preset: Uses ID to take goal from GoalRegistry, generates GoalActivation with it, adds this to the end of GoalHistory.
-     - goal add [name] [calories] [protein] [carbs] [fat] (notes) (type) (minCal) (maxCal) (minPro) (maxPro) (minCarb) (maxCarb) (minFat) (maxFat)
-                                            - Generates new goal and adds it to GoalRegistry, leave entries as blank (space between double quotations) for null. Min and Max parameters will usually be left as null.
-     - goal deleteactivation [ID]            - Deletes the selected goal activation from GoalHistory. Use 'goal history' to see history and IDs.
+     - goal add [name] [calories] [protein] [carbs] [fat] (goalType) (customType) (notes) (minCal) (maxCal) (minPro) (maxPro) (minCarb) (maxCarb) (minFat) (maxFat)
+                                            - Generates new goal and adds it to GoalRegistry, leave entries as blank (space between double quotations) for null. Min and Max parameters will usually be left as null. See note on GoalType below.
+     - goal deleteactivation [ID]           - Deletes the selected goal activation from GoalHistory. Use 'goal history' to see history and IDs.
      - goal delete [ID]                     - Deletes the selected goal from GoalRegistry. Use 'goal list' to see Registry and IDs. Will not delete a goal which has been used before. If you really want to delete all trace of such a goal, you will need to delete every use of it from GoalHistory with goal deactivate.
-     - goal edit [ID] [name] [calories] [protein] [carbs] [fat] (notes) (type) (minCal) (maxCal) (minPro) (maxPro) (minCarb) (maxCarb) (minFat) (maxFat)
-                                            - Sets the goal in GoalRegistry with ID to the specified amounts. If you want to keep data for one entry, use '_' (we can't use 'null', beacuse the optional data can be set and stored as null). Use 'goal list' to see GoalRegistry and IDs.
+     - goal edit [ID] [name] [calories] [protein] [carbs] [fat] (goalType) (customType) (notes) (minCal) (maxCal) (minPro) (maxPro) (minCarb) (maxCarb) (minFat) (maxFat)
+                                            - Sets the goal in GoalRegistry with ID to the specified amounts. If you want to keep data for one entry, use '_' (we can't use 'null', beacuse the optional data can be set and stored as null). Use 'goal list' to see GoalRegistry and IDs. See note on GoalType below.
      - goal getcurrent (date)               - Returns the current goal as of today's date. If a date is specified, returns the activated goal for that date.
      - goal history (startDate) (endDate)   - Returns GoalHistory. Returns all with no arguments, all from startDate to today if first argument specified, all between startDate and endDate if both specified.
-     - goal list                            - Returns GoalRegistry";
+     - goal list                            - Returns GoalRegistry
+
+Note on GoalType: For parameters 'GoalType', type one of: { 'None', 'Custom', 'Cut', 'Maintenance', 'Bulk' }, or their respective numbers (as they are actually stored). CustomType will only be accepted by the Goal constructor if GoalType.Custom is chosen, so put whatever you like for that argument.";
 
     
     public GoalCommand(GoalService service)
@@ -63,7 +65,7 @@ public class GoalCommand : ICommand
 
     private string Add(IReadOnlyList<string> args)
     {
-        if (args.Count < 5) return "Not enough arguments, usage: goal add [name] [calories] [protein] [carbs] [fat] (notes) (type) (minCal) (maxCal) (minPro) (maxPro) (minCarb) (maxCarb) (minFat) (maxFat)";
+        if (args.Count < 5) return "Not enough arguments, usage: goal add [name] [calories] [protein] [carbs] [fat] (goalType) (customType) (notes) (minCal) (maxCal) (minPro) (maxPro) (minCarb) (maxCarb) (minFat) (maxFat)";
 
         // Make sure the first 5 arguments work.
         string goalName = args[0];
@@ -79,11 +81,18 @@ public class GoalCommand : ICommand
             catch (Exception ex) {return $"Puppet.Commands.GoalCommand.Add(): 5 args, error adding goal: {ex.Message}";}
         }
 
-        // there might be a quicker way to do this, but I don't know it:
+        // GoalType & custom: We use FromString from GoalTypeExtensions for this, so we can use either numbers or text:
+        GoalType goalType = GoalType.None;
+        if (args.Count > 5 && !string.IsNullOrWhiteSpace(args[5]))
+        {
+            try { goalType = args[5].ToGoalType(); }
+            catch (Exception ex) { return $"Puppet.Commands.GoalCommand.Add(): > 5 args, could not parse GoalType  '{args[5]}': {ex.Message}"; }
+        }
+        // We could have something like, only accept this next one as the next argument if it is custom, but that would be a pain. I think we will make a Puppet2 for use in in-app REPLs, where we could have a system where we remove each argument as it's used and go for the next one or something, but for now we're just going to require you to do " ". Constructor handles cases where it should be null anyway.
+        string? customType = null;
         string? notes = null;
-        string? type = null;
-        if (args.Count > 5 && !string.IsNullOrWhiteSpace(args[5])) notes = args[5];
-        if (args.Count > 6 && !string.IsNullOrWhiteSpace(args[6])) type = args[6];
+        if (args.Count > 6 && !string.IsNullOrWhiteSpace(args[6])) customType = args[6];
+        if (args.Count > 7 && !string.IsNullOrWhiteSpace(args[7])) notes = args[7];
 
         double? MinCal = null;
         double? MaxCal = null;
@@ -94,17 +103,17 @@ public class GoalCommand : ICommand
         double? MinFat = null;
         double? MaxFat = null;
         
-        if (args.Count > 7 && double.TryParse(args[7], out double minCal)) MinCal = minCal;
-        if (args.Count > 8 && double.TryParse(args[8], out double maxCal)) MaxCal = maxCal;
-        if (args.Count > 9 && double.TryParse(args[9], out double minPro)) MinPro = minPro;
-        if (args.Count > 10 && double.TryParse(args[10], out double maxPro)) MaxPro = maxPro;
-        if (args.Count > 11 && double.TryParse(args[11], out double minCar)) MinCar = minCar;
-        if (args.Count > 12 && double.TryParse(args[12], out double maxCar)) MaxCar = maxCar;
-        if (args.Count > 13 && double.TryParse(args[13], out double minFat)) MinFat = minFat;
-        if (args.Count > 14 && double.TryParse(args[14], out double maxFat)) MaxFat = maxFat; 
+        if (args.Count > 8 && double.TryParse(args[8], out double minCal)) MinCal = minCal;
+        if (args.Count > 9 && double.TryParse(args[9], out double maxCal)) MaxCal = maxCal;
+        if (args.Count > 10 && double.TryParse(args[10], out double minPro)) MinPro = minPro;
+        if (args.Count > 11 && double.TryParse(args[11], out double maxPro)) MaxPro = maxPro;
+        if (args.Count > 12 && double.TryParse(args[12], out double minCar)) MinCar = minCar;
+        if (args.Count > 13 && double.TryParse(args[13], out double maxCar)) MaxCar = maxCar;
+        if (args.Count > 14 && double.TryParse(args[14], out double minFat)) MinFat = minFat;
+        if (args.Count > 15 && double.TryParse(args[15], out double maxFat)) MaxFat = maxFat; 
 
-        try {return PrintEntry(_service.AddGoal(goalName, calories, protein, carbs, fat, notes, type, MinCal, MaxCal, MinPro, MaxPro, MinCar, MaxCar, MinFat, MaxFat));}
-        catch (Exception ex) {return $"Puppet.Commands.GoalCommand.Add(): 15 args, error adding goal: {ex.Message}";}
+        try {return PrintEntry(_service.AddGoal(goalName, calories, protein, carbs, fat, goalType, customType, notes, MinCal, MaxCal, MinPro, MaxPro, MinCar, MaxCar, MinFat, MaxFat));}
+        catch (Exception ex) {return $"Puppet.Commands.GoalCommand.Add(): 16 args, error adding goal: {ex.Message}";}
     }
 
     public string DeleteActivation(IReadOnlyList<string> args)
@@ -125,7 +134,7 @@ public class GoalCommand : ICommand
 
     public string Edit(IReadOnlyList<string> args)
     {
-        if (args.Count < 6) return "Not enough arguments, usage: goal edit [ID] [name] [calories] [protein] [carbs] [fat] (notes) (type) (minCal) (maxCal) (minPro) (maxPro) (minCarb) (maxCarb) (minFat) (maxFat)";
+        if (args.Count < 6) return "Not enough arguments, usage: goal edit [ID] [name] [calories] [protein] [carbs] [fat] (goalType) (customType) (notes) (type) (minCal) (maxCal) (minPro) (maxPro) (minCarb) (maxCarb) (minFat) (maxFat)";
 
         double? parseDouble(string input, double? presentValue)
         {
@@ -158,11 +167,17 @@ public class GoalCommand : ICommand
             catch (Exception ex) {return $"Puppet.Commands.GoalCommand.Edit(): 6 args, error editing goal: {ex.Message}";}
         }
 
-        // there might be a quicker way to do this, but I don't know it:
+        GoalType goalType = goal.GoalType;
+        if (args.Count > 5 && !string.IsNullOrWhiteSpace(args[6]))
+        {
+            if (args[6] != "_") try { goalType = args[6].ToGoalType(); } catch (Exception ex) { return $"Pupper.Commands.GoalCommand.Edit(): > 6 args, could not parse GoalType 'args[6]': {ex.Message}"; }
+        }
+
+        string? customType = null;
         string? notes = null;
-        string? type = null;
-        if (args.Count > 6 && !string.IsNullOrWhiteSpace(args[6])) notes = args[6] == "_" ? goal.Notes : args[6];
-        if (args.Count > 7 && !string.IsNullOrWhiteSpace(args[7])) type = args[7] == "_" ? goal.GoalType : args[7];
+
+        if (args.Count > 7 && !string.IsNullOrWhiteSpace(args[7])) customType = args[7] == "_" ? goal.CustomType : args[7];
+        if (args.Count > 8 && !string.IsNullOrWhiteSpace(args[8])) notes = args[6] == "_" ? goal.Notes : args[6];
 
         double? MinCal = goal.MinCal;
         double? MaxCal = goal.MaxCal;
@@ -173,16 +188,16 @@ public class GoalCommand : ICommand
         double? MinFat = goal.MinFat;
         double? MaxFat = goal.MaxFat;
 
-        if (args.Count > 8) MinCal = parseDouble(args[8], MinCal);
-        if (args.Count > 9) MaxCal = parseDouble(args[9], MaxCal);
-        if (args.Count > 10) MinPro = parseDouble(args[10], MinPro);
-        if (args.Count > 11) MaxPro = parseDouble(args[11], MaxPro);
-        if (args.Count > 12) MinCar = parseDouble(args[12], MinCar);
-        if (args.Count > 13) MaxCar = parseDouble(args[13], MaxCar);
-        if (args.Count > 14) MinFat = parseDouble(args[14], MinFat);
-        if (args.Count > 15) MaxFat = parseDouble(args[15], MaxFat); 
+        if (args.Count > 9) MinCal = parseDouble(args[9], MinCal);
+        if (args.Count > 10) MaxCal = parseDouble(args[10], MaxCal);
+        if (args.Count > 11) MinPro = parseDouble(args[11], MinPro);
+        if (args.Count > 12) MaxPro = parseDouble(args[12], MaxPro);
+        if (args.Count > 13) MinCar = parseDouble(args[13], MinCar);
+        if (args.Count > 14) MaxCar = parseDouble(args[14], MaxCar);
+        if (args.Count > 15) MinFat = parseDouble(args[15], MinFat);
+        if (args.Count > 16) MaxFat = parseDouble(args[16], MaxFat); 
 
-        try {return PrintEntry(_service.EditGoal(id, goalName, calories, protein, carbs, fat, notes, type, MinCal, MaxCal, MinPro, MaxPro, MinCar, MaxCar, MinFat, MaxFat));}
+        try {return PrintEntry(_service.EditGoal(id, goalName, calories, protein, carbs, fat, goalType, customType, notes, MinCal, MaxCal, MinPro, MaxPro, MinCar, MaxCar, MinFat, MaxFat));}
         catch (Exception ex) {return $"Puppet.Commands.GoalCommand.Edit(): error editing goal: {ex.Message}";}
     }
 
@@ -225,14 +240,14 @@ public class GoalCommand : ICommand
         // Since we're being cute about formatting, let's make it long and nice.
         const int lengthID = 7;
         const int lengthName = 30;
-        const int lengthType = 10;
+        const int lengthType = 15;
         const int lengthCalories = 7;
         const int lengthMacro = 6;
         const int lengthNotes = 100;
 
         string Id = Truncate($"[{goal.Id}]", lengthID);
         string GoalName = Truncate(goal.GoalName, lengthName);
-        string GoalType = goal.GoalType == null ? Truncate("-", lengthType) : Truncate(goal.GoalType, lengthType);
+        string GoalType = goal.GoalType == Core.Models.GoalType.Custom ? Truncate(goal.CustomType ?? "Unnamed Custom Type", lengthType) : Truncate(goal.GoalType.GetString(), lengthType);
 
         string Calories = Truncate(goal.Calories.ToString(), lengthCalories);
         string Protein = Truncate(goal.Protein.ToString(), lengthMacro);
@@ -257,7 +272,7 @@ public class GoalCommand : ICommand
     {
         const int lengthID = 7;
         const int lengthName = 30;
-        const int lengthType = 10;
+        const int lengthType = 15;
         const int lengthCalories = 7;
         const int lengthMacro = 6;
 

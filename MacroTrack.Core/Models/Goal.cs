@@ -27,24 +27,24 @@ public class Goal
     // New
     public Goal(string goalName, double calories, double protein, double carbs, double fat, GoalType goalType = GoalType.None, string? customType = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar =  null, double? maxCar = null, double? minFat = null, double? maxFat = null)
     {
-        GoalName = goalName;
-        Calories = calories;
-        Protein = protein;
-        Carbs = carbs;
-        Fat = fat;
+        GoalName = goalName;    // 0
+        Calories = calories;    // 1
+        Protein = protein;      // 2
+        Carbs = carbs;          // 3
+        Fat = fat;              // 4
 
-        GoalType = goalType;
+        GoalType = goalType;    // 5
         CustomType = GoalType == GoalType.Custom ? customType : null;
-        Notes = notes;
+        Notes = notes;          // 7
 
-        MinCal = minCal;
-        MaxCal = maxCal;
-        MinPro = minPro;
-        MaxPro = maxPro;
-        MinCar = minCar;
-        MaxCar = maxCar;
-        MinFat = minFat;
-        MaxFat = maxFat;
+        MinCal = minCal;        // 8
+        MaxCal = maxCal;        // 9
+        MinPro = minPro;        // 10
+        MaxPro = maxPro;        // 11
+        MinCar = minCar;        // 12
+        MaxCar = maxCar;        // 13
+        MinFat = minFat;        // 14
+        MaxFat = maxFat;        // 15
     }
 
     // Load

@@ -29,6 +29,9 @@ namespace MacroTrack.BasicApp.Forms
             InitializeComponent();
             Services = services;
             _logger = Services.Logger;
+            cbType.DataSource = GoalTypeList.NoCustom;
+            cbType.DisplayMember = "DisplayName";
+            cbType.ValueMember = "Value";
             SetToDefault();
 
             sliderProtein.ValueChanged += MacroSlider_ValueChanged;
@@ -62,7 +65,7 @@ namespace MacroTrack.BasicApp.Forms
             spinMaxCal.Enabled = false;
             spinMaxCal.Value = 2100;
 
-            cbType.SelectedIndex = 0;
+            cbType.SelectedValue = GoalType.None;
 
             sliderProtein.Enabled = true;
             sliderProtein.Value = 35;
@@ -273,7 +276,7 @@ namespace MacroTrack.BasicApp.Forms
         {
             // Try to parse everything into something...
             string name = tbName.Text;
-            string? type = cbType.SelectedIndex == 0 ? null : cbType.SelectedItem!.ToString();
+            GoalType type = cbType.SelectedValue is null ? GoalType.None : (GoalType)cbType.SelectedValue;
 
             double totalCalories = Math.Round((double)spinTotalCal.Value, 1);
             double? minCal = checkMinCal.Checked ? Math.Round((double)spinMinCal.Value, 1) : null;
@@ -319,7 +322,7 @@ namespace MacroTrack.BasicApp.Forms
 
             try 
             { 
-                Goal goal = Services.goalService.AddGoal(name, totalCalories, protein, carbs, fat, type, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
+                Goal goal = Services.goalService.AddGoal(name, totalCalories, protein, carbs, fat, type, null, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
                 Print($"Added goal: ID = [{goal.Id}] GoalName = '{goal.GoalName}', Calories = '{goal.Calories}', Protein = '{goal.Protein}', Carbs = '{goal.Carbs}', fat: '{goal.Fat}', type = '{goal.GoalType}', notes: '{goal.Notes}'");
                 Close();
             }

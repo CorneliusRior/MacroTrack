@@ -354,16 +354,6 @@ namespace MacroTrack.BasicApp
             var ca = new ChartArea("Main");
             lineChartCal.ChartAreas.Add(ca);
 
-            // Set up grid lines
-            ca.AxisX.IntervalType = DateTimeIntervalType.Weeks;
-            ca.AxisX.Interval = 1;
-            ca.AxisX.MajorGrid.IntervalType = DateTimeIntervalType.Weeks;
-            ca.AxisX.MajorGrid.Interval = 1;
-            ca.AxisX.Minimum = StartDate.ToOADate();
-            ca.AxisX.Maximum = EndDate.ToOADate();
-            ca.AxisX.LabelStyle.Format = "dd/MM";
-            ca.AxisY.MajorGrid.Enabled = true;
-
             // Set up series
             var g = new Series("Goal")
             {
@@ -382,6 +372,16 @@ namespace MacroTrack.BasicApp
                 BorderWidth = 4,
                 Color = Color.Black
             };
+
+            // Set up grid lines
+            ca.AxisX.IntervalType = DateTimeIntervalType.Weeks;
+            ca.AxisX.Interval = 1;
+            ca.AxisX.MajorGrid.IntervalType = DateTimeIntervalType.Weeks;
+            ca.AxisX.MajorGrid.Interval = 1;
+            ca.AxisX.Minimum = StartDate.ToOADate();
+            ca.AxisX.Maximum = EndDate.ToOADate();
+            ca.AxisX.LabelStyle.Format = "dd/MM";
+            ca.AxisY.MajorGrid.Enabled = true;
 
             // Give them data:
             List<GoalSeriesPoint> goalCal = _services.dataService.GetGoalSeries(StartDate, EndDate);
@@ -544,6 +544,7 @@ namespace MacroTrack.BasicApp
 
         private void btBannerSetGoal_Click(object sender, EventArgs e)
         {
+            Print("Opening SetGoal...");
             var f = new SetGoal(_services);
             f.RequestRefresh += (_, _) => RefreshUI();
             f.RequestPrint += (sender, text) => Print($"{((Control)sender!).Name}: {text}");
