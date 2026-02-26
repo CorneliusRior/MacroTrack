@@ -3,6 +3,7 @@ using MacroTrack.AppLibrary.Commands;
 using MacroTrack.AppLibrary.Models;
 using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Logging;
+using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using Microsoft.Win32;
 using System;
@@ -32,6 +33,18 @@ namespace MacroTrack.AppLibrary.ViewModels
             set
             {
                 _goalName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Just does this for the time being, change it to be a combobox:
+        private GoalType _goalType = GoalType.None;
+        public GoalType GoalType
+        {
+            get => _goalType;
+            set
+            {
+                _goalType = value;
                 OnPropertyChanged();
             }
         }
@@ -276,7 +289,7 @@ namespace MacroTrack.AppLibrary.ViewModels
                 return;
             }
 
-            string? GoalType = null;
+            string? customType = null; // replace this.
             string? notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
             double? minCal = MinCalEnabled ? Math.Round(MinCal, 1) : null;
             double? maxCal = MaxCalEnabled ? Math.Round(MaxCal, 1) : null;
@@ -287,8 +300,9 @@ namespace MacroTrack.AppLibrary.ViewModels
             double? minFat = F.MinEnabled ? Math.Round(F.Min, 1) : null;
             double? maxFat = F.MaxEnabled ? Math.Round(F.Max, 1) : null;
 
-            Services.goalService.AddGoal(GoalName, Math.Round(Calories, 1), Math.Round(P.Grams, 1), Math.Round(C.Grams, 1), Math.Round(F.Grams, 1), GoalType, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
+            Services.goalService.AddGoal(GoalName, Math.Round(Calories, 1), Math.Round(P.Grams, 1), Math.Round(C.Grams, 1), Math.Round(F.Grams, 1), GoalType, customType, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
             AppServices.AppEvents.Publish(new GoalAdded());
+            RequestClose?.Invoke(true);
         }
     }
 }

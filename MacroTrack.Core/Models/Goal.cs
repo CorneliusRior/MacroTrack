@@ -10,7 +10,9 @@ public class Goal
     public double Carbs { get; set; }
     public double Fat { get; set; }
 
-    public string? GoalType { get; set; }
+    public GoalType GoalType { get; set; }
+    //public string? GoalType { get; set; }
+    public string? CustomType { get; set; }
     public string? Notes { get; set; }
 
     public double? MinCal { get; set; }
@@ -23,7 +25,7 @@ public class Goal
     public double? MaxFat { get; set; }
 
     // New
-    public Goal(string goalName, double calories, double protein, double carbs, double fat, string? notes, string? goalType, double? minCal, double? maxCal, double? minPro, double? maxPro, double? minCar, double? maxCar, double? minFat, double? maxFat)
+    public Goal(string goalName, double calories, double protein, double carbs, double fat, GoalType goalType = GoalType.None, string? customType = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar =  null, double? maxCar = null, double? minFat = null, double? maxFat = null)
     {
         GoalName = goalName;
         Calories = calories;
@@ -31,8 +33,9 @@ public class Goal
         Carbs = carbs;
         Fat = fat;
 
-        Notes = notes;
         GoalType = goalType;
+        CustomType = GoalType == GoalType.Custom ? customType : null;
+        Notes = notes;
 
         MinCal = minCal;
         MaxCal = maxCal;
@@ -45,7 +48,7 @@ public class Goal
     }
 
     // Load
-    public Goal(int id, string goalName, double calories, double protein, double carbs, double fat, string? notes, string? goalType, double? minCal, double? maxCal, double? minPro, double? maxPro, double? minCar, double? maxCar, double? minFat, double? maxFat)
+    public Goal(int id, string goalName, double calories, double protein, double carbs, double fat, GoalType goalType = GoalType.None, string? customType = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar = null, double? maxCar = null, double? minFat = null, double? maxFat = null)
     {
         Id = id;
         GoalName = goalName;
@@ -54,8 +57,9 @@ public class Goal
         Carbs = carbs;
         Fat = fat;
 
-        Notes = notes;
         GoalType = goalType;
+        CustomType = customType;
+        Notes = notes;
 
         MinCal = minCal;
         MaxCal = maxCal;
@@ -67,3 +71,4 @@ public class Goal
         MaxFat = maxFat;
     }
 }
+
