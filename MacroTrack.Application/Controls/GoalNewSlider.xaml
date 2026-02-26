@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="MacroTrack.AppLibrary.Controls.GoalNewSlider"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"     
+             xmlns:models="clr-namespace:MacroTrack.AppLibrary.Models"
+             xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
+             xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="150">
+    <UserControl.Resources>
+        <conv:InverseBoolConverter x:Key="InverseBool"/>
+    </UserControl.Resources>
+    <Grid Grid.Column="0" d:DataContext="{d:DesignInstance models:NGMacroState}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding Name}" Style="{DynamicResource TextBlock.SmallTitle}" HorizontalAlignment="Center" Grid.Row="0"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
+            <Label Content="{Binding DisplayGrams}" ContentStringFormat="{}{0}g"/>
+            <Label Content="{Binding DisplayProp}" ContentStringFormat="({0}%)"/>
+        </StackPanel>
+
+        <Slider Value="{Binding Prop, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            IsEnabled="{Binding IsLocked, Converter={StaticResource InverseBool}}"
+            IsMoveToPointEnabled="False" SmallChange="0.01" LargeChange="0.05"
+                Minimum="0" Maximum="1" Orientation="Vertical" HorizontalAlignment="Center" 
+            Grid.Row="2"/>
+
+        <!--Manual Value Entry:-->
+        <Grid Grid.Row="3" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!--Max-->
+            <CheckBox Content="Max" IsChecked="{Binding MaxEnabled, Mode=TwoWay}"
+                  Grid.Row="0" Grid.Column="0"/>
+            <local:SpinBox Value="{Binding Max, Mode=TwoWay}" IsEnabled="{Binding MaxEnabled}" 
+                           Step="10" SmallStep="1"
+                           Width="50" ButtonWidth="12" FormatString="0.##" Margin="2" 
+                           Grid.Row="0" Grid.Column="1"/>
+
+            <!--Set-->
+            <CheckBox Content="Set" IsChecked="{Binding IsLocked, Mode=TwoWay}"
+                  Grid.Row="1" Grid.Column="0"/>
+            <local:SpinBox Value="{Binding Grams, Mode=TwoWay}" IsEnabled="{Binding IsLocked}"
+                           Step="10" SmallStep="1"
+                           Width="50" ButtonWidth="12" FormatString="0.##" Margin="2" 
+                           Grid.Row="1" Grid.Column="1"/>
+
+            <!--Min-->
+            <CheckBox Content="Min" IsChecked="{Binding MinEnabled, Mode=TwoWay}"
+                  Grid.Row="2" Grid.Column="0"/>
+            <local:SpinBox Value="{Binding Min, Mode=TwoWay}" IsEnabled="{Binding MinEnabled}" 
+                           Step="10" SmallStep="1"
+                           Width="50" ButtonWidth="12" FormatString="0.##" Margin="2"
+                           Grid.Row="2" Grid.Column="1"/>
+
+        </Grid>
+    </Grid>
+</UserControl>

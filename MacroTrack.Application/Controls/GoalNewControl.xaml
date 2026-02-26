@@ -34,177 +34,49 @@
                     </Grid.RowDefinitions>
                     <WrapPanel Orientation="Horizontal" Grid.Row="0">
                         <Label Content="Goal name:" Target="{Binding ElementName=tbGoalName}"/>
-                        <TextBox x:Name="tbGoalName" MinWidth="200"/>
+                        <TextBox x:Name="tbGoalName" Text="{Binding GoalName}" MinWidth="200"/>
                     </WrapPanel>
                     <WrapPanel Orientation="Horizontal" Grid.Row="1">
                         <Label Content="Goal type:" Target="{Binding ElementName=cbType}"/>
                         <ComboBox x:Name="cbType" Template="{DynamicResource MTComboBoxTemplate}" MinWidth="150"/>
                     </WrapPanel>
+
                     <WrapPanel Orientation="Horizontal" Grid.Row="2">
-                        <Label Content="Calories:"/>
-                        <local:SpinBox Step="100" SmallStep="10" Margin="5" Width="64" FormatString="0.##" Value="{Binding Calories}"/>
-                        <CheckBox IsChecked="{Binding MinCalEnabled}" Content="Set minimum" Margin="2"/>
-                        <local:SpinBox IsEnabled="{Binding MinCalEnabled}" Step="100" SmallStep="10" Margin="5" Width="64" FormatString="0.##" Value="{Binding MinCal}"/>
-                        <CheckBox IsChecked="{Binding MaxCalEnabled}" Content="Set maximum" Margin="2"/>
-                        <local:SpinBox IsEnabled="{Binding MaxCalEnabled}" Step="100" SmallStep="10" Margin="5" Width="64" FormatString="0.##" Value="{Binding MaxCal}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Calories:"/>
+                            <local:SpinBox Value="{Binding Calories}"
+                                           Step="100" SmallStep="10"
+                                           Width="64" ButtonWidth="12" FormatString="0.##" Margin="5"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Set Minimum" IsChecked="{Binding MinCalEnabled, Mode=TwoWay}"/>
+                            <local:SpinBox Value="{Binding MinCal, Mode=TwoWay}" IsEnabled="{Binding MinCalEnabled}"
+                                           Width="64" ButtonWidth="12" FormatString="0.##" Margin="5"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Set Maximum" IsChecked="{Binding MaxCalEnabled, Mode=TwoWay}"/>
+                            <local:SpinBox Value="{Binding MaxCal, Mode=TwoWay}" IsEnabled="{Binding MaxCalEnabled}"
+                                           Width="64" ButtonWidth="12" FormatString="0.##" Margin="5"/>
+                        </StackPanel>
                     </WrapPanel>
-                    <Grid Grid.Row="3">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
+                    
+                    <!--Sliders-->
+                    <Grid HorizontalAlignment="Center" Grid.Row="3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Label Content="Protein:" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"/>
-                        <Label Content="Carbs:" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="2"/>
-                        <Label Content="Fat:" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="3"/>
-
-
-
-                        <Slider Orientation="Vertical" Value="{Binding ProProp}" Minimum="0" 
-                                Maximum="1" x:Name="sliderPro" HorizontalAlignment="Center" 
-                                Grid.Row="2" Grid.Column="1">
-                            <Slider.IsEnabled>
-                                <MultiBinding Converter="{StaticResource AndBool}">
-                                    <Binding Path="CanSetPro"/>
-                                    <Binding Path="SetProEnabled" Converter="{StaticResource InverseBool}"/>
-                                </MultiBinding>
-                            </Slider.IsEnabled>
-                        </Slider>
-                        <Slider Orientation="Vertical" Value="{Binding CarProp}"
-                                Minimum="0" Maximum="1" x:Name="sliderCar" HorizontalAlignment="Center" 
-                                Grid.Row="2" Grid.Column="2">
-                            <Slider.IsEnabled>
-                                <MultiBinding Converter="{StaticResource AndBool}">
-                                    <Binding Path="CanSetCar"/>
-                                    <Binding Path="SetCarEnabled" Converter="{StaticResource InverseBool}"/>
-                                </MultiBinding>
-                            </Slider.IsEnabled>
-                        </Slider>
-                        <Slider Orientation="Vertical" Value="{Binding FatProp}"
-                                Minimum="0" Maximum="1" x:Name="sliderFat" HorizontalAlignment="Center"
-                                Grid.Row="2" Grid.Column="3">
-                            <Slider.IsEnabled>
-                                <MultiBinding Converter="{StaticResource AndBool}">
-                                    <Binding Path="CanSetFat"/>
-                                    <Binding Path="SetFatEnabled" Converter="{StaticResource InverseBool}"/>
-                                </MultiBinding>
-                            </Slider.IsEnabled>
-                        </Slider>
-
-                        <Grid Grid.Row="3" Grid.Column="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding MaxProEnabled}" Content="Max" x:Name="cbxProMax" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding MaxPro}" IsEnabled="{Binding MaxProEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
-                        <Grid Grid.Row="4" Grid.Column="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding SetProEnabled}" IsEnabled="{Binding CanSetPro}" Content="Set" x:Name="cbxProSet" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding Protein}" IsEnabled="{Binding SetProEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
-                        <Grid Grid.Row="5" Grid.Column="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding MinProEnabled}" Content="Min" x:Name="cbxProMin" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding MinPro}" IsEnabled="{Binding MinProEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
-
-                        <Grid Grid.Row="3" Grid.Column="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding MaxCarEnabled}" Content="Max" x:Name="cbxCarMax" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding MaxCar}" IsEnabled="{Binding MaxCarEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
-                        <Grid Grid.Row="4" Grid.Column="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding SetCarEnabled}" IsEnabled="{Binding CanSetCar}" Content="Set" x:Name="cbxCarSet" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding Carbs}" IsEnabled="{Binding SetCarEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
-                        <Grid Grid.Row="5" Grid.Column="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding MinCarEnabled}" Content="Min" x:Name="cbxCarMin" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding MinCar}" IsEnabled="{Binding MinCarEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
-
-                        <Grid Grid.Row="3" Grid.Column="3">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding MaxFatEnabled}" Content="Max" x:Name="cbxFatMax" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding MaxFat}" IsEnabled="{Binding MaxFatEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
-                        <Grid Grid.Row="4" Grid.Column="3">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding SetFatEnabled}" IsEnabled="{Binding CanSetFat}" Content="Set" x:Name="cbxFatSet" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding Fat}" IsEnabled="{Binding SetFatEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
-                        <Grid Grid.Row="5" Grid.Column="3">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding MinFatEnabled}" Content="Min" x:Name="cbxFatMin" Margin="2" Grid.Column="0"/>
-                            <local:SpinBox Value="{Binding MinFat}" IsEnabled="{Binding MinFatEnabled}" 
-                                           FormatString="0.##" Step="10" SmallStep="1" 
-                                           Width="50" Margin="2" ButtonWidth="15" HorizontalAlignment="Right"
-                                           Grid.Column="1"/>
-                        </Grid>
+                        <!--Each slider is its own grid w/ data context-->
+                        <!--Protein:-->
+                        <local:GoalNewSlider DataContext="{Binding P}" Grid.Column="0"/>
+                        <local:GoalNewSlider DataContext="{Binding C}" Grid.Column="1"/>
+                        <local:GoalNewSlider DataContext="{Binding F}" Grid.Column="2"/>
                     </Grid>
+
                     <Label Content="Notes:" Grid.Row="4"/>
                     <TextBox x:Name="tbNotes" Text="{Binding Notes}" TextWrapping="Wrap" VerticalContentAlignment="Top" Grid.Row="5"/>
+                    
                 </Grid>
             </ScrollViewer>
 

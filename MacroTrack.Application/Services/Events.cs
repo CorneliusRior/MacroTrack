@@ -33,6 +33,7 @@ namespace MacroTrack.AppLibrary.Services
     public sealed record DiaryChanged;
     public sealed record FoodLogChanged;
     public sealed record GoalChanged;
+    public sealed record GoalAdded;
     public sealed record PresetListChanged;
     public sealed record PreviousPeriodRequested(TimePeriod period);
     public sealed record TaskCompletionChanged;
