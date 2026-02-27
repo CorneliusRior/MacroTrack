@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MacroTrack.Application\MacroTrack.AppLibrary.csproj" />
+    <ProjectReference Include="..\MacroTrack.Puppet2\MacroTrack.Puppet2.csproj" />
   </ItemGroup>
 
 </Project>

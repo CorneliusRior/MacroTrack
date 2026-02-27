@@ -6,6 +6,8 @@ using MacroTrack.AppLibrary.Windows.SettingsWindow;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
+using MacroTrack.Puppet2;
+using MacroTrack.Puppet2.Commands;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -29,6 +31,7 @@ namespace MacroTrack.Dashboard
         public CoreServices Services { get; private set; } = null!;
         public AppServices AppServices { get; private set; } = null!;
         private IMTLogger Logger = null!;
+        private ReplService _repl = null!;
         private readonly MainWindowVM? _vm;
 
         // Event Subscriptions:
@@ -36,7 +39,7 @@ namespace MacroTrack.Dashboard
 
         public MainWindow()
         {
-            
+
         }
 
         public MainWindow(CoreServices services, AppServices appServices) : this()
@@ -44,6 +47,9 @@ namespace MacroTrack.Dashboard
             Services = services;
             Logger = services.Logger;
             AppServices = appServices;
+            _repl = new ReplService(services);
+
+
             _vm = new MainWindowVM(Services, AppServices);
             DataContext = _vm;
             InitializeComponent();
@@ -120,15 +126,17 @@ namespace MacroTrack.Dashboard
 
         private void Repl_CommandHandler(object? sender, string cmd)
         {
+            if (Services is null) { Print("Error: Null Services"); return; }
             Log($"Command \"{cmd}\"", LogLevel.Info);
 
             // Echo entered command:
             Print($"> {cmd}");
-
-            // Handle (do externally):
-
             // This is a little test, disregard:
             if (cmd.ToLowerInvariant() == "hello world") Print("Hello!");
+
+            // Handle (do externally):
+            var result = _repl.Execute(cmd);
+            Print(result.Output);
         }
 
 
