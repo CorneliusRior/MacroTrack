@@ -17,7 +17,7 @@ namespace MacroTrack.Puppet2.Commands
         public override string ShortHelp => "Prints command information on all command, or one specifically";
         public override string LongHelp => $"If left blank, prints a list of all commands along with their description or their \"ShortHelp\". If a command name is specified, print a more detailed explanation of the command, including the name, aliases, usage, short help and long help of the command.";
         
-        public override PuppetResult Execute(IReadOnlyList<string> args)
+        public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
             if (args.Count == 0)
             {

@@ -1,7 +1,9 @@
 ﻿using MacroTrack.Core.Services;
 using MacroTrack.Puppet2.Commands;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace MacroTrack.Puppet2
@@ -18,11 +20,16 @@ namespace MacroTrack.Puppet2
         public PuppetResult Execute(string input)
         {
             var tokens = Tokenize(input);
+            foreach (string s in tokens) p(s);
             if (tokens.Count == 0) return PuppetResult.Ok("");
-            var head = tokens[0].ToLowerInvariant();
+
+            var head = TokenizeCommandHead(tokens[0]);
+            foreach (string s in head) p(s);
             var args = tokens.Skip(1).ToList();
-            if (!_map.TryGetValue(head, out var cmd)) return PuppetResult.Fail($"Unknown command '{head}', type 'help'.");
-            try { return cmd.Execute(args); }
+            foreach (string s in args) p(s);
+
+            if (!_map.TryGetValue(head[0], out var cmd)) return PuppetResult.Fail($"Unknown command '{head[0]}', type 'help'.");
+            try { return cmd.Execute(head, args); }
             catch (PuppetUserException ex) { return PuppetResult.Fail(ex.Message); }
             catch (Exception ex) { return PuppetResult.Fail($"Command '{head}' failed: {ex.Message}"); }
         }
@@ -60,7 +67,7 @@ namespace MacroTrack.Puppet2
         /// <returns></returns>
         public bool TryGetCommand(string name, [NotNullWhen(true)] out IPuppetCommand? command) =>_map.TryGetValue(name, out command);        
 
-        // Tokenizer (upgrade to read machine/human?)
+        // Tokenizer
         private static List<string> Tokenize(string input)
         {
             List<string> tokens = new();
@@ -93,16 +100,43 @@ namespace MacroTrack.Puppet2
                     current.Append(c);
                 }
             }
-
             if (current.Length > 0)
             {
                 tokens.Add(current.ToString());
             }
-
             return tokens;
         }
-    }
 
+        // Subcommand tokenizer, used to split "Diary.Add"/"Diary.Delete" &c. if we want to do it that way.
+        private static List<string> TokenizeCommandHead(string head)
+        {
+            List<string> tokens = new();
+            if (string.IsNullOrWhiteSpace(head)) return tokens;
+
+            var current = new StringBuilder();
+            foreach (char c in head.Trim())
+            {
+                if (c == '.')
+                {
+                    tokens.Add(current.ToString());
+                    current.Clear();
+                }
+                else current.Append(c);
+            }
+            if (current.Length > 0) tokens.Add(current.ToString());
+            return tokens;
+        }
+
+        /// <summary>
+        /// Better debugging printer. Ignore all parameters except "Message", the rest fill in automatically.
+        /// </summary>
+        /// <param name="message"></param>
+        public static void p(string message, [CallerMemberName] string member = "", [CallerFilePath] string file = "", [CallerLineNumber] int line = 0)
+        {
+            Debug.WriteLine($"{Path.GetFileName(file)} line {line} {member}(): {message}");
+        }
+    }
+    
     public interface IPuppetContext
     {
         IReadOnlyCollection<IPuppetCommand> CommandList { get; }

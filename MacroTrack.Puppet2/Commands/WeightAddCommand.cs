@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+/*
 namespace MacroTrack.Puppet2.Commands
 {
     public class WeightAddCommand : PuppetCommandBase
@@ -19,7 +19,7 @@ namespace MacroTrack.Puppet2.Commands
         public override string ShortHelp => "Adds weight entry to weight log (Kg).";
         public override string LongHelp => "Adds specified weight in Kg to the weight log at the specified date.";
 
-        public override PuppetResult Execute(IReadOnlyList<string> args)
+        public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
             WeightEntry entry;
             if (args.Count == 1 && args[0].TrimStart().StartsWith("{"))
@@ -40,3 +40,4 @@ namespace MacroTrack.Puppet2.Commands
         private sealed record WeightAddPayload(double Weight, DateTime? Time);
     }
 }
+*/

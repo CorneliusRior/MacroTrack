@@ -14,6 +14,6 @@ namespace MacroTrack.Puppet2.Commands
         string Usage { get; }
         string ShortHelp { get; }
         string LongHelp { get; }
-        PuppetResult Execute(IReadOnlyList<string> args);
+        PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args);
     }
 }

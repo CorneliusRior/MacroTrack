@@ -16,7 +16,7 @@ namespace MacroTrack.Puppet2.Commands
         public override string ShortHelp => "Lists all commands";
         public override string LongHelp => "Lists all commands which are available to the ReplEngine.";
 
-        public override PuppetResult Execute(IReadOnlyList<string> args)
+        public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
             string commandString = $"All commands. Type help <CommandName> for more details.";
             foreach (string cmd in _context.CommandList.OrderBy(c => c.Name).Select(c => c.Name)) commandString += Environment.NewLine + cmd;

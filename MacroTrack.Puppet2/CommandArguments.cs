@@ -142,7 +142,7 @@ namespace MacroTrack.Puppet2
         /// <param name="fallBack">Default return value</param>
         public static DateTime dateTimeOr(this IReadOnlyList<string> args, int index, string name, DateTime fallback)
         {
-            if (index > args.Count) return fallback;
+            if (index >= args.Count) return fallback;
             if (!DateTime.TryParse(args[index], out DateTime v)) throw new PuppetUserException($"Cannot parse DateTime '{name}': '{args[index]}'.");
             return v;
         }
@@ -154,7 +154,7 @@ namespace MacroTrack.Puppet2
         /// <param name="name">Assigned name for string, included in exception message</param>
         public static DateTime? dateTimeOrNull(this IReadOnlyList<string> args, int index, string name)
         {
-            if (index > args.Count) return null;
+            if (index >= args.Count) return null;
             if (!DateTime.TryParse(args[index], out DateTime v)) throw new PuppetUserException($"Cannot parse DateTime '{name}': '{args[index]}'.");
             return v;
         }

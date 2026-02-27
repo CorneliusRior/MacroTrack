@@ -16,7 +16,7 @@ namespace MacroTrack.Puppet2.Commands
         public override string ShortHelp => "Prints text to the output.";
         public override string LongHelp => "Standard print command, echos the text back";
        
-        public override PuppetResult Execute(IReadOnlyList<string> args)
+        public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
             if (args.Count == 0) return PuppetResult.Fail("Nothing to print :(");
             return PuppetResult.Ok(string.Join(" ", args));

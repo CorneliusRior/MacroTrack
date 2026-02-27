@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+/*
 namespace MacroTrack.Puppet2.Commands
 {
     internal class WeightDeleteCommand : PuppetCommandBase
@@ -18,7 +18,7 @@ namespace MacroTrack.Puppet2.Commands
         public override string ShortHelp => "Deletes the specified weight entry.";
         public override string LongHelp => "Deletes the specified weight entry. Try weight.list to find IDs";
 
-        public override PuppetResult Execute(IReadOnlyList<string> args)
+        public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
             WeightEntry entry;
             if (args.Count == 1 && args[0].TrimStart().StartsWith("{"))
@@ -35,4 +35,4 @@ namespace MacroTrack.Puppet2.Commands
         }
         private sealed record WeightDeletePayload(int Id);
     }
-}
+}*/
