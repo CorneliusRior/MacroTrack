@@ -14,9 +14,14 @@ namespace MacroTrack.Puppet2.Commands
         public WeightCommand(CoreServices services, IPuppetContext context) : base(services, context) { }
         public override string Name => "weight";
         public override IReadOnlyList<string> Aliases => new[] { "weightlog", "w" };
-        public override string Usage =>  "Weight.Add/Delete";
-        public override string ShortHelp => "Commands for interacting with WeightLog";
-        public override string LongHelp => "Add & Delete";
+
+        // Attempting to allow help to reach subcommands:
+        public override IReadOnlyList<CommandHelp> Help =>
+        [
+            new(["Weight"], "Weight.<subcommand: add/delete>", "Commands for interacting with WeightLog.", Aliases: Aliases),
+            new(["Weight", "Add"], "Weight.Add <double weight> (DateTime time)", "Adds a weight (Kg) to entry at specified time, or current time if not speficied.", "weight.add 80 27-02-2026 20:45:00", Aliases: new[] { "add", "+", "new" }),
+            new(["Weight", "Delete"], "Weight.Delete <double Id>", "Deletes the weight entry with specified Id.", "Weight.Delete 50", Aliases: new[] { "add", "-", "remove" })
+        ];
 
         public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
@@ -24,7 +29,11 @@ namespace MacroTrack.Puppet2.Commands
             return head[1].ToLowerInvariant().Trim() switch
             {
                 "add"       => Add(args),
+                "+"         => Add(args),
+                "new"       => Add(args),
                 "delete"    => Delete(args),
+                "-"         => Delete(args),
+                "remove"    => Delete(args),
                 _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'")
             };
         }

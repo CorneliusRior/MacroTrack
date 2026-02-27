@@ -22,9 +22,9 @@ namespace MacroTrack.Puppet2.Commands
 
         public abstract string Name { get; }
         public virtual IReadOnlyList<string> Aliases => Array.Empty<string>();
-        public abstract string Usage { get; }
-        public abstract string ShortHelp { get; }
-        public abstract string LongHelp { get; }
+
+        // Attempting to allow help to reach subcommands:
+        public abstract IReadOnlyList<CommandHelp> Help { get; }
 
         public abstract PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args);
 
@@ -39,4 +39,6 @@ namespace MacroTrack.Puppet2.Commands
             Debug.WriteLine($"{Path.GetFileName(file)} line {line} {member}(): {message}");
         }
     }
+
+    public sealed record CommandHelp(IReadOnlyList<string> Head, string Usage, string Description, string Example = "", string LongDescription = "", IReadOnlyList<string>? Aliases = null);
 }

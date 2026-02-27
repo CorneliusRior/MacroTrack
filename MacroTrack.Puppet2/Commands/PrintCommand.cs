@@ -12,10 +12,12 @@ namespace MacroTrack.Puppet2.Commands
         public PrintCommand(CoreServices services, IPuppetContext context) : base(services, context) { }
         public override string Name => "print";
         public override IReadOnlyList<string> Aliases => new[] { "p", "echo" };
-        public override string Usage => "print <string message>";
-        public override string ShortHelp => "Prints text to the output.";
-        public override string LongHelp => "Standard print command, echos the text back";
-       
+
+        public override IReadOnlyList<CommandHelp> Help =>
+        [
+            new(["Print"], "Print <string message>", "Prints text to the output.", Aliases: Aliases)
+        ];
+
         public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
             if (args.Count == 0) return PuppetResult.Fail("Nothing to print :(");

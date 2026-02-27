@@ -12,9 +12,10 @@ namespace MacroTrack.Puppet2.Commands
         public CommandsCommand(CoreServices services, IPuppetContext context) : base(services, context) { }
         public override string Name => "commands";
         public override IReadOnlyList<string> Aliases => new[] { "command", "commandlist", "helplist" };
-        public override string Usage => "commands";
-        public override string ShortHelp => "Lists all commands";
-        public override string LongHelp => "Lists all commands which are available to the ReplEngine.";
+        public override IReadOnlyList<CommandHelp> Help =>
+        [
+            new(["Commands"], "Commands", "Lists all available commands.", Aliases: Aliases)    
+        ];
 
         public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {

@@ -11,9 +11,7 @@ namespace MacroTrack.Puppet2.Commands
     {
         string Name { get; }
         IReadOnlyList<string> Aliases { get; }
-        string Usage { get; }
-        string ShortHelp { get; }
-        string LongHelp { get; }
+        IReadOnlyList<CommandHelp> Help { get; }
         PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args);
     }
 }

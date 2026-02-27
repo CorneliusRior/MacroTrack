@@ -28,6 +28,15 @@ namespace MacroTrack.Puppet2
             var args = tokens.Skip(1).ToList();
             foreach (string s in args) p(s);
 
+            // if the first argument is "help" or "?", we pass that to HelpCommand.
+
+            if (args.Count > 0) if (args[0].ToLowerInvariant().Trim() == "help" || args[0].ToLowerInvariant().Trim() == "?")
+            {
+                try { return _map.GetValueOrDefault("help")!.Execute(TokenizeCommandHead("help"), Tokenize(tokens[0])); }
+                catch (PuppetUserException ex) { return PuppetResult.Fail(ex.Message); }
+                catch (Exception ex) { return PuppetResult.Fail($"Command '{head}' failed: {ex.Message}"); }
+            }
+
             if (!_map.TryGetValue(head[0], out var cmd)) return PuppetResult.Fail($"Unknown command '{head[0]}', type 'help'.");
             try { return cmd.Execute(head, args); }
             catch (PuppetUserException ex) { return PuppetResult.Fail(ex.Message); }
