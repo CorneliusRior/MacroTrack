@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MacroTrack.Puppet2.Commands
@@ -19,9 +20,19 @@ namespace MacroTrack.Puppet2.Commands
 
         public override PuppetResult Execute(IReadOnlyList<string> args)
         {
-            int id = args.Int(0, "Id");
-            WeightEntry entry = _services.weightLogService.DeleteEntry(id);
-            return PuppetResult.Ok($"Deleted entry #{entry.Id}");
+            WeightEntry entry;
+            if (args.Count == 1 && args[0].TrimStart().StartsWith("{"))
+            {
+                var payload = JsonSerializer.Deserialize<WeightDeletePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload");
+                entry = _services.weightLogService.DeleteEntry(payload.Id);
+            }
+            else
+            {
+                int id = args.Int(0, "Id");
+                entry = _services.weightLogService.DeleteEntry(id);
+            }
+            return PuppetResult.Ok($"Deleted entry #{entry.Id}");            
         }
+        private sealed record WeightDeletePayload(int Id);
     }
 }

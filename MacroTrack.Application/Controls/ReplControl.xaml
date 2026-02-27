@@ -28,6 +28,7 @@
 
                 <TextBox Grid.Column="0"
                          Name="tbInput"
+                         PreviewKeyDown="tbInput_KeyDown"
                          KeyDown="tbInput_KeyDown"
                          Style="{StaticResource TextBox.ReplInput}"
                          Padding="5"

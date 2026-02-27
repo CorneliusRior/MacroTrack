@@ -26,6 +26,9 @@ namespace MacroTrack.AppLibrary.Controls
     {
         private readonly ReplVM _vm = new();
         public event EventHandler<string>? SubmitCommand;
+        private List<string> _history = new();
+        private int _historyIndex = -1;
+        private string _current = "";
         public ReplControl()
         {
             InitializeComponent();
@@ -63,12 +66,34 @@ namespace MacroTrack.AppLibrary.Controls
                 Submit();
                 e.Handled = true;
             }
+            if (e.Key == Key.Up)
+            {
+                if (_historyIndex == 0) return;
+                if (_historyIndex == _history.Count) _current = tbInput.Text;
+                if (_historyIndex > 0) _historyIndex--;
+                tbInput.Text = _history[_historyIndex];
+                tbInput.CaretIndex = tbInput.Text.Length;
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.Down)
+            {
+                if (_historyIndex < _history.Count) _historyIndex++;
+                if (_historyIndex == _history.Count) tbInput.Text = _current;
+                else tbInput.Text = _history[_historyIndex];
+                tbInput.CaretIndex = tbInput.Text.Length;
+                e.Handled = true;
+                return;
+            }
         }
 
         private void Submit()
         {
             var input = tbInput.Text.Trim();
             if (string.IsNullOrWhiteSpace(input)) return;
+            _history.Add(input);
+            _historyIndex = _history.Count;
+            _current = "";
             SubmitCommand?.Invoke(this, input);
             tbInput.Clear();
         }

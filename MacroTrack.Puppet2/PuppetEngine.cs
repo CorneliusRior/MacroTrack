@@ -66,23 +66,28 @@ namespace MacroTrack.Puppet2
             List<string> tokens = new();
             if (string.IsNullOrWhiteSpace(input)) return tokens;
 
-            var current = new System.Text.StringBuilder();
+            var current = new StringBuilder();
             bool inQuotes = false;
+            int braceDepth = 0;
 
             foreach (char c in input.Trim())
             {
                 if (c == '"')
                 {
                     inQuotes = !inQuotes;
+                    if (braceDepth > 0) current.Append(c);
                     continue;
                 }
-
-                if (!inQuotes && char.IsWhiteSpace(c) && current.Length > 0)
+                if (!inQuotes)
+                {
+                    if (c == '{') braceDepth++;
+                    if (c == '}') braceDepth--;
+                }    
+                if (!inQuotes && char.IsWhiteSpace(c) && current.Length > 0 && braceDepth == 0)
                 {
                     tokens.Add(current.ToString());
                     current.Clear();
                 }
-
                 else
                 {
                     current.Append(c);
