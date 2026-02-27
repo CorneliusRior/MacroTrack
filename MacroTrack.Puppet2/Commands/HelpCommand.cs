@@ -8,23 +8,16 @@ using System.Windows.Input;
 
 namespace MacroTrack.Puppet2.Commands
 {
-    public class HelpCommand : IPuppetCommand
+    public class HelpCommand : PuppetCommandBase
     {
-        public string Name => "help";
-        public IReadOnlyList<string> Aliases => new[] { "?", "h" };
-        public string Usage => "help (string CommandName)";
-        public string ShortHelp => "Prints command information on all command, or one specifically";
-        public string LongHelp => $"If left blank, prints a list of all commands along with their description or their \"ShortHelp\". If a command name is specified, print a more detailed explanation of the command, including the name, aliases, usage, short help and long help of the command.";
-
-        private readonly CoreServices _services;
-        private readonly IPuppetContext _context;
-        public HelpCommand(CoreServices services, IPuppetContext context) 
-        { 
-            _services = services;
-            _context = context;
-        }
-
-        public PuppetResult Execute(IReadOnlyList<string> args)
+        public HelpCommand(CoreServices services, IPuppetContext context) : base(services, context) { }
+        public override string Name => "help";
+        public override IReadOnlyList<string> Aliases => new[] { "?", "h" };
+        public override string Usage => "help (string CommandName)";
+        public override string ShortHelp => "Prints command information on all command, or one specifically";
+        public override string LongHelp => $"If left blank, prints a list of all commands along with their description or their \"ShortHelp\". If a command name is specified, print a more detailed explanation of the command, including the name, aliases, usage, short help and long help of the command.";
+        
+        public override PuppetResult Execute(IReadOnlyList<string> args)
         {
             if (args.Count == 0)
             {

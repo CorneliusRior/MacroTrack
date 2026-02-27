@@ -23,6 +23,7 @@ namespace MacroTrack.Puppet2
             var args = tokens.Skip(1).ToList();
             if (!_map.TryGetValue(head, out var cmd)) return PuppetResult.Fail($"Unknown command '{head}', type 'help'.");
             try { return cmd.Execute(args); }
+            catch (PuppetUserException ex) { return PuppetResult.Fail(ex.Message); }
             catch (Exception ex) { return PuppetResult.Fail($"Command '{head}' failed: {ex.Message}"); }
         }
         

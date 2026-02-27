@@ -7,18 +7,16 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.Puppet2.Commands
 {
-    public class PrintCommand : IPuppetCommand
+    public class PrintCommand : PuppetCommandBase
     {
-        public string Name => "print";
-        public IReadOnlyList<string> Aliases => new[] { "p", "echo" };
-        public string Usage => "print <string message>";
-        public string ShortHelp => "Prints text to the output.";
-        public string LongHelp => "Standard print command, echos the text back";
-
-        private readonly CoreServices _services;
-        public PrintCommand(CoreServices services, IPuppetContext context) { _services = services; }
-
-        public PuppetResult Execute(IReadOnlyList<string> args)
+        public PrintCommand(CoreServices services, IPuppetContext context) : base(services, context) { }
+        public override string Name => "print";
+        public override IReadOnlyList<string> Aliases => new[] { "p", "echo" };
+        public override string Usage => "print <string message>";
+        public override string ShortHelp => "Prints text to the output.";
+        public override string LongHelp => "Standard print command, echos the text back";
+       
+        public override PuppetResult Execute(IReadOnlyList<string> args)
         {
             if (args.Count == 0) return PuppetResult.Fail("Nothing to print :(");
             return PuppetResult.Ok(string.Join(" ", args));

@@ -11,4 +11,13 @@ namespace MacroTrack.Puppet2
         public static PuppetResult Ok(string output) => new(true, output);
         public static PuppetResult Fail(string output) => new(true, output);
     }
+
+    public sealed class PuppetUserException : Exception
+    {
+        public string? SourceCommand { get; }
+        public PuppetUserException(string message, string? sourceCommand = null) : base(message) 
+        {
+            SourceCommand = sourceCommand;
+        }
+    }
 }

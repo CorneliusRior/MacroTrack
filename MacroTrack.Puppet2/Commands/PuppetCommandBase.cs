@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,5 +26,7 @@ namespace MacroTrack.Puppet2.Commands
         public abstract string LongHelp { get; }
 
         public abstract PuppetResult Execute(IReadOnlyList<string> args);
+
+        protected string Location([CallerMemberName] string member = "") => $"{GetType().FullName}.{member}()";
     }
 }
