@@ -37,6 +37,22 @@ public class DiaryService : ServiceBase
         return entry;
     }
 
+    // With date enabled: We usually don't allow this, feels like a security thing, like getting rid of evidence, idk.
+    public DiaryEntry AddEntryAtTime(string body, DateTime time)
+    {
+        Log();
+        _repo.AddEntry(new DiaryEntry(time, body));
+        var entry = _repo.GetEntry(_repo.ReturnLastId());
+        if (entry == null)
+        {
+            Exception ex = new Exception("Entry returned as null after adding, connection issue?");
+            Log("Error adding entry.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        Log($"Added entry {entry.Id}.", LogLevel.Info);
+        return entry;
+    }
+
     public DiaryEntry EditEntry(int id, string body, string editNotes)
     {
         Log($"Edit to entry #{id} requested");

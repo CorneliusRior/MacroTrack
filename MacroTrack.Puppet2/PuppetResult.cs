@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MacroTrack.Puppet2.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,32 @@ namespace MacroTrack.Puppet2
     public sealed record PuppetResult(bool Success, string Output)
     {
         public static PuppetResult Ok(string output) => new(true, output);
-        public static PuppetResult Fail(string output) => new(true, output);
+        public static PuppetResult Fail(string output) => new(false, output);
+        public static PuppetResult FailHelp(CommandHelp help, FailHelpType failType = FailHelpType.Default)
+        {
+            string output;
+            output = failType switch
+            {
+                FailHelpType.Default => $"{string.Join('.', help.Head)}",
+                FailHelpType.NoSubCommand => $"{string.Join('.', help.Head)} requires a subcommand. {(help.SubCommands is null ? "" : $"Available subcommands: {{ \"{string.Join($"\", \"")}\" }}")}",
+                FailHelpType.NoArgs => $"{string.Join('.', help.Head)} requires arguments.",
+                _ => throw new ArgumentOutOfRangeException()
+
+            };
+            if (help.Aliases is not null) output += $"\n{"Aliases", -15} {{ \"{string.Join($"\", \"", help.Aliases)}\" }}";
+            output += $"\n{"Usage:",-15} {help.Usage}\n{"Description:",-15} {help.Description}";
+            if (!string.IsNullOrWhiteSpace(help.Example)) output += $"\n{"Example:",-15} {help.Example}";
+            if (!string.IsNullOrWhiteSpace(help.LongDescription)) output += $"\n{help.LongDescription}";
+
+            return new(false, output);
+        }
+    }
+
+    public enum FailHelpType
+    {
+        Default,
+        NoSubCommand,
+        NoArgs
     }
 
     public sealed class PuppetUserException : Exception

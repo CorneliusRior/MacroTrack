@@ -35,4 +35,10 @@ public class GoalActivation
         ActivatedAt = activatedAt;
         DeactivatedAt = deactivatedAt;
     }
+
+    // List (should do this for each of them but we're starting with this one:
+    const int PrintIdSpace = -8;
+    const int PrintDateSpace = -11;
+    public string Print(string dateFormat = "yyyy-MM-dd") => $"#{Id, PrintIdSpace}#{GoalId, PrintIdSpace}{ActivatedAt.ToString(dateFormat), PrintDateSpace}{DeactivatedAt.ToString(dateFormat), PrintDateSpace}";
+    public static string PrintHeader() => $"{"ID:",PrintIdSpace} {"Goal ID:",PrintIdSpace} {"Activated:", PrintDateSpace}{"Deactivated:", PrintDateSpace}";
 }

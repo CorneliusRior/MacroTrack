@@ -40,7 +40,7 @@ namespace MacroTrack.Puppet2
             if (!_map.TryGetValue(head[0], out var cmd)) return PuppetResult.Fail($"Unknown command '{head[0]}', type 'help'.");
             try { return cmd.Execute(head, args); }
             catch (PuppetUserException ex) { return PuppetResult.Fail(ex.Message); }
-            catch (Exception ex) { return PuppetResult.Fail($"Command '{head}' failed: {ex.Message}"); }
+            catch (Exception ex) { return PuppetResult.Fail($"Command '{string.Join('.', head)}' failed: {ex.Message}"); }
         }
         
         // Discover commands:

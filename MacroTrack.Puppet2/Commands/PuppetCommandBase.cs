@@ -40,5 +40,5 @@ namespace MacroTrack.Puppet2.Commands
         }
     }
 
-    public sealed record CommandHelp(IReadOnlyList<string> Head, string Usage, string Description, string Example = "", string LongDescription = "", IReadOnlyList<string>? Aliases = null);
+    public sealed record CommandHelp(IReadOnlyList<string> Head, string Usage, string Description, string Example = "", string LongDescription = "", IReadOnlyList<string>? Aliases = null, IReadOnlyList<string>? SubCommands = null);
 }

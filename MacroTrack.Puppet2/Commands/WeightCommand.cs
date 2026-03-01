@@ -41,9 +41,9 @@ namespace MacroTrack.Puppet2.Commands
         private PuppetResult Add(IReadOnlyList<string> args)
         {
             WeightEntry entry;
-            if (args.Count == 1 && args[0].TrimStart().StartsWith("{"))
+            if (args.IsJson())
             {
-                var payload = JsonSerializer.Deserialize<WeightAddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                var payload = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
                 DateTime time = payload.Time ?? DateTime.Now;
                 entry = _services.weightLogService.AddEntry(time, payload.Weight);
             }
@@ -53,15 +53,15 @@ namespace MacroTrack.Puppet2.Commands
                 DateTime time = args.dateTimeOr(1, "Time", DateTime.Now);
                 entry = _services.weightLogService.AddEntry(time, weight);
             }
-            return PuppetResult.Ok($"Added entry #{entry.Id}");
+            return PuppetResult.Ok($"Added WeightLog Entry #{entry.Id}");
         }
 
         private PuppetResult Delete(IReadOnlyList<string> args)
         {
             WeightEntry entry;
-            if (args.Count == 1 && args[0].TrimStart().StartsWith("{"))
+            if (args.IsJson())
             {
-                var payload = JsonSerializer.Deserialize<WeightDeletePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload");
+                var payload = JsonSerializer.Deserialize<DeletePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload");
                 entry = _services.weightLogService.DeleteEntry(payload.Id);
             }
             else
@@ -72,7 +72,7 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Deleted entry #{entry.Id}");
         }
 
-        private sealed record WeightAddPayload(double Weight, DateTime? Time);
-        private sealed record WeightDeletePayload(int Id);
+        private sealed record AddPayload(double Weight, DateTime? Time);
+        private sealed record DeletePayload(int Id);
     }
 }
