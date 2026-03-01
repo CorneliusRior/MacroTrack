@@ -30,6 +30,7 @@ namespace MacroTrack.Dashboard
         public AppServices AppServices;
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public ICommand GeneralRefreshCommand { get; }
         public ICommand PrintCommand { get; }
         public event Action<string>? RequestPrint;
         public ICommand OpenPreviousPeriodCommand { get; }
@@ -150,6 +151,7 @@ namespace MacroTrack.Dashboard
 
             // Commands (some might be redundant)
             //RefreshSummaryCommand = new RelayCommand(RefreshSummary);
+            GeneralRefreshCommand = new RelayCommand(() => AppServices.AppEvents.Publish(new GeneralRefresh()));
             PrintCommand = new RelayCommand(() => RequestPrint?.Invoke(""));
             OpenPreviousPeriodCommand = new RelayCommand<TimePeriod>(OpenPreviousPeriod);
 
@@ -161,18 +163,26 @@ namespace MacroTrack.Dashboard
                 SetHistoryString();
             });
             _subscriptions.Add(_subSettingsChanged);
-            IDisposable _foodLogChanged = AppServices.AppEvents.Subscribe<FoodLogChanged>(_ =>
+            IDisposable _subFoodLogChanged = AppServices.AppEvents.Subscribe<FoodLogChanged>(_ =>
             {
                 RefreshSummary();
             });
+            _subscriptions.Add(_subFoodLogChanged);
+            IDisposable _subGeneralRefresh = AppServices.AppEvents.Subscribe<GeneralRefresh>(_ =>
+            {
+                RefreshSummary();
+            });
+            _subscriptions.Add(_subGeneralRefresh);
             IDisposable _subGoalChanged = AppServices.AppEvents.Subscribe<GoalChanged>(_ =>
             {
                 RefreshSummary();
             });
+            _subscriptions.Add(_subGoalChanged);
             IDisposable _subPreviousPeriodRequested = AppServices.AppEvents.Subscribe<PreviousPeriodRequested>(msg =>
             {
                 OpenPreviousPeriod(msg.period);
             });
+            _subscriptions.Add(_subPreviousPeriodRequested);
 
             // Clock logic:      
             SetClockFormat();

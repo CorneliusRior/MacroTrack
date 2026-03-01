@@ -59,6 +59,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             base.Init(services, appServices);
             EventSubscribe(AppServices!.AppEvents.Subscribe<FoodLogChanged>(_ => Populate()));
+            EventSubscribe(AppServices!.AppEvents.Subscribe<GeneralRefresh>(_ => Populate()));
             EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => Populate()));
             Populate();
         }

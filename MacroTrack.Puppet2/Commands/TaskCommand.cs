@@ -1,8 +1,10 @@
-﻿using MacroTrack.Core.Services;
+﻿using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MacroTrack.Puppet2.Commands
@@ -27,7 +29,7 @@ namespace MacroTrack.Puppet2.Commands
                 "Task.Disable <int Id> (bool Reenable)",
                 "Sets a task as Deactivated: still exists but not displayed, or reenable deactivated tasks."),
             new(["Task", "List"],
-                "Task.List",
+                "Task.List (bool FilterActive) (bool FilterInactive)",
                 "Lists TaskRegistry."),
             new(["Task", "Set"],
                 "Task.Set <bool Complete> <int Id> (DateTime Date)",
@@ -62,65 +64,109 @@ namespace MacroTrack.Puppet2.Commands
 
         public PuppetResult Add(IReadOnlyList<string> args)
         {
+            DailyTask entry;
             if (args.IsJson())
             {
-
+                AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                entry = _services.taskService.AddTask(pl.Name, pl.Description);                
             }
             else
             {
-
+                string name = args.String(0, "Name");
+                string? desc = args.StringOrNull(1, "Description");
+                entry = _services.taskService.AddTask(name, desc);
             }
-
-            throw new NotImplementedException();
+            return PuppetResult.Ok($"Added Task #{entry.Id}");
         }
 
         public PuppetResult Current(IReadOnlyList<string> args)
         {
+            DateTime date;
+            bool filterInactive, filterActive;
             if (args.IsJson())
             {
-
+                CurrentPayload pl = JsonSerializer.Deserialize<CurrentPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                date = pl.Date ?? DateTime.Now;
+                filterInactive = pl.FilterInactive ?? false;
+                filterActive = pl.FilterActive ?? false;
             }
             else
             {
-
+                date = args.dateTimeOr(0, "Date", DateTime.Now);
+                filterInactive = args.BoolOr(1, "FilterInactive", false);
+                filterActive = args.BoolOr(2, "FilterActive", false);
             }
-
-            throw new NotImplementedException();
+            List<DailyTask> taskList = _services.taskService.GetAllStreaks(date, filterActive, filterInactive);
+            StringBuilder sb = new();
+            sb.AppendLine($"Printing Tasks as of {date.ToString("yyyy-MM-dd")}, FilterInactive='{filterInactive}', FilterActive='{filterActive}'");
+            sb.AppendLine(DailyTask.PrintHeader(true, true, true));
+            foreach (DailyTask dt in taskList) sb.AppendLine(dt.Print(true, true, true));
+            return PuppetResult.Ok(sb.ToString());
         }
 
         public PuppetResult Disable(IReadOnlyList<string> args)
         {
+            int id;
+            bool reenable;
             if (args.IsJson())
             {
-
+                DisablePayload pl = JsonSerializer.Deserialize<DisablePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                id = pl.Id;
+                reenable = pl.Reenable ?? false;
             }
             else
             {
-
+                id = args.Int(0, "Id");
+                reenable = args.BoolOr(1, "Reenable", false);
             }
-
-            throw new NotImplementedException();
+            bool r = _services.taskService.GetTask(id).IsActive;
+            DailyTask entry = reenable ? _services.taskService.Activate(id) : _services.taskService.Deactivate(id);
+            return PuppetResult.Ok($"Set Task #{entry.Id} from '{(r ? "Active" : "Inactive")}' to '{(entry.IsActive ? "Active" : "Inactive")}'.");
         }
 
         public PuppetResult List(IReadOnlyList<string> args)
         {
-            
-
-            throw new NotImplementedException();
+            bool filterInactive, filterActive;
+            if (args.IsJson())
+            {
+                ListPayload pl = JsonSerializer.Deserialize<ListPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                filterInactive = pl.FilterInactive ?? false;
+                filterActive = pl.FilterActive ?? false;
+            }
+            else
+            {
+                filterInactive = args.BoolOr(0, "FilterInactive", false);
+                filterActive = args.BoolOr(1, "FilterActive", false);
+            }
+            List<DailyTask> taskList = _services.taskService.GetAll(null, filterActive, filterInactive);
+            StringBuilder sb = new();
+            sb.AppendLine($"Printing TaskRegistry, FilterInactive='{filterInactive}', FilterActive='{filterActive}'.");
+            sb.AppendLine(DailyTask.PrintHeader(true, false, false));
+            foreach (DailyTask dt in taskList) sb.AppendLine(dt.Print(true, false, false));
+            return PuppetResult.Ok(sb.ToString());
         }
 
         public PuppetResult Set(IReadOnlyList<string> args)
         {
+            bool complete;
+            int id;
+            DateTime date;
             if (args.IsJson())
             {
-
+                SetPayload pl = JsonSerializer.Deserialize<SetPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                complete = pl.complete;
+                id = pl.Id;
+                date = pl.Date ?? DateTime.Now;
             }
             else
             {
-
+                complete = args.Bool(0, "Complete");
+                id = args.Int(1, "Id");
+                date = args.dateTimeOr(2, "Date", DateTime.Now);
             }
-
-            throw new NotImplementedException();
+            DailyTask r = _services.taskService.GetTask(id);
+            DailyTask entry = complete ? _services.taskService.SetComplete(id, date) : _services.taskService.SetIncomplete(id, date);
+            return PuppetResult.Ok($"Set task #{entry.Id} from '{r.Completed.Checked(false, "Complete", "Incomplete")}' to '{entry.Completed.Checked(false, "Complete", "Incomplete")}'.");
         }
 
         public PuppetResult Cheat(IReadOnlyList<string> head, IReadOnlyList<string> args)
@@ -136,37 +182,45 @@ namespace MacroTrack.Puppet2.Commands
 
         public PuppetResult CheatGet(IReadOnlyList<string> args)
         {
+            DateTime date;
             if (args.IsJson())
             {
-
+                CheatGetPayload pl = JsonSerializer.Deserialize<CheatGetPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                date = pl.Date ?? DateTime.Now;
             }
-            else
-            {
-
-            }
+            else date = args.dateTimeOr(0, "Date", DateTime.Now);
+            bool isCheatDay = _services.taskService.GetIsCheatDay(date);
+            return PuppetResult.Ok($"{date.ToString("yyyy-MM-dd")} IsCheatDay='{isCheatDay}'");
 
             throw new NotImplementedException();
         }
 
         public PuppetResult CheatSet(IReadOnlyList<string> args)
         {
+            DateTime date;
+            bool isCheatDay;
             if (args.IsJson())
             {
-
+                CheatSetPayload pl = JsonSerializer.Deserialize<CheatSetPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                date = pl.Date;
+                isCheatDay = pl.IsCheatDay;
             }
             else
             {
-
+                date = args.dateTime(0, "Date");
+                isCheatDay = args.Bool(1, "IsCheatDay");
             }
-
-            throw new NotImplementedException();
+            bool r = _services.taskService.GetIsCheatDay(date);
+            _services.taskService.SetCheatDay(date, isCheatDay);
+            return PuppetResult.Ok($"Set {date.ToString("yyyy-MM-dd")} IsCheatDay from '{r}' to '{isCheatDay}'");
         }
 
-        public sealed record AddPayload(string Name, string? Description);
-        public sealed record CurrentPayload(DateTime? Date, bool? FilterActive, bool? FilterInactive);
-        public sealed record DisablePayload(int Id, bool? Reenable);
-        public sealed record SetPayload(bool complete, int Id, DateTime? Date);
-        public sealed record CheatGetPayload(DateTime? Date);
-        public sealed record CheatSetPayload(DateTime Date, bool IsCheatDay);
+        private sealed record AddPayload(string Name, string? Description);
+        private sealed record CurrentPayload(DateTime? Date, bool? FilterInactive, bool? FilterActive);
+        private sealed record DisablePayload(int Id, bool? Reenable);
+        private sealed record SetPayload(bool complete, int Id, DateTime? Date);
+        private sealed record ListPayload(bool? FilterInactive, bool? FilterActive);
+        private sealed record CheatGetPayload(DateTime? Date);
+        private sealed record CheatSetPayload(DateTime Date, bool IsCheatDay);        
     }
 }

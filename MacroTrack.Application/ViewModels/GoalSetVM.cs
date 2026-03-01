@@ -110,7 +110,8 @@ namespace MacroTrack.AppLibrary.ViewModels
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
-            AppServices!.AppEvents.Subscribe<GoalAdded>(msg => Populate());
+            EventSubscribe(AppServices!.AppEvents.Subscribe<GeneralRefresh>(_ => Populate()));
+            EventSubscribe(AppServices!.AppEvents.Subscribe<GoalAdded>(_ => Populate()));
             Populate();
         }
 

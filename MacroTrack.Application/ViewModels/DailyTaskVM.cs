@@ -49,6 +49,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             base.Init(services, appServices);   
             ApplySettings();
+            EventSubscribe(AppServices!.AppEvents.Subscribe<GeneralRefresh>(_ => Populate()));
             EventSubscribe(AppServices!.AppEvents.Subscribe<TaskCompletionChanged>(_ => Populate()));
             EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ =>
             {

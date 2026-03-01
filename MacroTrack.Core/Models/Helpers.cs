@@ -32,5 +32,25 @@
             output = output.Truncate(length, truncateString);
             return output;
         }
+
+        public static string ToStringTruncate(this int input, int length, string prefix = "", string suffix = "", string truncateString = "…")
+        {
+            string output = prefix + input.ToString() + suffix;
+            output = output.Truncate(length, truncateString);
+            return output;
+        }
+
+        /// <summary>
+        /// Returns a string depending on if the bool is true or false. Default return value for true is "[x]". amd false if "[ ]". If invert is set true, inverts return. Used to display bools as strings. Checked and UnChecked strings can be set as anything with no character limits.
+        /// </summary>
+        /// <param name="check">Bool to represent as string.</param>
+        /// <param name="invert">Inverts the return.</param>
+        /// <param name="checkedString">String returned if "check" is true (unless invert)</param>
+        /// <param name="unCheckedString">String returned if "check" is false (unless invert)</param>
+        public static string Checked(this bool check, bool invert = false, string checkedString = "[x]", string unCheckedString = "[ ]" )
+        {
+            if (invert) return check ? unCheckedString : checkedString;
+            else return check ? checkedString : unCheckedString;
+        }
     }
 }

@@ -136,8 +136,8 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok(sb.ToString());
         }
 
-        public sealed record AddPayload(string PresetName, double Calories, double Protein, double Carbs, double Fat, double? Weight, string? Unit, string? Category, string? Notes);
-        public sealed record DeletePayLoad(int Id);
-        public sealed record EditPayload(int Id, string PresetName, double Calories, double Protein, double Carbs, double Fat, double? Weight, string? Unit, string? Category, string? Notes);
+        private sealed record AddPayload(string PresetName, double Calories, double Protein, double Carbs, double Fat, double? Weight, string? Unit, string? Category, string? Notes);
+        private sealed record DeletePayLoad(int Id);
+        private sealed record EditPayload(int Id, string PresetName, double Calories, double Protein, double Carbs, double Fat, double? Weight, string? Unit, string? Category, string? Notes);
     }
 }

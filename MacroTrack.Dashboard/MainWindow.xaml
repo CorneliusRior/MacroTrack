@@ -229,7 +229,7 @@
                            Style="{DynamicResource Label.Title}"
                            Grid.Column="0"/>
                     <Button Content="Refresh"
-                            Command="{Binding DataContext.RefreshSummaryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Command="{Binding DataContext.GeneralRefreshCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                             Grid.Column="1"/>
 
                 </Grid>

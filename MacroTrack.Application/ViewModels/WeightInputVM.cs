@@ -21,6 +21,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             base.Init(services, appServices);
             EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => UpdateSettings()));
+            EventSubscribe(AppServices!.AppEvents.Subscribe<GeneralRefresh>(_ => DrawGraph()));
             EventSubscribe(AppServices!.AppEvents.Subscribe<WeightLogChanged>(_ => DrawGraph()));
             UpdateSettings();
             DrawGraph();

@@ -135,8 +135,9 @@ namespace MacroTrack.Dashboard
             if (cmd.ToLowerInvariant() == "hello world") Print("Hello!");
 
             // Handle (do externally):
-            var result = _repl.Execute(cmd);
+            var result = _repl.Execute(cmd);           
             Print(result.Output);
+            if (result.Success) AppServices.AppEvents.Publish(new GeneralRefresh());
         }
 
 

@@ -29,6 +29,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         public override void Init(CoreServices services, AppServices appServices)
         {
             base.Init(services, appServices);
+            EventSubscribe(AppServices!.AppEvents.Subscribe<GeneralRefresh>(_ => UpdatePresets()));
             EventSubscribe(AppServices!.AppEvents.Subscribe<PresetListChanged>(_ => Populate()));
             EventSubscribe(AppServices!.AppEvents.Subscribe<SettingsChanged>(_ => Populate()));
             Mult = 1.00;
@@ -274,10 +275,15 @@ namespace MacroTrack.AppLibrary.ViewModels
             Log();
             if (Time is null) Time = DateTime.Now;
             DTPFormat = Services!.SettingsService.Settings.DTPInLongFormat ? Services.SettingsService.GetLongDateTimeString(false, false) : Services.SettingsService.GetShortDateTimeString(false, false);
-            
+
+            UpdatePresets();
+        }
+
+        private void UpdatePresets()
+        {
             try
             {
-                List<Preset> presetList = Services.presetService.GetAll();
+                List<Preset> presetList = Services!.presetService.GetAll();
                 PresetList.Clear();
                 foreach (Preset p in presetList) PresetList.Add(p);
 
