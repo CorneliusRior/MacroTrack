@@ -35,47 +35,7 @@ namespace MacroTrack.Puppet2.Commands
 
         public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
-            /*
             var allHelp = _context.CommandList.SelectMany(c => c.Help).OrderBy(c => string.Join('.', c.Head));
-            if (args.Count == 0)
-            {
-                string helpstring = $"All commands. Type help <command> for more details.\n";
-                foreach (CommandHelp c in allHelp)
-                {
-                    helpstring += $"\n- {string.Join('.', c.Head) + ":", -20} {c.Description}";
-                }
-                return PuppetResult.Ok(helpstring);
-            }
-            // There is an argument, tokenize and compare:
-            var searchHeads = args[0].Split('.', StringSplitOptions.RemoveEmptyEntries);
-            var matches = allHelp.Where(c => c.Head.HeadSearch(searchHeads)).ToList();
-            if (matches.Count == 0) return PuppetResult.Fail($"Unknown command '{string.Join('.', searchHeads)}'");
-            string longhelpstring = $"Commands with head '{args[0]}':";
-            foreach (CommandHelp c in matches)
-            {
-                longhelpstring += $"\n\n{string.Join('.', c.Head)}:";
-                if (c.Aliases is not null) longhelpstring += $"\n{"Aliases:",-15} {{ \"{string.Join($"\", \"", c.Aliases)}\" }}";
-                longhelpstring += $"\n{"Usage:", -15} {c.Usage}\n{"Description:", -15} {c.Description}";
-                if (!string.IsNullOrWhiteSpace(c.Example)) longhelpstring += $"\n{"Example:", -15} {c.Example}";
-                if (!string.IsNullOrWhiteSpace(c.LongDescription)) longhelpstring += $"\n{c.LongDescription}";
-            }
-            return PuppetResult.Ok(longhelpstring);*/
-
-            // Rewriting it here:
-            var allHelp = _context.CommandList.SelectMany(c => c.Help).OrderBy(c => string.Join('.', c.Head));
-
-            /* Possible command formats we want to be able to handle:
-             *  - help                      (head.Count == 0, args.count == 0)
-             *  - help food                 (head.Count == 0, args.count == 1)
-             *  - help food usage           (head.Count == 0, args.count == 2)
-             *  - help.list                 (head.Count == 1, args.count == 0)
-             *  - help.list food            (head.Count == 1, args.count == 1)
-             *  - help.list food usage      (head.Count == 1, args.count == 2)
-             *  - help.full                 (head.Count == 2, args.Count == 0)
-             *  - help.full food            (head.Count == 2, args.Count == 1)
-             * We'll iterate through args.Count.
-             */
-
             if (head.Count < 2)
             {
                 if (args.Count == 0) return ShortList(args, allHelp);
@@ -97,41 +57,33 @@ namespace MacroTrack.Puppet2.Commands
 
         private PuppetResult ShortList(IReadOnlyList<string> args, IOrderedEnumerable<CommandHelp> helpList)
         {
-            /* 4 possible command formats:
-             *  - help
-             *  - help food
-             *  - help usage
-             *  - help food usage
-             */
             HelpListType type = HelpListType.Description;
-
             StringBuilder sb = new();
+
             if (args.Count == 0)
             {
                 sb.AppendLine("Printing all Commands:");
             }
             if (args.Count == 1)
-            {
-                // If we can parse first argument as a HelpListType, parse it as a command:
+            { // If we can parse first argument as a HelpListType, parse it as a command:                
                 if (!args[0].IsHelpListType(out HelpListType t))
                 { // Can't parse:
                     helpList = Search(args[0], helpList);
                     sb.AppendLine($"Printing all Commands with head '{args[0].ToLowerInvariant().Trim()}':");
-                } // Can parse:
+                } 
                 else
-                {
+                { // Can parse:
                     type = t;
                     sb.AppendLine($"Printing all Commands and {type.ToString(true)}:");
                 }
             }
             if (args.Count > 1)
-            {
-                // If there are 2 or more arguments, then the first one is command, the second one is HelpListType.
+            { // If there are 2 or more arguments, then the first one is command, the second one is HelpListType.
                 helpList = Search(args[0], helpList);
                 type = args[1].ToHelpListType();
                 sb.AppendLine($"Printing all Commands and {type.ToString(true)} with head '{args[0].ToLowerInvariant().Trim()}'");
             }
-            //if (helpList.Count() == 0) return PuppetResult.Fail($"Unknown command '{args[0] ?? ""}'.");
+            if (helpList.Count() == 0) return PuppetResult.Fail($"Unknown command '{args[0] ?? ""}'.");
 
             sb.AppendLine(CommandHelp.PrintHeader(type));
             foreach (CommandHelp c in helpList) sb.AppendLine(c.ShortList(type));

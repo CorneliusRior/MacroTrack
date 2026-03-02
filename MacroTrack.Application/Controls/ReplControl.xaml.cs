@@ -2,20 +2,9 @@
 using MacroTrack.AppLibrary.ViewModels;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace MacroTrack.AppLibrary.Controls
 {
@@ -39,6 +28,13 @@ namespace MacroTrack.AppLibrary.Controls
         {
             base.Init(services, appServices);
             _vm.Init(services, appServices);
+            DispatcherTimer t = new() { Interval = TimeSpan.FromSeconds(1) };
+            t.Tick += (_, _) =>
+            {
+                t.Stop();
+                RollBanner();
+            };
+            t.Start();
         }
 
         protected override void OnUnloaded(object sender, RoutedEventArgs e)
@@ -97,5 +93,34 @@ namespace MacroTrack.AppLibrary.Controls
             SubmitCommand?.Invoke(this, input);
             tbInput.Clear();
         }
+
+        public void PrintTimedMultiLine(string[] lines, double seconds = 0.025)
+        {
+            int i = 0;
+            DispatcherTimer t = new() { Interval = TimeSpan.FromSeconds(seconds) };
+            t.Tick += (_, _) =>
+            {
+                if (i >= lines.Length)
+                {
+                    t.Stop();
+                    return;
+                }
+                AppendLine(lines[i]);
+                i++;
+            };
+            t.Start();
+        }
+
+        public void RollBanner() => PrintTimedMultiLine( ImportFunctions.ImportAssetTxt("banner").SplitToLines());
+         
     }
+
+    /// <summary>
+    /// If you can think of somewhere more suitable to put this, put it there. For now it lives here because I need to use it here.
+    /// </summary>
+    public static class StringFunctions
+    {
+        public static string[] SplitToLines(this string text) => text.Replace("\r\n", "\n").Replace("\r", "\n").Split("\n", StringSplitOptions.None);
+    }
+        
 }
