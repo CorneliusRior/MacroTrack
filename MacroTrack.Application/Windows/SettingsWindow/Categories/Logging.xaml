@@ -26,6 +26,18 @@
                                   IsChecked="{Binding SettingsEditable.LogInitMessages, Mode=TwoWay}"/>
                     </StackPanel>
                 </Expander>
+                <Expander Header="File" IsExpanded="True">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
+                        <Button x:Name="buttonViewLog"
+                                Content="Open Log File"
+                                Command="{Binding ViewLogCommand}"
+                                HorizontalAlignment="Left"/>
+                        <Button x:Name="buttonViewDirFile"
+                                Content="Open Log Directory"
+                                Command="{Binding ViewLogDirCommand}"
+                                HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </Expander>
                 <Expander Header="Logging Threshold" IsExpanded="True">
                     <StackPanel>
                         <Label Content="UI Logging Threshold:"/>

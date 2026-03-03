@@ -17,7 +17,6 @@ namespace MacroTrack.Core.Logging
         void Log(object sourceObj, string caller, LogLevel level, string message, Exception? exception = null);
         void LogVars(object sourceObj, object vars, string caller, string? prefix = null);
         void OpenLogFile();
-
         void OpenLogDir();
     }
 }

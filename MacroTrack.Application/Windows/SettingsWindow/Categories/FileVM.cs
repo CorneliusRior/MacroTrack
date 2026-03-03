@@ -1,4 +1,5 @@
 ﻿using MacroTrack.AppLibrary.Commands;
+using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 using MacroTrack.Core.Settings;
@@ -26,22 +27,15 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow.Categories
             Services = services;
             Logger = services.Logger;
 
-            ViewLogCommand = new RelayCommand(() => ViewLog());
-            ViewLogDirCommand = new RelayCommand(() => ViewLogDir());
+            ViewLogCommand = new RelayCommand(() => Logger.OpenLogFile());
+            ViewLogDirCommand = new RelayCommand(() => Logger.OpenLogDir());
             ExportDataCommand = new RelayCommand(() => ExportData());
-            OpenDataFileCommand = new RelayCommand(() => OpenDataFile());
+            OpenDataFileCommand = new RelayCommand(() => Paths.OpenAppDataDir());
         }
 
-        public void ViewLog()
-        {
-            Logger.OpenLogFile();
-        }
-
-        public void ViewLogDir()
-        {
-            Logger.OpenLogDir();
-        }
-
+        /// <summary>
+        /// Allows you to export data to excel. We do use exportService, which we might use for backups (we haven't done that yet, we will, rewriting much of Infrastructure/Paths &c.). It is kept in here due to "SaveFileDialogue" needing to be in a WPF environment, originally we tried to put this in export services actually, but it didn't work.
+        /// </summary>
         public void ExportData()
         {
             var dlg = new SaveFileDialog
@@ -50,11 +44,6 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow.Categories
                 FileName = "MTDataExport.xlsx"
             };
             if (dlg.ShowDialog() == true) Services.exportService.ExportToExcel(dlg.FileName);
-        }
-
-        private void OpenDataFile()
-        {
-
         }
     }
 }

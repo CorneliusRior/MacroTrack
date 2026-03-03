@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,18 @@ namespace MacroTrack.Core.Infrastructure
         {
             var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             return Path.Combine(baseDir, "MacroTrack");
+        }
+
+        /// <summary>
+        /// This is added to give functionality to "Open Data File" in File.xaml in settings. Given that we are very shortly going to be changing a lot of the fundamentals here it might be prudent to note that you don't need to cling onto this too much.
+        /// </summary>
+        public static void OpenAppDataDir()
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = FindAppDataDir(),
+                UseShellExecute = true
+            });
         }
 
         public static string FindDBPath()
@@ -56,6 +69,6 @@ namespace MacroTrack.Core.Infrastructure
             var dir = Path.Combine(FindAppDataDir(), "config");
             Directory.CreateDirectory(dir);
             return Path.Combine(dir, "settings.json");
-        }
+        }        
     }
 }

@@ -71,7 +71,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow
             Categories.Add(new GeneralVM(SettingsEditable));
             Categories.Add(new FileVM(SettingsEditable, Services));
             Categories.Add(new GraphSettingsVM(SettingsEditable));
-            Categories.Add(new LoggingVM(SettingsEditable));
+            Categories.Add(new LoggingVM(SettingsEditable, Services));
             Categories.Add(new FormattingVM(SettingsEditable));
         }
 
