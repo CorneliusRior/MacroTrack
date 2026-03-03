@@ -19,16 +19,51 @@ namespace MacroTrack.Core.Infrastructure
         }
 
         /// <summary>
+        /// Returns the backup folder. Note that this returns the basedir, which will contain MacrkTrack.Debug and MacroTrack(.release). Use FindBackupDir for that.
+        /// </summary>
+        public static string FindBackupBaseDir() => Path.Combine(FindAppDataDir(), "backups");
+        
+        /// <summary>
+        /// Returns the backup directory, taking account of whether you're in debug mode or not.
+        /// </summary>
+        public static string FindBackupDir()
+        {
+            string dirName;
+            #if DEBUG
+            dirName = "MacroTrack.debug";
+            #else
+            dirName = "MacroTrack";
+            #endif
+            return Path.Combine(FindBackupBaseDir(), dirName);
+        }
+        public static string FindBackupAutoDir() => Path.Combine(FindBackupDir(), "auto");
+        public static string FindBackupManualDir() => Path.Combine(FindBackupDir(), "manual");
+
+        /// <summary>
+        /// Returns the data Directory (default).
+        /// </summary>
+        public static string FindDataDir() => Path.Combine(FindAppDataDir(), "data");
+
+        /// <summary>
         /// This is added to give functionality to "Open Data File" in File.xaml in settings. Given that we are very shortly going to be changing a lot of the fundamentals here it might be prudent to note that you don't need to cling onto this too much.
         /// </summary>
-        public static void OpenAppDataDir()
+        public static void OpenAppDataDir() => Process.Start(new ProcessStartInfo
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = FindAppDataDir(),
-                UseShellExecute = true
-            });
-        }
+            FileName = FindAppDataDir(),
+            UseShellExecute = true
+        });
+
+        public static void OpenBackupDir() => Process.Start(new ProcessStartInfo
+        {
+            FileName = FindBackupDir(),
+            UseShellExecute = true
+        });
+
+        public static void OpenDataDir() => Process.Start(new ProcessStartInfo 
+        { 
+            FileName = FindDataDir(),
+            UseShellExecute = true,
+        });
 
         public static string FindDBPath()
         {

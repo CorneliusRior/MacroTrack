@@ -14,6 +14,11 @@ namespace MacroTrack.Core.Settings
     public sealed class AppSettings
     {
         // When adding a new setting, be sure to put it both here and in the Clone() method at the bottom.
+        public string? StartupDatabase { get; set; } = null; // null means use Paths default. Note that if we use "reset to default" in settings, this will reset to null! I won't bother doing protections for that right now.
+        public string? StartupDatabaseDebug { get; set; } = null;
+        public bool BackupDailyAuto { get; set; } = true;
+        public DateTime BackupDailyLastDate { get; set; } // Will just be DateTime.MinValue if not set. Potential vulnerability: if you went back in time to around the birth of Christ, it wouldn't back up on the first day.
+        public int BackupDailyRetentionCount { get; set; } = 3; // How many daily auto backups we have.
         public string Theme { get; set; } = "Light";
         public string ThemeCustomForeground { get; set; } = "#FFFFFF00";
         public string GraphColorPro { get; set; } = "#FFFF0000";
@@ -53,6 +58,11 @@ namespace MacroTrack.Core.Settings
         {
             return new AppSettings
             {
+                StartupDatabase = this.StartupDatabase,
+                StartupDatabaseDebug = this.StartupDatabaseDebug,
+                BackupDailyAuto = this.BackupDailyAuto,
+                BackupDailyLastDate = this.BackupDailyLastDate,
+                BackupDailyRetentionCount = this.BackupDailyRetentionCount,
                 Theme = this.Theme,
                 LogInitMessages = this.LogInitMessages,
                 LogRetainAmount = this.LogRetainAmount,

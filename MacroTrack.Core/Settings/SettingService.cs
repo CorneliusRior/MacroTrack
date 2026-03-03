@@ -77,6 +77,26 @@ namespace MacroTrack.Core.Settings
             Logger.Log(this, caller, level, message, ex);
         }
 
+        // File/Backup methods:
+        /// <summary>
+        /// This is to get that and ensure seperation w/ debug.
+        /// </summary>
+        public string? GetStartupDatabase()
+        {
+            #if DEBUG
+            return Settings.StartupDatabaseDebug;
+            #else
+            return Settings.StartupDatabasel
+            #endif
+        }
+
+        public void SetBackupDailyLastDate(DateTime date)
+        {
+            date = date.Date;
+            Settings.BackupDailyLastDate = date;
+
+        }
+
         public string GetDTFormatShortString()
         {
             return DTFormatSList.FormatByValue.TryGetValue(Settings.DTFormatShort, out var fmt) ? fmt : "yyyy-MM-dd HH:mm";

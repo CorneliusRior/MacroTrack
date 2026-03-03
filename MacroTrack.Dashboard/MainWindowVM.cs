@@ -145,10 +145,19 @@ namespace MacroTrack.Dashboard
             Services = service;
             Logger = service.Logger;
             AppServices = appServices;
-            ApplyTheme();
 
-            RefreshSummary();
-
+            // Auto backup:
+            try { Services.fileService.BackupAutoDaily(); }
+            catch 
+            { 
+                MessageBoxResult r = MessageBox.Show($"Warning:\n\nError with daily backup. This probably isn't an issue, likely failed to delete old backup file(s).\n\nOpen logs?", "AutoBackup Error", MessageBoxButton.YesNo, MessageBoxImage.Warning); 
+                if (r == MessageBoxResult.Yes)
+                {
+                    Logger.OpenLogDir();
+                    Logger.OpenLogFile();
+                }
+            }
+            
             // Commands (some might be redundant)
             //RefreshSummaryCommand = new RelayCommand(RefreshSummary);
             GeneralRefreshCommand = new RelayCommand(() => AppServices.AppEvents.Publish(new GeneralRefresh()));
@@ -199,6 +208,8 @@ namespace MacroTrack.Dashboard
             };
             _clockTimer.Start();
 
+            ApplyTheme();
+            RefreshSummary();
             SetHistoryString();
             _isCheatDay = Services.taskService.GetIsCheatDay(DateTime.Today);
         }

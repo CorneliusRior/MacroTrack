@@ -30,7 +30,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow.Categories
             ViewLogCommand = new RelayCommand(() => Logger.OpenLogFile());
             ViewLogDirCommand = new RelayCommand(() => Logger.OpenLogDir());
             ExportDataCommand = new RelayCommand(() => ExportData());
-            OpenDataFileCommand = new RelayCommand(() => Paths.OpenAppDataDir());
+            OpenDataFileCommand = new RelayCommand(() => Paths.OpenDataDir());
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace MacroTrack.AppLibrary.Windows.SettingsWindow.Categories
                 Filter = "Excel Workbook (*.xlsx)|*.xlsx",
                 FileName = "MTDataExport.xlsx"
             };
-            if (dlg.ShowDialog() == true) Services.exportService.ExportToExcel(dlg.FileName);
+            if (dlg.ShowDialog() == true) Services.fileService.ExportToExcel(dlg.FileName);
         }
     }
 }

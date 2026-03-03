@@ -8,28 +8,45 @@ using System.IO;
 
 namespace MacroTrack.Core.Repositories
 {
-    public class ExportRepo : RepoBase
+    /// <summary>
+    /// Responsible for general file side things, backups, exports, imports, &c., was originally called "ExportRepo" for ExportDataBaseToExcel();
+    /// </summary>
+    public class FileRepo : RepoBase
     {
         private readonly string _connectionString;
 
-        public ExportRepo(string connectionString, CoreContext ctx) : base(ctx)
+        public FileRepo(string connectionString, CoreContext ctx) : base(ctx)
         {
             _connectionString = connectionString;            
         }
 
-        /*
-        public void ExportToExcel()
+        /// <summary>
+        /// Backup mathod. Please note that, if destinationPath already exists, it will override it.
+        /// </summary>
+        /// <param name="sourcePath">Existing data you want to back up.</param>
+        /// <param name="destinationPath">Where you would like the backup.</param>
+        /// <exception cref="FileNotFoundException"></exception>
+        public void BackupDatabase(string sourcePath, string destinationPath)
         {
-            var dlg = new SaveFileDialog
-            {
-                Filter = "Excel Workbook (*.xlsx)|*.xlsx)",
-                FileName = "MTDatabaseExport.xlsx"
-            };
+            // Make sure dest dir exists:
+            string? destDir = Path.GetDirectoryName(destinationPath);
+            if (!string.IsNullOrWhiteSpace(destDir)) Directory.CreateDirectory(destDir);
 
-            if (dlg.ShowDialog() != true) return;
+            // ConnStrings:
+            string srcConnString = $"Data Source={sourcePath}";
+            string destConnString = $"Data Source={destinationPath}";
 
-            ExportDataBaseToExcel(dlg.FileName);
-        }*/
+            // Connections:
+            using var source = new SqliteConnection(srcConnString);
+            using var destination = new SqliteConnection(destConnString);
+
+            // Open connections:
+            source.Open();
+            destination.Open();
+
+            // Backup:
+            source.BackupDatabase(destination);
+        }
 
         public void ExportDataBaseToExcel(string outputPath)
         {
