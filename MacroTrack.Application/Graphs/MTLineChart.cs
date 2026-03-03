@@ -91,12 +91,28 @@ namespace MacroTrack.AppLibrary.Graphs
             
             // Determine min & max X & Y:
             var allPoints = ss.SelectMany(s => s.DataPoints ?? Array.Empty<DataPoint>()).ToList();
-            DateTime minX = XStart ?? allPoints.Min(p => p.Time);
-            DateTime maxX = XEnd ?? allPoints.Max(p => p.Time);
-            if (minX == maxX) maxX = maxX.AddDays(1); // This "Avoids divide by 0"
+            
 
-            double minY = YStart ?? (ShowZero ? 0 : allPoints.Min(p => p.Value));
-            double maxY = YEnd ?? allPoints.Max(p => p.Value);
+            // Originally was just contents of the else statements, but would crash when you opened an empty .db file.
+            DateTime minX;
+            DateTime maxX;
+            double minY;
+            double maxY; 
+            if (allPoints.Count == 0) 
+            {
+                minX = XStart ?? DateTime.Today - XDefault;
+                maxX = XEnd ?? DateTime.Today.AddDays(1);
+                minY = YStart ?? 0;
+                maxY = YEnd ?? minY + YDefault; 
+            }
+            else
+            {
+                minX = XStart ?? allPoints.Min(p => p.Time);
+                maxX = XEnd ?? allPoints.Max(p => p.Time);
+                minY = YStart ?? (ShowZero ? 0 : allPoints.Min(p => p.Value));
+                maxY = YEnd ?? allPoints.Max(p => p.Value);
+            }
+            if (minX == maxX) maxX = maxX.AddDays(1); // This "Avoids divide by 0"
             if (minY == maxY) maxY += 1;
 
             // Draw Gridlines & Axis Labels:

@@ -118,6 +118,8 @@ namespace MacroTrack.Dashboard
             }
         }
 
+        private DateTime _lastDay;
+
         // History string
         private string _historyString = "Recent Entries (3 days)";
         public string HistoryString
@@ -147,16 +149,7 @@ namespace MacroTrack.Dashboard
             AppServices = appServices;
 
             // Auto backup:
-            try { Services.fileService.BackupAutoDaily(); }
-            catch 
-            { 
-                MessageBoxResult r = MessageBox.Show($"Warning:\n\nError with daily backup. This probably isn't an issue, likely failed to delete old backup file(s).\n\nOpen logs?", "AutoBackup Error", MessageBoxButton.YesNo, MessageBoxImage.Warning); 
-                if (r == MessageBoxResult.Yes)
-                {
-                    Logger.OpenLogDir();
-                    Logger.OpenLogFile();
-                }
-            }
+            AutoDailyBackup();
             
             // Commands (some might be redundant)
             //RefreshSummaryCommand = new RelayCommand(RefreshSummary);
@@ -170,6 +163,7 @@ namespace MacroTrack.Dashboard
                 SetClockFormat();
                 ApplyTheme();
                 SetHistoryString();
+                _lastDay = Services.SettingsService.Settings.BackupDailyLastDate;
             });
             _subscriptions.Add(_subSettingsChanged);
             IDisposable _subFoodLogChanged = AppServices.AppEvents.Subscribe<FoodLogChanged>(_ =>
@@ -194,6 +188,7 @@ namespace MacroTrack.Dashboard
             _subscriptions.Add(_subPreviousPeriodRequested);
 
             // Clock logic:      
+            _lastDay = Services.SettingsService.Settings.BackupDailyLastDate;
             SetClockFormat();
             CurrentTime = DateTime.Now;            
             ClockString = CurrentTime.ToString(ClockFormat);
@@ -205,9 +200,10 @@ namespace MacroTrack.Dashboard
             {
                 CurrentTime = DateTime.Now;
                 ClockString = CurrentTime.ToString(ClockFormat);
+                if (DateTime.Today != _lastDay) AutoDailyBackup();
             };
             _clockTimer.Start();
-
+            
             ApplyTheme();
             RefreshSummary();
             SetHistoryString();
@@ -217,6 +213,21 @@ namespace MacroTrack.Dashboard
         public void OnClose()
         {
             foreach (IDisposable s in _subscriptions) s.Dispose();
+            _clockTimer.Stop();
+        }
+
+        public void AutoDailyBackup()
+        {
+            try { Services.fileService.BackupAutoDaily(); }
+            catch
+            {
+                MessageBoxResult r = MessageBox.Show($"Warning:\n\nError with daily backup. This probably isn't an issue, likely failed to delete old backup file(s).\n\nOpen logs?", "AutoBackup Error", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (r == MessageBoxResult.Yes)
+                {
+                    Logger.OpenLogDir();
+                    Logger.OpenLogFile();
+                }
+            }
         }
 
         private void SetClockFormat()

@@ -135,8 +135,17 @@ namespace MacroTrack.Dashboard
             if (cmd.ToLowerInvariant() == "hello world") Print("Hello!");
 
             // Handle (do externally):
-            var result = _repl.Execute(cmd);           
-            Print(result.Output);
+            var result = _repl.Execute(cmd);
+            if (result.RestartArgs is null) Print(result.Output);
+            else
+            {
+                RestartArgs args = result.RestartArgs;
+                Log("Restart requested: Excepting cancellation, moving to a new instance.", LogLevel.Info);
+                Print(result.Output);
+                if (args.RequestType == RestartRequestType.ForceRestart) ApplicationLifeCycle.Restart();
+                else ApplicationLifeCycle.RestartCloseCancel(args.Message, args.Caption);
+            }
+            //if (result.Restart) ApplicationLifeCycle.RestartCloseCancel(result.Output); 
             if (result.Success) AppServices.AppEvents.Publish(new GeneralRefresh());
         }
 

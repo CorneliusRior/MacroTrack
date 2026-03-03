@@ -1,5 +1,6 @@
 ﻿using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
+using MacroTrack.Core.Models;
 using MacroTrack.Core.Repositories;
 using MacroTrack.Core.Settings;
 
@@ -17,19 +18,6 @@ namespace MacroTrack.Core.Services
         {
             _repo = repo;
             _settingsService = ctx.Settings;
-        }
-
-        /// <summary>
-        /// Test of backup system, delete if you find that this hasn't been deleted:
-        /// </summary>
-        public void TestBackup()
-        {
-            /*
-            string sourceString = Paths.FindDBPath();
-            string destString = Path.Combine(Paths.FindDataDir(), "test_backup.db");
-            LogVars(new { sourceString, destString }, "These were defined just now, backing up now:");
-            _repo.BackupDatabase(Paths.FindDBPath(), Path.Combine(Paths.FindDataDir(), "test_backup.db"));
-            Log("Affirming that we got here");*/
         }
 
         public void Backup(string destPath)
@@ -80,6 +68,7 @@ namespace MacroTrack.Core.Services
             string timeStamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             string fileName = $"{(string.IsNullOrWhiteSpace(prefix) ? "" : $"{prefix.Replace(' ', '_')}_" )}{(addTimeStamp ? $"{timeStamp}_" : "")}{reason.Replace(' ', '_')}";
             if (!fileName.EndsWith(".db", StringComparison.OrdinalIgnoreCase)) fileName += ".db";
+            if (fileName.IsInvalidFileName()) throw new FileFormatException($"Invalid file name {fileName}, cannot contain the following: {{ '\', '/', ':', '*', '<', '>', '|' }} (and others).");
 
             // Build destPath and call backup method:
             string destPath = Path.Combine(backupDir, fileName);
@@ -104,6 +93,56 @@ namespace MacroTrack.Core.Services
                     throw;
                 }
             }
+        }
+
+        public void RestoreDB(string sourcePath, string destinationPath)
+        {
+            // Ensure source exists:
+            if (!File.Exists(sourcePath)) throw new FileNotFoundException($"FIle SourcePath='{sourcePath}' does not exist.");
+
+            // Ensure destination directory exists:
+            var destDir = Path.GetDirectoryName(destinationPath);
+            if (!string.IsNullOrWhiteSpace(destDir)) Directory.CreateDirectory(destDir);
+
+            // See if destinationPath exists. If so, back it up, otherwise, do nothing.
+            if (File.Exists(destinationPath))
+            {
+                // Ensure backupDir exists:
+                string backupDir = Paths.FindBackupOverriddenDir();
+                Directory.CreateDirectory(backupDir);
+
+                // Create file name
+                string ovrdName = Path.GetFileNameWithoutExtension(destinationPath);
+                string bkupName = $"{ovrdName}_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}_pre-override.db";
+                string bkupPath = Path.Combine(backupDir, bkupName);
+                try { _repo.BackupDatabase(destinationPath, bkupPath); }
+                catch (Exception ex)
+                {
+                    Log($"Backup failed! destinationPath='{destinationPath}', bkupPath='{bkupPath}'. No backup was made.", LogLevel.Error, ex);
+                    throw;
+                }
+            }
+
+            // Backup Source to dest.
+            try { _repo.BackupDatabase(sourcePath, destinationPath); }
+            catch (Exception ex)
+            {
+                Log($"Backup failed! sourcePath='{sourcePath}', destinationPath='{destinationPath}'. No new file or override.", LogLevel.Error, ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Replaces StartupDatabase with a new path so that it will be generated on the next restart. Make sure when ysing this to restart the program immediately afterwards. Places them directly in the data directory.
+        /// </summary>
+        /// <param name="name"></param>
+        public void NewDB(string name)
+        {
+            string fileName = $"{name.Replace(' ', '_')}";
+            if (!fileName.EndsWith(".db", StringComparison.OrdinalIgnoreCase)) fileName += ".db";
+            if (fileName.IsInvalidFileName()) throw new FileFormatException($"Invalid file name {fileName}, cannot contain the following: {{ '\', '/', ':', '*', '<', '>', '|' }} (and others).");
+            string filePath = Path.Combine(Paths.FindDataDir(), fileName);            
+            _settingsService.NewStartupDatabase(filePath);
         }
 
         public void ExportToExcel(string outputPath)

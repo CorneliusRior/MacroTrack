@@ -38,6 +38,7 @@ namespace MacroTrack.Core.Infrastructure
         }
         public static string FindBackupAutoDir() => Path.Combine(FindBackupDir(), "auto");
         public static string FindBackupManualDir() => Path.Combine(FindBackupDir(), "manual");
+        public static string FindBackupOverriddenDir() => Path.Combine(FindBackupDir(), "overridden");
 
         /// <summary>
         /// Returns the data Directory (default).

@@ -26,10 +26,7 @@ namespace MacroTrack.Dashboard
         {
             base.OnStartup(e);
 
-            // Get paths & apply:
-            // Database:
-            string dbPath = Paths.FindDBPath();
-            string connString = $"Data Source ={dbPath}";
+            // Setup: //
 
             // Logger:
             string logPath = Paths.FindLogPath();
@@ -43,6 +40,10 @@ namespace MacroTrack.Dashboard
 
             // Application of some settings:
             Paths.DeleteOldLogs(settingsService.Settings.LogRetainAmount);
+            
+            // Database:
+            string dbPath = settingsService.GetStartupDatabase() ?? Paths.FindDBPath();
+            string connString = $"Data Source={dbPath}";
 
             // Create context, then CoreServices:
             var context = new CoreContext(connString, logger, settingsService);

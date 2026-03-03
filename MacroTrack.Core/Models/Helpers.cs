@@ -52,5 +52,11 @@
             if (invert) return check ? unCheckedString : checkedString;
             else return check ? checkedString : unCheckedString;
         }
+
+        public static bool IsInvalidFileName(this string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return true;
+            return name.IndexOfAny(Path.GetInvalidFileNameChars()) > 0;
+        }
     }
 }

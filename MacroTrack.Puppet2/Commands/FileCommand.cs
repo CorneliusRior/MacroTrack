@@ -29,9 +29,18 @@ namespace MacroTrack.Puppet2.Commands
             new(["File", "OpenBackupDir"],
                 "File.OpenBackupDir",
                 "Opens the backup directory AppData/Local/MacroTrack/Backup/MacroTrack (or MacroTrack.debug if in debug mode)."),
-            new(["File", "BackUpTest"],
-                "File.BackUpTest",
-                "Testing Backup method in FileRepo. Will/should probably delete this.")
+            new(["File", "Restore"],
+                "File.Restore <string SourcePath> <string DestinationPath",
+                "Back up Destination Database, then replace destination Database with Source. Used to restore Backups. Restarts program.",
+                Example: $"File.Restore \"C:\\Users\\[...]]\\AppData\\Local\\MacroTrack\\backups\\MacroTrack\\auto\\AutoBackupDaily_2026-03-03_19-34-28.db\" \"C:\\Users\\[...]]\\AppData\\Local\\MacroTrack\\data\\MacroTrack.db\""),
+            new(["File", "NewDB"],
+                "File.NewDB <string Name>",
+                "Creates new database with given name.",
+                Example: $"`File.NewDB Ronald`, File.NewDB \"Rosies file\"",
+                LongDescription: "Sets the startup"),
+            new(["File", "SetDB"],
+                "File.SetDB <string Path>",
+                "Sets string StartUpDatabase, or StartUpDatabaseDebug if in debug mode, then prompts restart. Needs the full path incl. .db.")
         ];
 
         public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
@@ -41,12 +50,14 @@ namespace MacroTrack.Puppet2.Commands
             p("Made it past headcount");
             return head[1].ToLowerInvariant().Trim() switch
             {
-                "backuptest"    => BackUpTest(),
                 "backup"        => Backup(args),
                 "backupnow"     => Backup(args),
                 "backupmanual"  => Backup(args),
                 "manualbackup"  => Backup(args),
                 "openbackupdir" => OpenBackupDir(),
+                "restore"       => Restore(head, args),
+                "newdb"         => NewDB(args),
+                "setdb"         => SetDB(head, args),
                 _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
             };
         }
@@ -73,10 +84,22 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Backup sucessful. Should be named \"{(string.IsNullOrWhiteSpace(prefix) ? "" : $"{prefix.Replace(' ', '_')}_")}{(addTimeStamp ? $"{DateTime.Now.ToString("yyyy-MM-dd_HH:mm:ss")}_" : "")}{reason.Replace(' ', '_') + (reason.EndsWith(".db", StringComparison.OrdinalIgnoreCase) ? "" : ".db")}\"");
         }
 
-        private PuppetResult BackUpTest()
+        private PuppetResult Restore(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
-            _services.fileService.TestBackup();
-            return PuppetResult.Ok("Should have executed, take a look.");
+            string srcString, dstString;
+            if (args.IsJson())
+            {
+                RestorePayload pl = JsonSerializer.Deserialize<RestorePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                srcString = pl.Source;
+                dstString = pl.Destination;
+            }
+            else
+            {
+                srcString = args.String(0, "Source String");
+                dstString = args.String(1, "Destinaction String");
+            }
+            _services.fileService.RestoreDB(srcString, dstString);
+            return PuppetResult.ForceRestart();
         }
 
         private PuppetResult OpenBackupDir()
@@ -85,6 +108,29 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Opened {Paths.FindBackupDir()}");
         }
 
+        public PuppetResult NewDB(IReadOnlyList<string> args)
+        {
+            string name = args.String(0, "Name");
+            _services.fileService.NewDB(name);
+            return PuppetResult.ForceRestart();
+        }
+
+        public PuppetResult SetDB(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            string dbPath;
+            if (args.IsJson())
+            {
+                SetDBPayload pl = JsonSerializer.Deserialize<SetDBPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                dbPath = pl.Path;
+            }
+            else dbPath = args.String(0, "DBPath");
+            _services.SettingsService.SetStartupDatabase(dbPath);
+            return PuppetResult.ForceRestart();
+            // return PuppetResult.RequestRestart($"Set StartupDatabase, which is now:\n\n'{_services.SettingsService.GetStartupDatabase()}'\n\nApplication requires a restart to apply. Closing application, would you like to restart? (Pressing 'Cancel' will close this message box, new Database will load next time application launches)", "DBPath changed.", $"DBPath set as '{dbPath}', requesting restart.");
+        }
+
         public sealed record BackupPayload(string Reason, bool ShowTimeStamp, string Prefix);
+        public sealed record RestorePayload(string Source, string Destination);
+        public sealed record SetDBPayload(string Path);
     }
 }

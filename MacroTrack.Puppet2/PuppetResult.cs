@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MacroTrack.Puppet2
 {
-    public sealed record PuppetResult(bool Success, string Output)
+    public sealed record PuppetResult(bool Success, string Output, RestartArgs? RestartArgs = null)
     {
         public static PuppetResult Ok(string output) => new(true, output);
         public static PuppetResult Fail(string output) => new(false, output);
@@ -29,6 +29,9 @@ namespace MacroTrack.Puppet2
 
             return new(false, output);
         }
+
+        public static PuppetResult RequestRestart(string message = "", string caption = "", string printOutput = "Restart Requested") => new(true, printOutput, RestartArgs.Request(message, caption));
+        public static PuppetResult ForceRestart() => new(true, "Restarting...", RestartArgs.Force());
     }
 
     public enum FailHelpType
@@ -45,5 +48,20 @@ namespace MacroTrack.Puppet2
         {
             SourceCommand = sourceCommand;
         }
+    }
+
+    public sealed record RestartArgs(RestartRequestType RequestType = RestartRequestType.Default, string Message = "", string Caption = "")
+    {
+        public static RestartArgs Request(string message = "", string caption = "") => new(RestartRequestType.RequestRestart, message, caption);
+        public static RestartArgs Force() => new(RestartRequestType.ForceRestart);
+    }
+
+
+    // This is just added in case you want to put in more arguments, it literally does nothing.
+    public enum RestartRequestType
+    {
+        Default,
+        RequestRestart,
+        ForceRestart
     }
 }

@@ -86,8 +86,38 @@ namespace MacroTrack.Core.Settings
             #if DEBUG
             return Settings.StartupDatabaseDebug;
             #else
-            return Settings.StartupDatabasel
+            return Settings.StartupDatabase;
             #endif
+        }
+
+        /// <summary>
+        /// Used to create a new one, functionally identical to SetStartupDatabase except it ensures the new file doesn't exist, instead of ensuring that it does.
+        /// </summary>
+        /// <param name="path"></param>
+        public void NewStartupDatabase(string path)
+        {
+            if (File.Exists(path)) throw new Exception($"File '{path}' already exists. Delete it before adding.");
+            #if DEBUG
+            Settings.StartupDatabaseDebug = path;
+            #else
+            Settings.StartupDataBase = path;
+            #endif
+            Save();
+        }
+
+        /// <summary>
+        /// This is to set that and ensure seperation w/ debug.
+        /// </summary>
+        /// <param name="path"></param>
+        public void SetStartupDatabase(string path)
+        {
+            if (!File.Exists(path)) throw new FileNotFoundException($"File not found: '{path}'.");
+            #if DEBUG
+            Settings.StartupDatabaseDebug = path;
+            #else
+            Settings.StartupDataBase = path;
+            #endif
+            Save();
         }
 
         public void SetBackupDailyLastDate(DateTime date)
