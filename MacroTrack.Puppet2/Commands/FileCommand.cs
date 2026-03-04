@@ -45,9 +45,7 @@ namespace MacroTrack.Puppet2.Commands
 
         public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
-            p("Made it this far.");
             if (head.Count < 2) return PuppetResult.Fail("Subcommand required (this is not how we decided to do these errors but eh...");
-            p("Made it past headcount");
             return head[1].ToLowerInvariant().Trim() switch
             {
                 "backup"        => Backup(args),
