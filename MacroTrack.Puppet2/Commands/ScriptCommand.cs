@@ -31,7 +31,9 @@ namespace MacroTrack.Puppet2.Commands
 
         public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
+            p("");
             if (head.Count < 2) return PuppetResult.Fail("Subcommand required (this is not how we decided to do these errors but eh...");
+            p("");
             return head[1].ToLowerInvariant().Trim() switch
             {
                 "run"       => Run(args),
@@ -68,10 +70,13 @@ namespace MacroTrack.Puppet2.Commands
 
         private PuppetResult TestParse(IReadOnlyList<string> args)
         {
+            p("");
             //return PuppetResult.Ok($"Args count]'{args.Count}', args: '{string.Join(' ', args)}'");
             string path = args.String(0, "Path");
+            p("");
             //return PuppetResult.Ok(path);
             var script = ScriptParser.ParseFile(path);
+            p("");
             return PuppetResult.Ok(script.PrintFullInfo());
         }
 

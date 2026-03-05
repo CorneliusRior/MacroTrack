@@ -100,7 +100,7 @@ namespace MacroTrack.Core.Settings
             #if DEBUG
             Settings.StartupDatabaseDebug = path;
             #else
-            Settings.StartupDataBase = path;
+            Settings.StartupDatabase = path;
             #endif
             Save();
         }
@@ -115,7 +115,7 @@ namespace MacroTrack.Core.Settings
             #if DEBUG
             Settings.StartupDatabaseDebug = path;
             #else
-            Settings.StartupDataBase = path;
+            Settings.StartupDatabase = path;
             #endif
             Save();
         }

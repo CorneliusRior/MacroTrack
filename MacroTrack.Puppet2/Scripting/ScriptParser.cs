@@ -22,7 +22,7 @@ namespace MacroTrack.Puppet2.Scripting
 
             string fileName = Path.GetFileName(path);
             prog?.Report(new ScriptProgress(0, total, $"Starting, attempting to parse file '{fileName}' ({lines.Length} lines):"));
-
+            p("");
             for (int i = 0; i < lines.Length; i++)
             {
                 // Filter comments & empty:
