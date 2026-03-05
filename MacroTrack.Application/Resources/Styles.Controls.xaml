@@ -182,6 +182,7 @@
     <!--REPL textbox-->
     <Style x:Key="TextBox.Repl" TargetType="TextBox">
         <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
         <Setter Property="FontFamily" Value="{DynamicResource ReplFont}"/>
         <Setter Property="FontSize" Value="{DynamicResource ReplSize}"/>
