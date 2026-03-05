@@ -2,6 +2,7 @@ using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Services;
 using MacroTrack.Core.Settings;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace MacroTrack.BasicApp
 {
@@ -18,7 +19,7 @@ namespace MacroTrack.BasicApp
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
 
-            //var root = FindSolutionRoot();
+            /*
             var settingsPath = FindSettingsPath();
             var settingsService = new SettingsService(settingsPath);
 
@@ -33,23 +34,37 @@ namespace MacroTrack.BasicApp
             _logger.UILevel = settingsService.Settings.LogUILevel;
             _logger.FileLevel = settingsService.Settings.LogFileLevel;
 
-            var _context = new CoreContext(_logger);
-            var _services = new CoreServices(connString, _context, settingsService);
+            var _context = new CoreContext(connString, _logger, settingsService);
+            var _services = new CoreServices(_context);
+            */
+
+            // Get paths & apply:
+            // Database:
+            string dbPath = Paths.FindDBPath();
+            string connString = $"Data Source ={dbPath}";
+
+            // Logger:
+            string logPath = Paths.FindLogPath();
+            string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+            var logger = new MTLogger(logFile, "BasicApp");
+
+            // Settings:
+            string settingsPath = Paths.FindSettingsPath();
+            var settingsService = new SettingsService(settingsPath, logger);
+            settingsService.Apply(settingsService.Settings);
+
+            // Application of some settings:
+            Paths.DeleteOldLogs(settingsService.Settings.LogRetainAmount);
+
+            // Create context, then CoreServices
+            var context = new CoreContext(connString, logger, settingsService);
+            var Services = new CoreServices(context);
 
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1(_services));
+            Application.Run(new Form1(Services));
         }
 
         /*
-        static string FindSolutionRoot()
-        {
-            var dir = new DirectoryInfo(AppContext.BaseDirectory);
-            while (dir != null && !Directory.Exists(Path.Combine(dir.FullName, "Data"))) dir = dir.Parent;
-            if (dir == null) throw new DirectoryNotFoundException("No");
-            return dir.FullName;
-        }
-        */
-
         static string FindAppDataDir()
         {
             var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -89,5 +104,6 @@ namespace MacroTrack.BasicApp
             Directory.CreateDirectory(dir);
             return Path.Combine(dir, "settings.json");
         }
+        */
     }
 }

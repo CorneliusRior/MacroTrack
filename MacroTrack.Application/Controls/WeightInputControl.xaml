@@ -1,0 +1,123 @@
+﻿<local:ControlBase x:Class="MacroTrack.AppLibrary.Controls.WeightInputControl"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                   xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+                   xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs"
+                   xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls"
+                   mc:Ignorable="d" 
+                   xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
+                   d:DesignHeight="300" d:DesignWidth="300">
+    <local:ControlBase.Resources>
+        <conv:NullableDoubleConverter x:Key="NullDouble"/>
+    </local:ControlBase.Resources>
+
+    <Border Background="{DynamicResource PanelBackGroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0"
+               Style="{DynamicResource Label.Title}"
+               Content="Weight Entry"/>
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!--Input Grid:-->
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Content="Time:"
+                           Grid.Row="0" Grid.Column="0"/>
+
+                    <controls:DateTimePicker x:Name="dateTimePicker"
+                                             Value="{Binding Time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                             Margin="5"
+                                             Grid.Row="0" Grid.Column="1"/>
+
+                    <Button Content="Current Time"
+                            Name="buttonNow"
+                            Click="buttonNow_Click"
+                            Grid.Row="0" Grid.Column="2"/>
+
+                    <Label Content="Weight:"
+                           Grid.Row="1" Grid.Column="0"/>
+
+                    <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Name="tb_Entry"
+                                 Text="{Binding WeightInput,
+                                        Converter={StaticResource NullDouble},
+                                        UpdateSourceTrigger=PropertyChanged,
+                                        ValidatesOnDataErrors=True}"
+                                 Style="{DynamicResource TextBox.Numeric}"
+                                 Grid.Column="0"/>
+                        <Label Content="{Binding UnitLabel}"
+                               Name="lbl_Unit"
+                               Grid.Column="1"/>
+                        <Label Content="{Binding ConversionString}"
+                               Name="lbl_Conversion"
+                               HorizontalAlignment="Right"
+                               Grid.Column="2"/>
+
+
+                    </Grid>
+                    
+                    
+
+                </Grid>
+                <Border BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="{DynamicResource ButtonBorderThickness}"
+                        Margin="5"
+                        Grid.Row="1">
+                    <!--Graph is here:-->
+                    <graphs:MTLineChart x:Name="WeightGraph" 
+                                        SeriesSet="{Binding GraphSeriesSet}"
+                                        XStart="{Binding GraphStartTime}"
+                                        XEnd="{Binding GraphEndTime}"
+                                        YAxisSuffix="{Binding UnitLabel}" 
+                                        Settings="{Binding GraphSettings}"
+                                        ShowZero="False"
+                                        PlotMargin="32,8,8,16"
+                                        Grid.Row="1"/>
+                </Border>
+                        
+
+            </Grid>
+
+            <StackPanel Grid.Row="2"
+                    Style="{DynamicResource StackPanel.Footer}">
+
+                <Button Content="Clear"
+                        Name="ButtonClear"
+                        Click="ButtonClear_Click"/>
+                <Button Content="Add"
+                        Name="ButtonAdd"
+                        Click="ButtonAdd_Click"/>
+
+            </StackPanel>
+        </Grid>
+    </Border>
+</local:ControlBase>

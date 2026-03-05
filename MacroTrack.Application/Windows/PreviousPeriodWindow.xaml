@@ -1,0 +1,148 @@
+﻿<local:WindowBase x:Class="MacroTrack.AppLibrary.Windows.PreviousPeriodWindow"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:local="clr-namespace:MacroTrack.AppLibrary.Windows"
+                  xmlns:graphs="clr-namespace:MacroTrack.AppLibrary.Graphs"
+                  xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls"
+                  mc:Ignorable="d"
+                  Title="PreviousPeriodWindow" Height="700" Width="1200"
+                  
+                  KeyDown="WindowBase_KeyDown"
+                  Background="{DynamicResource AppBackGroundBrush}">
+    <local:WindowBase.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </local:WindowBase.Resources>
+    
+    <!--Banner Separator-->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!--Banner-->
+        <Border Grid.Row="0"
+                Margin="5"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="{DynamicResource BorderThickness}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="buttonPrevious"
+                        Content="Previous"
+                        Click="buttonPrevious_Click"
+                        Grid.Column="0"/>
+
+                <TextBlock x:Name="tbxBannerDate"
+                           Text="{Binding DateString}"
+                           Style="{DynamicResource TextBlock.MidTitle}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Grid.Column="2"/>
+                <Button x:Name="buttonCheatDay"
+                        Content="{Binding DeclareCheatString}"
+                        Visibility="{Binding IsDay, Converter={StaticResource BoolToVis}}"
+                        Click="buttonCheatDay_Click"
+                        Grid.Column="3"/>
+                <Button x:Name="buttonNext"
+                        Content="Next"
+                        Click="buttonNext_Click"
+                        Grid.Column="4"/>
+            </Grid>
+        </Border>
+        
+        <!--Main Content Area-->
+        <Grid Grid.Row="1" Margin="5,0,5,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!--Upper Row-->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <graphs:MTDonut x:Name="DonutPresent"
+                                        Totals="{Binding CurrentSummary.Actual}"
+                                        Style="{DynamicResource MTDonutBase}"                                        
+                                        Grid.Column="0"/>
+                        <graphs:MTDonut x:Name="DonutGoal"
+                                        Totals="{Binding CurrentSummary.Target}"
+                                        Style="{DynamicResource MTDonutBase}"                                        
+                                        Grid.Column="1"/>
+                    </Grid>
+                </Border>
+            
+                <GridSplitter Grid.Column="1"/>
+
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="2">
+                    <controls:Summary x:Name="Summary"
+                                      CurrentSummary="{Binding CurrentSummary}"
+                                      PreviousPeriod="{Binding Period}"
+                                      ShowTimeFrameCB="False"/>
+                </Border>
+
+                <GridSplitter Grid.Column="3"/>
+
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="4">
+                    <controls:DailyTaskControl x:Name="DailyTasks" Date="{Binding DataContext.StartTime, RelativeSource={RelativeSource AncestorType={x:Type local:PreviousPeriodWindow}}}"/>
+                </Border>
+            </Grid>
+
+            <GridSplitter Grid.Row="1"/>
+
+            <!--Lower Row-->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="0" Padding="5">
+                    <controls:HistoryControl x:Name="History" Period="{Binding DataContext.Period, RelativeSource={RelativeSource AncestorType={x:Type local:PreviousPeriodWindow}}}"/>
+                </Border>
+
+                <GridSplitter Grid.Column="1"/>
+
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="2">
+                    <controls:WeightViewControl x:Name="WeightView" Period="{Binding DataContext.Period, RelativeSource={RelativeSource AncestorType={x:Type local:PreviousPeriodWindow}}}"/> 
+                </Border>
+
+                <GridSplitter Grid.Column="3"/>
+
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="{DynamicResource BorderThickness}" Grid.Column="4">
+                    <controls:DiaryViewControl x:Name="DiaryView" ShowTopRibbon="False" ShowViewDay="False"
+                                               PreviousPeriod="{Binding DataContext.Period, RelativeSource={RelativeSource AncestorType={x:Type local:PreviousPeriodWindow}}}"/>
+                </Border>
+
+            </Grid>
+        </Grid>
+        
+
+    </Grid>
+    
+</local:WindowBase>

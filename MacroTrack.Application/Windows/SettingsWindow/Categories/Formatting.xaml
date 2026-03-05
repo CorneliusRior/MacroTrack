@@ -1,0 +1,137 @@
+﻿<UserControl x:Class="MacroTrack.AppLibrary.Windows.SettingsWindow.Categories.Formatting" 
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:set="clr-namespace:MacroTrack.Core.Settings;assembly=MacroTrack.Core"
+             xmlns:local="clr-namespace:MacroTrack.AppLibrary.Windows.SettingsWindow.Categories"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="450">
+    <Border Background="{DynamicResource PanelBackGroundBrush}">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <Expander Header="Time Formatting" IsExpanded="True">
+                    <StackPanel Orientation="Vertical">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="Date/Time short" Grid.Row="0" Grid.Column="0"/>
+                            <ComboBox x:Name="cbDTFormatShort" 
+                                      Template="{DynamicResource MTComboBoxTemplate}"
+                                      ItemsSource="{x:Static set:DTFormatSList.List}"
+                                      SelectedValue="{Binding SettingsEditable.DTFormatShort, Mode=TwoWay}"
+                                      DisplayMemberPath="Display"
+                                      SelectedValuePath="Value"
+                                      Width="250"
+                                      Grid.Row="0" Grid.Column="1"/>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="Date/Time long" Grid.Row="0" Grid.Column="0"/>
+                            <ComboBox x:Name="cbDTFormatLong"
+                                      Template="{DynamicResource MTComboBoxTemplate}"
+                                      ItemsSource="{x:Static set:DTFormatLList.List}"
+                                      SelectedValue="{Binding SettingsEditable.DTFormatLong, Mode=TwoWay}"
+                                      DisplayMemberPath="Display"
+                                      SelectedValuePath="Value"
+                                      Width="250"
+                                      Grid.Row="0" Grid.Column="1"/>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>                                
+                            </Grid.RowDefinitions>
+                            
+                            <Label Content="Time Format" Grid.Row="0" Grid.Column="0"/>
+                            <ComboBox x:Name="cbTimeFormat"
+                                      Template="{DynamicResource MTComboBoxTemplate}"
+                                      ItemsSource="{x:Static set:TimeFormatList.List}"
+                                      SelectedValue="{Binding SettingsEditable.TimeFormat, Mode=TwoWay}"
+                                      DisplayMemberPath="Display"
+                                      SelectedValuePath="Value"
+                                      HorizontalAlignment="Right"
+                                      HorizontalContentAlignment="Right"
+                                      Width="175"
+                                      Grid.Row="0" Grid.Column="1"/>
+
+                            <Label Content="Short Date Format" Grid.Row="1" Grid.Column="0"/>
+                            <ComboBox x:Name="cbDateFormatShort"
+                                      Template="{DynamicResource MTComboBoxTemplate}"
+                                      ItemsSource="{x:Static set:DFormatSList.List}"
+                                      SelectedValue="{Binding SettingsEditable.DFormatShort, Mode=TwoWay}"
+                                      DisplayMemberPath="Display"
+                                      SelectedValuePath="Value"
+                                      HorizontalAlignment="Right"
+                                      HorizontalContentAlignment="Right"
+                                      Width="175"
+                                      Grid.Row="1" Grid.Column="1"/>
+
+                            <Label Content="Long Date Format" Grid.Row="2" Grid.Column="0"/>
+                            <ComboBox x:Name="cbDateFormatLong"
+                                      Template="{DynamicResource MTComboBoxTemplate}"
+                                      ItemsSource="{x:Static set:DFormatLList.List}"
+                                      SelectedValue="{Binding SettingsEditable.DFormatLong, Mode=TwoWay}"
+                                      DisplayMemberPath="Display"
+                                      SelectedValuePath="Value"
+                                      HorizontalAlignment="Right"
+                                      HorizontalContentAlignment="Right"
+                                      Width="175"
+                                      Grid.Row="2" Grid.Column="1"/>
+
+                        </Grid>
+
+                        <CheckBox Content="Clock time formatted as long"
+                                  IsChecked="{Binding SettingsEditable.ClockInLongFormat, Mode=TwoWay}"/>
+                        <CheckBox Content="Date time picker times formatted as Long"
+                                  IsChecked="{Binding SettingsEditable.DTPInLongFormat, Mode=TwoWay}"/>
+                        <CheckBox Content="Diary Entry times formatted as Long"
+                                  IsChecked="{Binding SettingsEditable.DiaryTimeIsLongFormat, Mode=TwoWay}"/>
+                        <CheckBox Content="Show time in Diary Entries"
+                                  IsChecked="{Binding SettingsEditable.DiaryTimeIncludesTime, Mode=TwoWay}"/>
+                        <CheckBox Content="Show seconds in Diary Entry times"
+                                  IsChecked="{Binding SettingsEditable.DiaryTimeIncludesSeconds, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Expander>
+                <Expander Header="Weight Formatting" IsExpanded="True">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Weight Format:" Target="{Binding ElementName=cbWeightFormat}" Grid.Column="0"/>
+                            <ComboBox x:Name="cbWeightFormat"
+                                      Template="{DynamicResource MTComboBoxTemplate}"
+                                      ItemsSource="{x:Static set:WeightFormatList.List}"
+                                      DisplayMemberPath="LongDisplay"
+                                      SelectedValuePath="Value"
+                                      SelectedValue="{Binding SettingsEditable.WeightFormat, Mode=TwoWay}"
+                                      Width="80"
+                                      HorizontalContentAlignment="Right"
+                                      Grid.Column="1"/>
+                        </Grid>
+                        
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace MacroTrack.Core.Logging
 {
@@ -17,10 +20,10 @@ namespace MacroTrack.Core.Logging
         private readonly string _logFilePath;
         private readonly object _lock = new();
 
-        public MTLogger(string logFilePath)
+        public MTLogger(string logFilePath, string? program = "Unknown Program")
         {
             _logFilePath = logFilePath;
-            Log(this, "Constructor", LogLevel.Info, $"UILevel = '{UILevel}', FileLevel = '{FileLevel}'");
+            Log(this, "Constructor", LogLevel.Info, $"New logger called by '{program ?? "Null"}'. UILevel = '{UILevel}', FileLevel = '{FileLevel}'");
         }
 
         public void Log(object sourceObj, string caller, LogLevel level, string message, Exception? ex = null)
@@ -47,6 +50,54 @@ namespace MacroTrack.Core.Logging
             {
                 MessageLogged?.Invoke(this, msg);
             }
+        }
+
+        /// <summary>
+        /// Logs name and value of variables supplied in an anonymous object
+        /// Format like LogVars(new{ a, b, c } [...] )
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// LogVars(new{ a, b, c }, "Variables before");
+        /// </code>
+        /// </example>
+        /// <param name="sourceObj">Caller source</param>
+        /// <param name="vars">An object whose public instances are logged</param>
+        /// <param name="caller">Automatically supplied member name of caller, ignore.</param>
+        /// <param name="prefix">String which proceeds the variable listing in the log entry</param>
+        public void LogVars(object sourceObj, object vars, string caller, string? prefix = null)
+        {
+            var props = vars.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var parts = props.Select(p =>
+            {
+                var value = p.GetValue(vars);
+                return $"{p.Name}={Format(value)}";
+            });
+            Log(sourceObj, caller, LogLevel.Debug, $"{(prefix ?? "LogVars:")} {string.Join(", ", parts)}");
+        }
+
+        private string Format(object? value)
+        {
+            if (value is null) return "null";
+            return $"{value.GetType().Name} '{value}'";
+        }
+
+        public void OpenLogFile()
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = _logFilePath,
+                UseShellExecute = true
+            });
+        }
+
+        public void OpenLogDir()
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = Path.GetDirectoryName(_logFilePath),
+                UseShellExecute = true
+            });
         }
     }
 }

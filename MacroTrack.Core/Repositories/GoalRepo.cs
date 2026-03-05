@@ -2,7 +2,8 @@
 
 namespace MacroTrack.Core.Repositories;
 
-using MacroTrack.Core.AppModels;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
@@ -33,6 +34,7 @@ public class GoalRepo : RepoBase
         connection.Open();
         using var cmd = new SqliteCommand("PRAGMA foreign_keys = ON;", connection);
         cmd.ExecuteNonQuery();
+        // Empty space is where we removed "Type TEXT", feel free to get rid of that and this comment if it starts working! Same with the "TEMPORARY! REMOVE!:" bit below.
         string sql1 = @"
         CREATE TABLE IF NOT EXISTS GoalRegistry (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,7 +43,9 @@ public class GoalRepo : RepoBase
             Protein DOUBLE NOT NULL,
             Carbs DOUBLE NOT NULL,
             Fat DOUBLE NOT NULL,
-            Type TEXT,
+            TypeId INTEGER NOT NULL DEFAULT 0,
+            CustomType TEXT,
+            
             Notes TEXT,
             MinCal DOUBLE,
             MaxCal DOUBLE,
@@ -67,6 +71,14 @@ public class GoalRepo : RepoBase
         ";
         using var cmd2 = new SqliteCommand(sql2, connection);
         cmd2.ExecuteNonQuery();
+        /*
+        // TEMPORARY! REMOVE!:
+        string sql3 = @"
+        ALTER TABLE GoalRegistry ADD COLUMN TypeId INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE GoalRegistry ADD COLUMN CustomType TEXT;
+        ";
+        using var cmd3 = new SqliteCommand(sql3, connection);
+        cmd3.ExecuteNonQuery();*/
     }
 
     // New Goal
@@ -76,8 +88,8 @@ public class GoalRepo : RepoBase
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
         string sql = @"
-        INSERT INTO GoalRegistry (Name, Calories, Protein, Carbs, Fat, Type, Notes, MinCal, MaxCal, MinPro, MaxPro, MinCar, MaxCar, MinFat, MaxFat)
-        VALUES ($name, $calories, $protein, $carbs, $fat, $type, $notes, $mincal, $maxcal, $minpro, $maxpro, $mincar, $maxcar, $minfat, $maxfat);
+        INSERT INTO GoalRegistry (Name, Calories, Protein, Carbs, Fat, TypeId, CustomType, Notes, MinCal, MaxCal, MinPro, MaxPro, MinCar, MaxCar, MinFat, MaxFat)
+        VALUES ($name, $calories, $protein, $carbs, $fat, $typeId, $customType, $notes, $mincal, $maxcal, $minpro, $maxpro, $mincar, $maxcar, $minfat, $maxfat);
         ";
         using var cmd = new SqliteCommand(sql, connection);
         cmd.Parameters.AddWithValue("$name", goal.GoalName);
@@ -85,7 +97,8 @@ public class GoalRepo : RepoBase
         cmd.Parameters.AddWithValue("$protein", goal.Protein);
         cmd.Parameters.AddWithValue("$carbs", goal.Carbs);
         cmd.Parameters.AddWithValue("$fat", goal.Fat);
-        cmd.Parameters.AddWithValue("$type", goal.GoalType ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("$typeId", (int)goal.GoalType);
+        cmd.Parameters.AddWithValue("$customType", goal.CustomType ?? (object)DBNull.Value);
         cmd.Parameters.AddWithValue("$notes", goal.Notes ?? (object)DBNull.Value);
         cmd.Parameters.AddWithValue("$mincal", goal.MinCal.HasValue ? (object)goal.MinCal.Value : DBNull.Value);
         cmd.Parameters.AddWithValue("$maxcal", goal.MaxCal.HasValue ? (object)goal.MaxCal.Value : DBNull.Value);
@@ -109,22 +122,23 @@ public class GoalRepo : RepoBase
         using var reader = cmd.ExecuteReader();
         if (!reader.Read()) return null;
         return new Goal(
-            reader.GetInt32(0),
-            reader.GetString(1),
-            reader.GetDouble(2),
-            reader.GetDouble(3),
-            reader.GetDouble(4),
-            reader.GetDouble(5),
-            reader.IsDBNull(6) ? null : reader.GetString(6),
-            reader.IsDBNull(7) ? null : reader.GetString(7),
-            reader.IsDBNull(8) ? null : reader.GetDouble(8),
-            reader.IsDBNull(9) ? null : reader.GetDouble(9),
-            reader.IsDBNull(10) ? null : reader.GetDouble(10),
-            reader.IsDBNull(11) ? null : reader.GetDouble(11),
-            reader.IsDBNull(12) ? null : reader.GetDouble(12),
-            reader.IsDBNull(13) ? null : reader.GetDouble(13),
-            reader.IsDBNull(14) ? null : reader.GetDouble(14),
-            reader.IsDBNull(15) ? null : reader.GetDouble(15)
+            reader.GetInt32(reader.GetOrdinal("Id")),
+            reader.GetString(reader.GetOrdinal("Name")),      
+            reader.GetDouble(reader.GetOrdinal("Calories")),  
+            reader.GetDouble(reader.GetOrdinal("Protein")),          
+            reader.GetDouble(reader.GetOrdinal("Carbs")),          
+            reader.GetDouble(reader.GetOrdinal("Fat")),                              
+            (GoalType)reader.GetInt32(reader.GetOrdinal("TypeId")),
+            reader.IsDBNull(reader.GetOrdinal("CustomType")) ? null : reader.GetString(reader.GetOrdinal("CustomType")),  
+            reader.IsDBNull(reader.GetOrdinal("Notes")) ? null : reader.GetString(reader.GetOrdinal("Notes")),
+            reader.IsDBNull(reader.GetOrdinal("MinCal")) ? null : reader.GetDouble(reader.GetOrdinal("MinCal")),  
+            reader.IsDBNull(reader.GetOrdinal("MaxCal")) ? null : reader.GetDouble(reader.GetOrdinal("MaxCal")),  
+            reader.IsDBNull(reader.GetOrdinal("MinPro")) ? null : reader.GetDouble(reader.GetOrdinal("MinPro")),
+            reader.IsDBNull(reader.GetOrdinal("MaxPro")) ? null : reader.GetDouble(reader.GetOrdinal("MaxPro")),
+            reader.IsDBNull(reader.GetOrdinal("MinCar")) ? null : reader.GetDouble(reader.GetOrdinal("MinCar")),
+            reader.IsDBNull(reader.GetOrdinal("MaxCar")) ? null : reader.GetDouble(reader.GetOrdinal("MaxCar")),
+            reader.IsDBNull(reader.GetOrdinal("MinFat")) ? null : reader.GetDouble(reader.GetOrdinal("MinFat")),
+            reader.IsDBNull(reader.GetOrdinal("MaxFat")) ? null : reader.GetDouble(reader.GetOrdinal("MaxFat"))            
         );
     }
 
@@ -153,22 +167,23 @@ public class GoalRepo : RepoBase
         while (reader.Read())
         {
             goals.Add(new Goal(
-                reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetDouble(2),
-                reader.GetDouble(3),
-                reader.GetDouble(4),
-                reader.GetDouble(5),
-                reader.IsDBNull(6) ? null : reader.GetString(6),
-                reader.IsDBNull(7) ? null : reader.GetString(7),
-                reader.IsDBNull(8) ? null : reader.GetDouble(8),
-                reader.IsDBNull(9) ? null : reader.GetDouble(9),
-                reader.IsDBNull(10) ? null : reader.GetDouble(10),
-                reader.IsDBNull(11) ? null : reader.GetDouble(11),
-                reader.IsDBNull(12) ? null : reader.GetDouble(12),
-                reader.IsDBNull(13) ? null : reader.GetDouble(13),
-                reader.IsDBNull(14) ? null : reader.GetDouble(14),
-                reader.IsDBNull(15) ? null : reader.GetDouble(15)
+                reader.GetInt32(reader.GetOrdinal("Id")),
+                reader.GetString(reader.GetOrdinal("Name")),
+                reader.GetDouble(reader.GetOrdinal("Calories")),
+                reader.GetDouble(reader.GetOrdinal("Protein")),
+                reader.GetDouble(reader.GetOrdinal("Carbs")),
+                reader.GetDouble(reader.GetOrdinal("Fat")),
+                (GoalType)reader.GetInt32(reader.GetOrdinal("TypeId")),
+                reader.IsDBNull(reader.GetOrdinal("CustomType")) ? null : reader.GetString(reader.GetOrdinal("CustomType")),
+                reader.IsDBNull(reader.GetOrdinal("Notes")) ? null : reader.GetString(reader.GetOrdinal("Notes")),
+                reader.IsDBNull(reader.GetOrdinal("MinCal")) ? null : reader.GetDouble(reader.GetOrdinal("MinCal")),
+                reader.IsDBNull(reader.GetOrdinal("MaxCal")) ? null : reader.GetDouble(reader.GetOrdinal("MaxCal")),
+                reader.IsDBNull(reader.GetOrdinal("MinPro")) ? null : reader.GetDouble(reader.GetOrdinal("MinPro")),
+                reader.IsDBNull(reader.GetOrdinal("MaxPro")) ? null : reader.GetDouble(reader.GetOrdinal("MaxPro")),
+                reader.IsDBNull(reader.GetOrdinal("MinCar")) ? null : reader.GetDouble(reader.GetOrdinal("MinCar")),
+                reader.IsDBNull(reader.GetOrdinal("MaxCar")) ? null : reader.GetDouble(reader.GetOrdinal("MaxCar")),
+                reader.IsDBNull(reader.GetOrdinal("MinFat")) ? null : reader.GetDouble(reader.GetOrdinal("MinFat")),
+                reader.IsDBNull(reader.GetOrdinal("MaxFat")) ? null : reader.GetDouble(reader.GetOrdinal("MaxFat"))
             ));
         }
         return goals;
@@ -179,14 +194,15 @@ public class GoalRepo : RepoBase
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
-        string sql = "UPDATE GoalRegistry SET Name = $name, Calories = $calories, Protein = $protein, Carbs = $carbs, Fat = $fat, Type = $type, Notes = $notes, MinCal = $mincal, MaxCal = $maxcal, MinPro = $minpro, MaxPro = $maxpro, MinCar = $mincar, MaxCar = $maxcar, MinFat = $minfat, MaxFat = $maxfat WHERE Id = $id";
+        string sql = "UPDATE GoalRegistry SET Name = $name, Calories = $calories, Protein = $protein, Carbs = $carbs, Fat = $fat, TypeId = $typeId, CustomType = $customType, Notes = $notes, MinCal = $mincal, MaxCal = $maxcal, MinPro = $minpro, MaxPro = $maxpro, MinCar = $mincar, MaxCar = $maxcar, MinFat = $minfat, MaxFat = $maxfat WHERE Id = $id";
         using var cmd = new SqliteCommand(sql, connection);
         cmd.Parameters.AddWithValue("$name", goal.GoalName);
         cmd.Parameters.AddWithValue("$calories", goal.Calories);
         cmd.Parameters.AddWithValue("$protein", goal.Protein);
         cmd.Parameters.AddWithValue("$carbs", goal.Carbs);
         cmd.Parameters.AddWithValue("$fat", goal.Fat);
-        cmd.Parameters.AddWithValue("$type", goal.GoalType ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("$typeId", (int)goal.GoalType);
+        cmd.Parameters.AddWithValue("$customType", goal.CustomType ?? (object)DBNull.Value);
         cmd.Parameters.AddWithValue("$notes", goal.Notes ?? (object)DBNull.Value);
         cmd.Parameters.AddWithValue("$mincal", goal.MinCal.HasValue ? (object)goal.MinCal.Value : DBNull.Value);
         cmd.Parameters.AddWithValue("$maxcal", goal.MaxCal.HasValue ? (object)goal.MaxCal.Value : DBNull.Value);
@@ -282,6 +298,47 @@ public class GoalRepo : RepoBase
         {
             return new GoalActivation(Id, GoalId, ActivatedAt, DateOnly.Parse(reader.GetString(3)));
         }
+    }
+
+    /// <summary>
+    /// Returns every instance of given Goal (id) being activated. Useful if you want to know if a goal has been used before deleting it.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public List<GoalActivation> GetActivationsOfGoal(int id)
+    {
+        List<GoalActivation> activationList = new();
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        string sql = "SELECT * FROM GoalHistory WHERE GoalId = $goalId";
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue($"goalId", id);
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            if (reader.IsDBNull(3))
+            {
+                activationList.Add(
+                    new GoalActivation(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1),
+                        DateOnly.Parse(reader.GetString(2))
+                    )
+                );
+            }
+            else
+            {
+                activationList.Add(
+                    new GoalActivation(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1),
+                        DateOnly.Parse(reader.GetString(2)),
+                        DateOnly.Parse(reader.GetString(3))
+                    )
+                );
+            }
+        }
+        return activationList;
     }
 
     // Return last Activation

@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="MacroTrack.AppLibrary.Controls.SpinBox" x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="80"
+             MinHeight="25">
+    <Border x:Name="OuterBorder">
+
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="BorderBrush" Value="{Binding OuterBorderBrush, ElementName=Root}"/>
+                <Setter Property="BorderThickness" Value="{Binding OuterBorderThickness, ElementName=Root}"/>
+                <Setter Property="Padding" Value="1"/>
+                <Style.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsMouseOver, ElementName=Root}" Value="True"/>
+                            <Condition Binding="{Binding IsKeyboardFocusWithin, ElementName=Root}" Value="False"/>
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}"/>
+                        <Setter Property="BorderThickness" Value="{DynamicResource SelectedBorderThickness}"/>
+                    </MultiDataTrigger>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.56"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="{Binding ButtonWidth, ElementName=Root}"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="tbValue"  
+                     Style="{StaticResource TextBox.SpinBox}"
+                     Grid.Column="0"/>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Button x:Name="ButtonUp"
+                        Content="▲"
+                        Click="ButtonUp_Click"
+                        Style="{StaticResource Button.SpinBox}"  
+                        Grid.Row="0"/>
+
+                <Button x:Name="ButtonDown"
+                        Content="▼"
+                        Click="ButtonDown_Click"
+                        Style="{StaticResource Button.SpinBox}"
+                        Grid.Row="1"/>
+            </Grid>
+        </Grid>
+        
+    </Border>
+    
+</UserControl>
+    

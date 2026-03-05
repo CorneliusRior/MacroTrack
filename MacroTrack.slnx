@@ -1,6 +1,10 @@
 <Solution>
+  <Project Path="MacroTrack.Application/MacroTrack.AppLibrary.csproj" Id="b301ec53-1bd5-41ff-bf75-a85d474a754c" />
   <Project Path="MacroTrack.BasicApp/MacroTrack.BasicApp.csproj" Id="67400bd8-9a69-40f0-8fe7-ea745482388a" />
   <Project Path="MacroTrack.Cli/MacroTrack.Cli.csproj" />
   <Project Path="MacroTrack.Core/MacroTrack.Core.csproj" />
+  <Project Path="MacroTrack.Dashboard/MacroTrack.Dashboard.csproj" Id="7560e679-b17f-4871-b427-0e2f931f39fb" />
   <Project Path="MacroTrack.Puppet/MacroTrack.Puppet.csproj" Id="3e3ae3dd-f06c-475c-a699-d126bef45acb" />
+  <Project Path="MacroTrack.Puppet2/MacroTrack.Puppet2.csproj" Id="7fb7a881-54b5-4bdd-86cf-bc9509027d91" />
+  <Project Path="MT5toMTScript/MT5toMTScript.csproj" Id="20291d81-10ec-4aaf-8696-eaad16b4cb7e" />
 </Solution>

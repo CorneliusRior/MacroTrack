@@ -1,0 +1,41 @@
+﻿<local:ControlBase x:Class="MacroTrack.AppLibrary.Controls.DiaryInputControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
+             mc:Ignorable="d" d:DesignHeight="272" d:DesignWidth="555">
+    <Border Background="{DynamicResource PanelBackGroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0"
+                   Style="{DynamicResource Label.Title}"
+                   Content="Diary Entry"/>
+
+            <TextBox Grid.Row="1"
+                     Name="tbDiary"
+                     Style="{StaticResource TextBox.MultiLine}"/>
+
+            <StackPanel Grid.Row="2"
+                        Style="{DynamicResource StackPanel.Footer}">
+                
+                <Button Content="View Diary"
+                        Name="ButtonViewDiary"
+                        Click="ButtonViewDiary_Click"/>
+                <Button Content="Clear"
+                        Name="ButtonClear"
+                        Click="ButtonClear_Click"/>
+                <Button Content="Add"
+                        Name="ButtonAdd"
+                        Click="ButtonAdd_Click"/>
+
+            </StackPanel>
+
+        </Grid>
+    </Border>
+</local:ControlBase>

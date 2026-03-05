@@ -18,6 +18,7 @@ public sealed class CoreServices
     public SettingsService SettingsService { get; }
 
     public DiaryRepo diaryRepo { get; }
+    public FileRepo fileRepo { get; }
     public FoodLogRepo foodLogRepo { get; }
     public GoalRepo goalRepo { get; }
     public PresetRepo presetRepo { get; }
@@ -26,6 +27,7 @@ public sealed class CoreServices
 
     public DataService dataService { get; }
     public DiaryService diaryService { get; }
+    public FileService fileService { get; }
     public FoodLogService foodLogService { get; }
     public GoalService goalService { get; }
     public TaskService taskService { get; }
@@ -33,14 +35,17 @@ public sealed class CoreServices
     public WeightLogService weightLogService { get; }
 
 
-    public CoreServices(string conn, CoreContext ctx, SettingsService settingsService)
+    public CoreServices(CoreContext ctx)
     {
+        string conn = ctx.ConnString;
+
         Logger = ctx.Logger;
         Logger.MessageLogged += (sender, msg) => MessageLogged?.Invoke(sender, msg);
 
-        SettingsService = settingsService;
+        SettingsService = ctx.Settings;
 
         diaryRepo = new DiaryRepo(conn, ctx);
+        fileRepo = new FileRepo(conn, ctx);
         foodLogRepo = new FoodLogRepo(conn, ctx);
         goalRepo = new GoalRepo(conn, ctx);
         presetRepo = new PresetRepo(conn, ctx);
@@ -49,6 +54,7 @@ public sealed class CoreServices
 
         dataService = new DataService(foodLogRepo, goalRepo, weightLogRepo, ctx);
         diaryService = new DiaryService(diaryRepo, ctx);
+        fileService = new FileService(fileRepo, ctx);
         foodLogService = new FoodLogService(foodLogRepo, presetRepo, ctx);
         goalService = new GoalService(goalRepo, ctx);
         taskService = new TaskService(taskRepo, ctx);

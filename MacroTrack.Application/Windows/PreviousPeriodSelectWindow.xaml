@@ -1,0 +1,107 @@
+﻿<local:WindowBase x:Class="MacroTrack.AppLibrary.Windows.PreviousPeriodSelectWindow"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:local="clr-namespace:MacroTrack.AppLibrary.Windows"
+                  xmlns:controls="clr-namespace:MacroTrack.AppLibrary.Controls"
+                  xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
+                  mc:Ignorable="d"
+                  Title="PreviousPeriodSelectWindow" Height="600" Width="450">
+    <local:WindowBase.Resources>
+        <conv:EnumRadioConverter x:Key="EnumRadioConverter"/>
+    </local:WindowBase.Resources>
+    <Border Background="{DynamicResource PanelBackGroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Select Previous Period"
+                       Style="{DynamicResource TextBlock.MidTitle}"
+                       Grid.Row="0"/>
+
+            <StackPanel Orientation="Vertical" Grid.Row="1">
+                <GroupBox Header="Quick Buttons">
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="ButtonYesterday"
+                                Content="Yesterday"
+                                Command="{Binding ConfirmCommand}"
+                                CommandParameter="{x:Static local:PreviousPeriodMode.QuickYesterday}"/>
+                        <Button x:Name="buttonLastWeek"
+                                Content="Last Week"
+                                Command="{Binding ConfirmCommand}"
+                                CommandParameter="{x:Static local:PreviousPeriodMode.QuickLastWeek}"/>
+                        <Button x:Name="buttonLastMonth"
+                                Content="Last Month"
+                                Command="{Binding ConfirmCommand}"
+                                CommandParameter="{x:Static local:PreviousPeriodMode.QuickLastMonth}"/>
+                    </WrapPanel>
+                </GroupBox>
+
+                
+                <GroupBox>
+                    <GroupBox.Header>
+                        <RadioButton x:Name="rbSingleDay" GroupName="rbgMode"
+                                     Content="Single day"
+                                     IsChecked="{Binding Mode, 
+                                                Converter={StaticResource EnumRadioConverter}, 
+                                                ConverterParameter={x:Static local:PreviousPeriodMode.SingleDay}, 
+                                                Mode=TwoWay}"/>        
+                    </GroupBox.Header>
+                    <Grid IsEnabled="{Binding IsChecked, ElementName=rbSingleDay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Date:" Target="{Binding ElementName=dtpSingleDay}" Grid.Column="0"/>
+                        <controls:DateTimePicker x:Name="dtpSingleDay" Value="{Binding DTSingle}" Margin="5" Grid.Column="1"/>
+                        <Button x:Name="buttonSingleDayNow" Content="Today" Click="buttonSingleDayNow_Click" Grid.Column="2"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox>
+                    <GroupBox.Header>
+                        <RadioButton x:Name="rbCustom" GroupName="rbgMode"
+                                     Content="Custom"
+                                     IsChecked="{Binding Mode, 
+                                     Converter={StaticResource EnumRadioConverter}, 
+                                     ConverterParameter={x:Static local:PreviousPeriodMode.Custom}, 
+                                     Mode=TwoWay}"/>
+                    </GroupBox.Header>
+                    <Grid IsEnabled="{Binding IsChecked, ElementName=rbCustom}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Label Content="From:" Target="{Binding ElementName=dtpCustomStart}" Grid.Column="0" Grid.Row="0"/>
+                        <controls:DateTimePicker x:Name="dtpCustomStart" Value="{Binding DTCustomStart}" Margin="5" Grid.Column="1" Grid.Row="0"/>
+                        <Button x:Name="buttonCustomStartNow" Content="Today" Click="buttonCustomStartNow_Click" Grid.Column="2" Grid.Row="0"/>
+                        <Label Content="To:" Target="{Binding ElementName=dtpCustomEnd}" Grid.Column="0" Grid.Row="1"/>
+                        <controls:DateTimePicker x:Name="dtpCustomEnd" Value="{Binding DTCustomEnd}" Margin="5" Grid.Column="1" Grid.Row="1"/>
+                        <Button x:Name="buttonCustomEndNow" Content="Today" Click="buttonCustomEndNow_Click" Grid.Column="2" Grid.Row="1"/>
+                    </Grid>
+                </GroupBox>
+
+            </StackPanel>
+            
+            <StackPanel Style="{DynamicResource StackPanel.Footer}"
+                        Grid.Row="2">
+                <Button x:Name="buttonCancel"
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"/>
+                <Button x:Name="buttonConfirm"
+                        Content="Confirm"
+                        Command="{Binding ConfirmCommand}"
+                        CommandParameter="{Binding Mode}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</local:WindowBase>

@@ -1,0 +1,61 @@
+﻿using System.Configuration;
+using System.Data;
+using System.IO;
+using System.Windows;
+using MacroTrack.AppLibrary.Services;
+using MacroTrack.Core.Infrastructure;
+using MacroTrack.Core.Logging;
+using MacroTrack.Core.Services;
+using MacroTrack.Core.Settings;
+
+namespace MacroTrack.Dashboard
+{
+    /// <summary>
+    /// Interaction logic for App.xaml.
+    /// Composition Root for Dashboard Application of AppLibrary WPF assets.
+    /// </summary>
+    /// <remarks>
+    /// You might notice that we ignore our usual convention of trying to put Parameters in alphabetical order: No, Services goes first, it deserves it.
+    /// </remarks>
+    public partial class App : Application
+    {
+        public CoreServices Services { get; private set; } = null!;
+        public AppServices AppServices { get; private set; } = null!;
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            // Setup: //
+
+            // Logger:
+            string logPath = Paths.FindLogPath();
+            string logFile = Path.Combine(logPath, $"MTLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+            var logger = new MTLogger(logFile, this.GetType().Namespace);
+
+            // Settings:
+            string settingsPath = Paths.FindSettingsPath();
+            var settingsService = new SettingsService(settingsPath, logger);
+            settingsService.Apply(settingsService.Settings);
+
+            // Application of some settings:
+            Paths.DeleteOldLogs(settingsService.Settings.LogRetainAmount);
+            
+            // Database:
+            string dbPath = settingsService.GetStartupDatabase() ?? Paths.FindDBPath();
+            string connString = $"Data Source={dbPath}";
+
+            // Create context, then CoreServices:
+            var context = new CoreContext(connString, logger, settingsService);
+            Services = new CoreServices(context);
+
+            // Create AppServices:
+            AppServices = new AppServices(Services);
+
+            // Show Window:
+            var mainWindow = new MainWindow(Services, AppServices);
+            mainWindow.Show();            
+        }
+    }
+
+}

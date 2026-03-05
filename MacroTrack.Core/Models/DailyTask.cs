@@ -56,4 +56,23 @@ public class DailyTask
         Completed = completed;
         Streak = streak;
     }
+
+    // Print:
+    const int PrintCheckSpace = -8;
+    const int PrintNameSpace = -20;
+    const int PrintDescriptionSpace = -50;
+    public static string PrintHeader(bool showIsActive = true, bool showCompleted = true, bool showStreak = false) =>
+        $"{"ID:",PrintCheckSpace}" +
+        $"{(showIsActive ? $"{"Active:", PrintCheckSpace}" : "")}" +
+        $"{(showCompleted ? $"{"Cmplt.:", PrintCheckSpace}" : "")}" +
+        $"{(showStreak ? $"{"Streak:", PrintCheckSpace}" : "")}" +
+        $"{"Name:", PrintNameSpace}" +
+        $"{"Description:", PrintDescriptionSpace}";    
+    public string Print(bool showIsActive = true, bool showCompleted = true, bool showStreak = false) =>
+        $"{$"#{Id}".Truncate(PrintCheckSpace), PrintCheckSpace}" +
+        $"{(showIsActive ? $"{IsActive.Checked(), PrintCheckSpace}" : "")}" +
+        $"{(showCompleted ? $"{Completed.Checked(), PrintCheckSpace}" : "")}" +
+        $"{(showStreak ? $"{Streak.ToStringTruncate(PrintCheckSpace), PrintCheckSpace}" : "")}" +
+        $"{Name.Truncate(PrintNameSpace), PrintNameSpace}" +
+        $"{Description.Truncate(PrintDescriptionSpace),PrintDescriptionSpace}";
 }

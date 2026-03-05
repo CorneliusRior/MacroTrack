@@ -31,9 +31,9 @@ namespace MacroTrack.BasicApp.Forms
         {
             InitializeComponent();
             Services = services;
-            _logger = Services.Logger;
-            Populate();
+            _logger = Services.Logger;            
             GoalReg = Services.goalService.GetAllGoals();
+            Populate();            
             dtpStart_ValueChanged(this, EventArgs.Empty);
             buttonCancel.Focus();
         }
@@ -130,7 +130,7 @@ namespace MacroTrack.BasicApp.Forms
 
                 // Fill in table.
 
-                labelType.Text = g.GoalType == null ? "Type: No type" : $"Type: {g.GoalType}";
+                labelType.Text = g.GoalType == GoalType.Custom ? (string.IsNullOrWhiteSpace(g.CustomType) ? "Unnamed Custom Type" : g.CustomType ) : g.GoalType.ToString();
 
                 labelMTPP.Text = g.Calories <= 0 ? "-%" : (((g.Protein * 4) / g.Calories)).ToString("0.0%");
                 labelMTCP.Text = g.Calories <= 0 ? "-%" : (((g.Carbs * 4) / g.Calories)).ToString("0.0%");

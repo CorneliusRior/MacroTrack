@@ -1,6 +1,6 @@
 namespace  MacroTrack.Core.Services;
 
-using MacroTrack.Core.AppModels;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
@@ -24,11 +24,11 @@ public class GoalService : ServiceBase
     }
 
     // New Goal
-    public Goal AddGoal(string name, double calories, double protein, double carbs, double fat, string? type = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar = null, double? maxCar = null, double? minFat = null, double? maxFat = null)
+    public Goal AddGoal(string name, double calories, double protein, double carbs, double fat, GoalType goalType = GoalType.None, string? customType = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar = null, double? maxCar = null, double? minFat = null, double? maxFat = null)
     {
         try 
         {            
-            _repo.AddGoal(new Goal(name, calories, protein, carbs, fat, notes, type, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat));
+            _repo.AddGoal(new Goal(name, calories, protein, carbs, fat, goalType, customType, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat));
             var added = GetGoal(_repo.ReturnLastId());
             Log($"Added goal id #{added.Id}", LogLevel.Info);
             return added;
@@ -77,12 +77,12 @@ public class GoalService : ServiceBase
     }
 
     // Edit 
-    public Goal EditGoal(int id, string name, double calories, double protein, double carbs, double fat, string? type = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar = null, double? maxCar = null, double? minFat = null, double? maxFat = null)
+    public Goal EditGoal(int id, string name, double calories, double protein, double carbs, double fat, GoalType goalType = GoalType.None, string? customType = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar = null, double? maxCar = null, double? minFat = null, double? maxFat = null)
     {
         Log($"Called on Goal #{id}");
         // Make sure ID still exists, given that it is an "update" command, it doesn't really matter, so we don't really need to have an exception for it, just a warning.
         if (_repo.GetGoal(id) == null) Log($"Warning: No goal with ID '{id}' could be found. No edit will be made.", LogLevel.Warning);
-        var goal = new Goal(id, name, calories, protein, carbs, fat, notes, type, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
+        var goal = new Goal(id, name, calories, protein, carbs, fat, goalType, customType, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
         _repo.EditGoal(id, goal);       
         return GetGoal(id);
     }
@@ -171,6 +171,23 @@ public class GoalService : ServiceBase
         return _repo.GetGoalHistory();
     }
 
+    // Get activate goal history as tuple of activationdate and goal calories, used for WPF calGraph:
+    public List<(DateTime date, double cal)> GetTupleGoalHistory(DateTime startTime, DateTime endTime, bool clampStartTime = false)
+    {
+        // Get the data from repo:
+        var history = _repo.GetGoalHistoryInterval(startTime, endTime);
+        List<(DateTime date, double cal)> tupleList = new();
+        foreach (GoalActivation ga in history)
+        {
+            DateTime date = ga.ActivatedAt.ToDateTime(TimeOnly.MinValue);
+            if (clampStartTime && date < startTime) date = startTime;
+            Goal? g = _repo.GetGoal(ga.GoalId);
+            if (g is null) continue; // Goal has been deleted presumably.
+            tupleList.Add( (date, g.Calories) );
+        }
+        return tupleList;
+    }
+
     public MacroTotals GetMacroGoals(DateTime startTime, int timeFrame)
     {
         Log($"Requested from '{startTime}' for '{timeFrame}' days");
@@ -220,5 +237,10 @@ public class GoalService : ServiceBase
             Fat: fat
         );
         return totals;
+    }
+
+    public List<GoalActivation> GetActivationsOfGoal(int id)
+    {
+        return _repo.GetActivationsOfGoal(id);
     }
 }

@@ -1,6 +1,6 @@
 namespace MacroTrack.Core.Services;
 
-using MacroTrack.Core.AppModels;
+using MacroTrack.Core.DataModels;
 using MacroTrack.Core.Infrastructure;
 using MacroTrack.Core.Logging;
 using MacroTrack.Core.Models;
@@ -37,7 +37,7 @@ public class FoodLogService : ServiceBase
             Log("Error adding entry, wrong ID probably", LogLevel.Warning, ex);
             throw ex;
         }
-        Log($"Added entry #{entry.Id}");
+        Log($"Added entry #{added.Id}");
         return added;
     }
 
@@ -130,6 +130,12 @@ public class FoodLogService : ServiceBase
             Fat: PeriodSum("Fat", startTime, endTime)
         );
         return totals;
+    }
+
+    // Return list of parameter daily (tuple)
+    public List<(DateTime Day, double totalParemeter)> DailySumRange(string parameter, DateTime startDate, DateTime endDate)
+    {
+        return _repo.DailySumRange(parameter, startDate, endDate);
     }
 
     // Edit
