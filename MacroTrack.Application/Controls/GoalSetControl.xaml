@@ -117,6 +117,7 @@
                           CanUserResizeColumns="True"
                           CanUserSortColumns="True"
                           AutoGenerateColumns="False" 
+                          
                           Grid.Column="2">
                     
                     <DataGrid.Columns>
@@ -128,7 +129,13 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Type"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding DisplayType}" SortMemberPath="DisplayType" Width="80">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                         <DataGridTextColumn Header="Calories" Binding="{Binding Calories, StringFormat={}{0:N0} kcal}" SortMemberPath="Calories">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
@@ -161,9 +168,10 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" SortMemberPath="Notes" Width="*">
+                        <DataGridTextColumn Header="Notes" Binding="{Binding DisplayNotes}" SortMemberPath="Notes" Width="*">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="NoWrap"/>
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                                     <Setter Property="ToolTip" Value="{Binding Notes}"/>
                                 </Style>

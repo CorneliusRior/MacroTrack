@@ -24,6 +24,9 @@ public class Goal
     public double? MinFat { get; set; }
     public double? MaxFat { get; set; }
 
+    public string DisplayType => GoalType == GoalType.Custom ? CustomType ?? "Custom" : GoalType.ToString();
+    public string? DisplayNotes => Notes is null ? null : Notes.ToSingleLineNullable();
+
     // New
     public Goal(string goalName, double calories, double protein, double carbs, double fat, GoalType goalType = GoalType.None, string? customType = null, string? notes = null, double? minCal = null, double? maxCal = null, double? minPro = null, double? maxPro = null, double? minCar =  null, double? maxCar = null, double? minFat = null, double? maxFat = null)
     {

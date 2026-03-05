@@ -46,6 +46,20 @@ namespace MacroTrack.AppLibrary.ViewModels
             {
                 _goalType = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ShowCustomTypeEntry));
+            }
+        }
+
+        public bool ShowCustomTypeEntry => _goalType == GoalType.Custom;
+
+        private string _customType = "";
+        public string CustomType
+        {
+            get => _customType;
+            set
+            {
+                _customType = value;
+                OnPropertyChanged();
             }
         }
 
@@ -289,7 +303,7 @@ namespace MacroTrack.AppLibrary.ViewModels
                 return;
             }
 
-            string? customType = null; // replace this.
+            string? customType = GoalType == GoalType.Custom ? string.IsNullOrWhiteSpace(CustomType) ? null : CustomType : null; 
             string? notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
             double? minCal = MinCalEnabled ? Math.Round(MinCal, 1) : null;
             double? maxCal = MaxCalEnabled ? Math.Round(MaxCal, 1) : null;

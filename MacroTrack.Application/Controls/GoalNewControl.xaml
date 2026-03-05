@@ -4,12 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                    xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
+                   xmlns:models="clr-namespace:MacroTrack.Core.Models;assembly=MacroTrack.Core"
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="500">
     <local:ControlBase.Resources>
         <conv:AndBoolConverter x:Key="AndBool"/>
         <conv:InverseBoolConverter x:Key="InverseBool"/>
+        <BooleanToVisibilityConverter x:Key="BoolVis"/>
     </local:ControlBase.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}">
         <Grid>
@@ -38,7 +40,20 @@
                     </WrapPanel>
                     <WrapPanel Orientation="Horizontal" Grid.Row="1">
                         <Label Content="Goal type:" Target="{Binding ElementName=cbType}"/>
-                        <ComboBox x:Name="cbType" Template="{DynamicResource MTComboBoxTemplate}" MinWidth="150"/>
+                        <ComboBox x:Name="cbType" 
+                                  ItemsSource="{x:Static models:GoalTypeList.WithCustom}"
+                                  DisplayMemberPath="DisplayName"
+                                  SelectedValuePath="Value"
+                                  SelectedValue="{Binding GoalType}"
+                                  Template="{DynamicResource MTComboBoxTemplate}" MinWidth="150"/>
+                        <Grid Visibility="{Binding ShowCustomTypeEntry, Converter={StaticResource BoolVis}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Custom name (optional):" Grid.Column="0"/>
+                            <TextBox Name="tbCustomType" Text="{Binding CustomType}" MinWidth="100" Width="auto" Grid.Column="1"/>
+                        </Grid>
                     </WrapPanel>
 
                     <WrapPanel Orientation="Horizontal" Grid.Row="2">
@@ -75,7 +90,7 @@
                     </Grid>
 
                     <Label Content="Notes:" Grid.Row="4"/>
-                    <TextBox x:Name="tbNotes" Text="{Binding Notes}" TextWrapping="Wrap" VerticalContentAlignment="Top" Grid.Row="5"/>
+                    <TextBox x:Name="tbNotes" Text="{Binding Notes}" Style="{DynamicResource TextBox.MultiLine}" VerticalContentAlignment="Top" Grid.Row="5"/>
                     
                 </Grid>
             </ScrollViewer>

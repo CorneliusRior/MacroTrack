@@ -6,6 +6,7 @@
     public static class TruncationHelper
     {
         public static string ToSingleLine(this string input) => input.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
+        public static string? ToSingleLineNullable(this string? input) => input is null ? null : input.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
         public static string Unindent(this string input) => input.Replace("\t", "");
 
         /// <summary>
