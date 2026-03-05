@@ -50,8 +50,20 @@ namespace MacroTrack.Puppet2.Commands
         private PuppetResult Run(IReadOnlyList<string> args)
         {
             string path = args.String(0, "Path");
-            bool ran = _context.RunScriptFromPath(path);
-            return PuppetResult.Bool(ran);
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    _context.RunScriptFromPath(path);
+                }
+                catch
+                {
+                    // suffer in silence
+                }
+            });
+
+            return PuppetResult.Ok("");
         }
 
         private PuppetResult TestParse(IReadOnlyList<string> args)

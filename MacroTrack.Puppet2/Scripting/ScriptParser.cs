@@ -37,6 +37,7 @@ namespace MacroTrack.Puppet2.Scripting
                 if (string.IsNullOrWhiteSpace(lines[i])) continue;
 
                 // Now we presume that this is a JSON:
+                Thread.Sleep(2);
                 string commandHead;
                 string jsonStart = "";
                 int startLine = i + 1;
@@ -62,11 +63,12 @@ namespace MacroTrack.Puppet2.Scripting
                     i++;
                     if (i >= lines.Length) throw new Exception($"Cannot parse JSON of statement #{statementIndex} (line {startLine}): Current line exceeds document length, probably failed to close statement (no \"}}\").\n\nCurrently looks like:\n{sb.ToString()}");
                     if (!string.IsNullOrWhiteSpace(lines[i])) sb.AppendLine(lines[i]);
+                    Thread.Sleep(2);
                 }
 
                 statements.Add(new ScriptStatement(statementIndex, startLine, commandHead, sb.ToString().Trim()));
                 prog?.Report(new ScriptProgress(i, total, $"Added statement #{0} '{commandHead}' (lines {startLine}-{i})"));
-                statementIndex++;
+                statementIndex++;                
             }
 
             // Create metadata:
@@ -128,7 +130,7 @@ namespace MacroTrack.Puppet2.Scripting
         string JsonPayload)
     {
         public string PrintInfo() => $"Statement #{Index} (line {StartLine}):\n{CommandHead} {JsonPayload.Replace("\n", " ").Replace("\r", " ").ToSingleLine().Unindent()}";
-        public string PrintShortInfo() => $"#{Index} (line {StartLine}): {CommandHead} {JsonPayload.ToSingleLine().Unindent()}".Truncate(250);
+        public string PrintShortInfo() => $"#{Index} (line {StartLine}): {CommandHead} {JsonPayload.ToSingleLine().Unindent()}".Truncate(150);
     }
 
 

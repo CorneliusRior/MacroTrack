@@ -58,6 +58,7 @@ namespace MacroTrack.Puppet2
             int pv = previousSteps;
             int total = script.Statements.Count;
             _prog?.Report(new ScriptProgress(pv + 0, pv + 2, $"\n\n{new string('*', 50)}\n\nRunning script:\n\n{script.PrintInfo()}\n"));
+
             if (!ScriptValidateFormat(script)) return false;
 
             _prog?.Report(new ScriptProgress(pv + 1, pv + 2, $"\n\n{new string('*', 50)}\n\nFormat validated. Running script...\n"));
@@ -84,6 +85,7 @@ namespace MacroTrack.Puppet2
                     _prog?.Report(new ScriptProgress(st.Index - 1, total, $"Command #{st.Index} failed ('{st.CommandHead}', line {st.StartLine}), returning.\nException: \"{ex.Message}\"."));
                     return false;
                 }
+                Thread.Sleep(2);
             }
             _prog?.Report(new ScriptProgress(pv + 2, pv + 2, $"\n\n{new string('*', 50)}\n\nCompleted successfully."));
             return true;
@@ -126,15 +128,16 @@ namespace MacroTrack.Puppet2
                 string command = string.Join(' ', st.CommandHead, st.JsonPayload);
                 if (TestJson(command).Success)
                 {
-                    _prog?.Report(new ScriptProgress(i + 1, total, $"[PARSED] #{st.Index} (line {st.StartLine}): '{command.ToSingleLine().Unindent()}'"));
+                    _prog?.Report(new ScriptProgress(i + 1, total, $"[PARSED] #{st.Index} (line {st.StartLine}): '{command.ToSingleLine().Unindent()}'".Truncate(150)));
                 }
                 else
                 {
                     // Fail
                     errors++;
                     errorsIndex.Add(st.Index);                    
-                    _prog?.Report(new ScriptProgress(i + 1, total, $"*[ERROR] #{st.Index} (line {st.StartLine}): '{command.ToSingleLine().Unindent()}'"));
+                    _prog?.Report(new ScriptProgress(i + 1, total, $"*[ERROR] #{st.Index} (line {st.StartLine}): '{command.ToSingleLine().Unindent()}'".Truncate(150)));
                 }
+                Thread.Sleep(2);
             }
             if (errors == 0)
             {
