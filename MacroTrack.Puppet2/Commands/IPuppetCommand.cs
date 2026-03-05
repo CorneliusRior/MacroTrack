@@ -13,5 +13,6 @@ namespace MacroTrack.Puppet2.Commands
         IReadOnlyList<string> Aliases { get; }
         IReadOnlyList<CommandHelp> Help { get; }
         PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args);
+        PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args);
     }
 }

@@ -38,6 +38,19 @@ namespace MacroTrack.Puppet2.Commands
             };
         }
 
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            return head[1].ToLowerInvariant().Trim() switch
+            {
+                "add"       => TestAdd(args),
+                "delete"    => TestDelete(args),
+                "edit"      => TestEdit(args),
+                "list"      => TestList(args),
+                "view"      => TestView(args),
+                _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
+            };
+        }
+
         private PuppetResult Add(IReadOnlyList<string> args)
         {
             DiaryEntry entry;
@@ -55,6 +68,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Added Diary Entry #{entry.Id}");
         }
 
+        private PuppetResult TestAdd(IReadOnlyList<string> args)
+        {
+            try
+            {
+                AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         private PuppetResult Delete(IReadOnlyList<string> args)
         {
             DiaryEntry entry;
@@ -69,6 +92,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.diaryService.DeleteEntry(Id);
             }
             return PuppetResult.Ok($"Deleted Diary entry #{entry.Id}");
+        }
+
+        private PuppetResult TestDelete(IReadOnlyList<string> args)
+        {
+            try
+            {
+                DeletePayload pl = JsonSerializer.Deserialize<DeletePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         private PuppetResult Edit(IReadOnlyList<string> args)
@@ -88,6 +121,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.diaryService.EditEntry(id, body, editNotes);
             }
             return PuppetResult.Ok($"Edited Diary entry #{entry.Id}");
+        }
+
+        private PuppetResult TestEdit(IReadOnlyList<string> args)
+        {
+            try
+            {
+                EditPayload pl = JsonSerializer.Deserialize<EditPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         private PuppetResult List(IReadOnlyList<string> args)
@@ -124,6 +167,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok(sb.ToString());
         }
 
+        private PuppetResult TestList(IReadOnlyList<string> args)
+        {
+            try
+            {
+                ListPayload pl = JsonSerializer.Deserialize<ListPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         private PuppetResult View(IReadOnlyList<string> args)
         {
             int id;
@@ -135,6 +188,16 @@ namespace MacroTrack.Puppet2.Commands
             else id = args.Int(0, "Id");
             DiaryEntry entry = _services.diaryService.GetEntry(id);
             return PuppetResult.Ok($"#{entry.Id} {entry.Time.ToString("(yyyy-MM-dd HH:mm:ss):"),-21}\n{entry.Body}");
+        }
+
+        private PuppetResult TestView(IReadOnlyList<string> args)
+        {
+            try
+            {
+                ViewPayload pl = JsonSerializer.Deserialize<ViewPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         // JSON payloads:

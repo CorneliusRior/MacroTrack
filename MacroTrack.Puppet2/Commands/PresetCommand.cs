@@ -53,7 +53,19 @@ namespace MacroTrack.Puppet2.Commands
                 "list"      => List(args),
                 _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
             };
-            throw new NotImplementedException();
+        }
+
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            if (head.Count < 2) PuppetResult.FailHelp(Help[0], FailHelpType.NoSubCommand);
+            return head[1].ToLowerInvariant().Trim() switch
+            {
+                "add"       => TestAdd(args),
+                "delete"    => TestDelete(args),
+                "edit"      => TestEdit(args),
+                "list"      => PuppetResult.Ok("No Json in this command."),
+                _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
+            };
         }
 
         public PuppetResult Add(IReadOnlyList<string> args)
@@ -80,6 +92,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Added Preset #{entry.Id}");
         }
 
+        private PuppetResult TestAdd(IReadOnlyList<string> args)
+        {
+            try
+            {
+                AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         public PuppetResult Delete(IReadOnlyList<string> args)
         {
             int id;
@@ -95,6 +117,16 @@ namespace MacroTrack.Puppet2.Commands
             Preset entry = _services.presetService.DeleteEntry(id);
             return PuppetResult.Ok($"Deleted Preset #{entry.Id}");
             throw new NotImplementedException();
+        }
+
+        private PuppetResult TestDelete(IReadOnlyList<string> args)
+        {
+            try
+            {
+                DeletePayLoad pl = JsonSerializer.Deserialize<DeletePayLoad>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult Edit(IReadOnlyList<string> args)
@@ -122,6 +154,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.presetService.EditEntry(id, presetName, calories, protein, carbs, fat, weight, unit, category, notes);
             }
             return PuppetResult.Ok($"Edited Preset #{entry.Id}");            
+        }
+
+        private PuppetResult TestEdit(IReadOnlyList<string> args)
+        {
+            try
+            {
+                EditPayload pl = JsonSerializer.Deserialize<EditPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult List(IReadOnlyList<string> args)

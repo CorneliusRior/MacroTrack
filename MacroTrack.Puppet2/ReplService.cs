@@ -11,9 +11,9 @@ namespace MacroTrack.Puppet2
     public sealed class ReplService
     {
         private readonly PuppetEngine _engine;
-        public ReplService(CoreServices services)
+        public ReplService(CoreServices services, IProgress<ScriptProgress>? prog)
         {
-            _engine = new PuppetEngine(services);
+            _engine = new PuppetEngine(services, prog);
         }
         public PuppetResult Execute(string input)
         {

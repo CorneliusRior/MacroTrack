@@ -47,7 +47,11 @@ namespace MacroTrack.Dashboard
             Services = services;
             Logger = services.Logger;
             AppServices = appServices;
-            _repl = new ReplService(services);
+            IProgress<ScriptProgress> replProgress = new Progress<ScriptProgress>(p =>
+            {
+                Print($"({p.ActionsDone}/{p.ActionsTotal}): {p.Message}");
+            });
+            _repl = new ReplService(services, replProgress);
 
 
             _vm = new MainWindowVM(Services, AppServices);

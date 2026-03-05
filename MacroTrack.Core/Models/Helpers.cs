@@ -5,6 +5,9 @@
     /// </summary>
     public static class TruncationHelper
     {
+        public static string ToSingleLine(this string input) => input.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
+        public static string Unindent(this string input) => input.Replace("\t", "");
+
         /// <summary>
         /// Removes new paragrams, truncates the string down to a single line of a given length, finished off with a truncateString, by default "…".
         /// </summary>

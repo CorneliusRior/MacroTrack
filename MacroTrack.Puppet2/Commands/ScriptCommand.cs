@@ -23,7 +23,10 @@ namespace MacroTrack.Puppet2.Commands
                 "Runs script."),
             new(["Script", "TestParse"],
                 "Script.TestParse <string Path>",
-                "Loads script, attempts to parse, prints information but does not attempt to run.")
+                "Loads script, attempts to parse, prints information but does not attempt to run."),
+            new(["Script", "TestFormat"],
+                "Script.TestFormat <string Path>",
+                "Loads scripts, runs it through ScriptValidateFormat() (through TestJson()) to ensure it's in correct format.")
         ];
 
         public override PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args)
@@ -33,13 +36,22 @@ namespace MacroTrack.Puppet2.Commands
             {
                 "run"       => Run(args),
                 "testparse" => TestParse(args),
+                "testformat"=> TestFormat(args),
                 _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
             };
         }
 
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            // There is no point in having any Json here, and that would be bad, sounds like the start of a virus or something idk.            
+            return PuppetResult.Ok("No Json in this command.");
+        }
+
         private PuppetResult Run(IReadOnlyList<string> args)
         {
-            throw new NotImplementedException();
+            string path = args.String(0, "Path");
+            bool ran = _context.RunScriptFromPath(path);
+            return PuppetResult.Bool(ran);
         }
 
         private PuppetResult TestParse(IReadOnlyList<string> args)
@@ -49,6 +61,15 @@ namespace MacroTrack.Puppet2.Commands
             //return PuppetResult.Ok(path);
             var script = ScriptParser.ParseFile(path);
             return PuppetResult.Ok(script.PrintFullInfo());
+        }
+
+        private PuppetResult TestFormat(IReadOnlyList<string> args)
+        {
+            string path = args.String(0, "Path");
+            //var script = ScriptParser.ParseFile(path);
+            //bool parsed = _context.ScriptValidateFormat(script);
+            bool parsed = _context.ScriptValidateFormatPath(path);
+            return PuppetResult.Bool(parsed);
         }
     }
 }

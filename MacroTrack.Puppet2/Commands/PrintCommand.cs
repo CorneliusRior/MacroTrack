@@ -23,5 +23,10 @@ namespace MacroTrack.Puppet2.Commands
             if (args.Count == 0) return PuppetResult.Fail("Nothing to print :(");
             return PuppetResult.Ok(string.Join(" ", args));
         }
+
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            return PuppetResult.Ok("No Json in this command.");
+        }
     }
 }

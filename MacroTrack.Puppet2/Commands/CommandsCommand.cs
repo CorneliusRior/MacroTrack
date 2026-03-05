@@ -23,5 +23,10 @@ namespace MacroTrack.Puppet2.Commands
             foreach (string cmd in _context.CommandList.OrderBy(c => c.Name).Select(c => c.Name)) commandString += Environment.NewLine + cmd;
             return PuppetResult.Ok(commandString);
         }
+
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            return PuppetResult.Ok("No Json in this command.");
+        }
     }
 }

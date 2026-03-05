@@ -1,5 +1,7 @@
-﻿using MacroTrack.Core.Services;
+﻿using MacroTrack.Core.Models;
+using MacroTrack.Core.Services;
 using MacroTrack.Puppet2.Commands;
+using MacroTrack.Puppet2.Scripting;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -11,22 +13,21 @@ namespace MacroTrack.Puppet2
     public sealed class PuppetEngine : IPuppetContext
     {
         private readonly Dictionary<string, IPuppetCommand> _map;
-        public PuppetEngine(CoreServices services)
+        private readonly IProgress<ScriptProgress>? _prog;
+        public PuppetEngine(CoreServices services, IProgress<ScriptProgress>? prog)
         {
             var commands = DiscoverCommands(services);
             _map = BuildCommandMap(commands);
+            _prog = prog;
         }
 
         public PuppetResult Execute(string input)
         {
             var tokens = Tokenize(input);
-            foreach (string s in tokens) p(s);
             if (tokens.Count == 0) return PuppetResult.Ok("");
 
             var head = TokenizeCommandHead(tokens[0]);
-            foreach (string s in head) p(s);
             var args = tokens.Skip(1).ToList();
-            foreach (string s in args) p(s);
 
             // if the first argument is "help" or "?", we pass that to HelpCommand.
 
@@ -34,13 +35,126 @@ namespace MacroTrack.Puppet2
             {
                 try { return _map.GetValueOrDefault("help")!.Execute(TokenizeCommandHead("help"), Tokenize(tokens[0])); }
                 catch (PuppetUserException ex) { return PuppetResult.Fail(ex.Message); }
-                catch (Exception ex) { return PuppetResult.Fail($"Command '{head}' failed: {ex.Message}"); }
+                catch (Exception ex) { return PuppetResult.Fail($"Command '{head}' failed: '{ex.Message}'"); }
             }
 
             if (!_map.TryGetValue(head[0], out var cmd)) return PuppetResult.Fail($"Unknown command '{head[0]}', type 'help'.");
             try { return cmd.Execute(head, args); }
             catch (PuppetUserException ex) { return PuppetResult.Fail(ex.Message); }
             catch (Exception ex) { return PuppetResult.Fail($"Command '{string.Join('.', head)}' failed: {ex.Message}"); }
+        }
+
+        public PuppetResult ExecuteJson(string commandHead, string json)
+        {
+            // We don't like Jason so we're going to execute him. 
+            var head = TokenizeCommandHead(commandHead);
+            List<string> args = new();
+            args.Add(json);
+            if (!_map.TryGetValue(head[0], out var cmd)) return PuppetResult.Fail($"Unknown command '{head[0]}', type 'help'.");
+            return cmd.Execute(head, args);
+        }
+        public bool RunScript(Script script, int previousSteps = 0)
+        {
+            int pv = previousSteps;
+            int total = script.Statements.Count;
+            _prog?.Report(new ScriptProgress(pv + 0, pv + 2, $"\n\n{new string('*', 50)}\n\nRunning script:\n\n{script.PrintInfo()}\n"));
+            if (!ScriptValidateFormat(script)) return false;
+
+            _prog?.Report(new ScriptProgress(pv + 1, pv + 2, $"\n\n{new string('*', 50)}\n\nFormat validated. Running script...\n"));
+
+            foreach (ScriptStatement st in script.Statements)
+            {
+                try 
+                { 
+                    PuppetResult result = ExecuteJson(st.CommandHead, st.JsonPayload);
+                    if (!result.Success)
+                    {
+                        _prog?.Report(new ScriptProgress(st.Index, total, $"Result for statement #{st.Index} returned as failed ('{st.CommandHead}', line {st.StartLine}):\n\"{result.Output}\"\nReturning."));
+                        return false;
+                    }
+                    else _prog?.Report(new ScriptProgress(st.Index, total, $"Executed statement {st.PrintShortInfo()}"));
+                }
+                catch (PuppetUserException ex) 
+                {
+                    _prog?.Report(new ScriptProgress(st.Index - 1, total, $"Command #{st.Index} failed ('{st.CommandHead}', line {st.StartLine}), returning.\nPuppetUserException: \"{ex.Message}\"."));
+                    return false;
+                }
+                catch (Exception ex) 
+                {
+                    _prog?.Report(new ScriptProgress(st.Index - 1, total, $"Command #{st.Index} failed ('{st.CommandHead}', line {st.StartLine}), returning.\nException: \"{ex.Message}\"."));
+                    return false;
+                }
+            }
+            _prog?.Report(new ScriptProgress(pv + 2, pv + 2, $"\n\n{new string('*', 50)}\n\nCompleted successfully."));
+            return true;
+        }
+
+        public bool RunScriptFromPath(string path)
+        {
+            _prog?.Report(new ScriptProgress(0, 3, $"\n\n{new string('*', 50)}"));
+            Script script = ScriptParser.ParseFile(path, _prog);
+            return RunScript(script, 1);
+        }
+
+        /// <summary>
+        /// Runs the "TestJson" command in the given command. Use for input validation.
+        /// </summary>
+        public PuppetResult TestJson(string input)
+        {
+            var tokens = Tokenize(input);
+            if (tokens.Count == 0) return PuppetResult.Ok("");
+
+            var head = TokenizeCommandHead(tokens[0]);
+            var args = tokens.Skip(1).ToList();
+
+            if (!_map.TryGetValue(head[0], out var cmd)) return PuppetResult.Fail($"Unknown command '{head[0]}'");
+            try { return cmd.TestJson(head, args); }
+            catch (PuppetUserException ex) { return PuppetResult.Fail(ex.Message); }
+            catch (Exception ex) { return PuppetResult.Fail($"Command '{head}' failed: '{ex.Message}'"); }
+        }
+
+
+        public bool ScriptValidateFormat(Script script)
+        {
+            int total = script.Statements.Count;
+            int errors = 0;
+            List<int> errorsIndex = new();
+            _prog?.Report(new ScriptProgress(0, total, "Validating command format."));
+            for (int i = 0; i < script.Statements.Count; i++)
+            {
+                ScriptStatement st = script.Statements[i];
+                string command = string.Join(' ', st.CommandHead, st.JsonPayload);
+                if (TestJson(command).Success)
+                {
+                    _prog?.Report(new ScriptProgress(i + 1, total, $"[PARSED] #{st.Index} (line {st.StartLine}): '{command.ToSingleLine().Unindent()}'"));
+                }
+                else
+                {
+                    // Fail
+                    errors++;
+                    errorsIndex.Add(st.Index);                    
+                    _prog?.Report(new ScriptProgress(i + 1, total, $"*[ERROR] #{st.Index} (line {st.StartLine}): '{command.ToSingleLine().Unindent()}'"));
+                }
+            }
+            if (errors == 0)
+            {
+                _prog?.Report(new ScriptProgress(total, total, $"Success! No errors found."));
+                return true;
+            }
+            else
+            {
+                StringBuilder sb = new();
+                sb.AppendLine($"{errors} error(s) found:");
+                foreach (int i in errorsIndex) sb.AppendLine($" - {script.Statements[i].PrintInfo}");
+                _prog?.Report(new ScriptProgress(total, total, sb.ToString()));                
+                return false;
+            }
+        }
+
+        public bool ScriptValidateFormatPath(string path)
+        {
+            Script script = ScriptParser.ParseFile(path, _prog);
+            return ScriptValidateFormat(script);
         }
         
         // Discover commands:
@@ -150,5 +264,10 @@ namespace MacroTrack.Puppet2
     {
         IReadOnlyCollection<IPuppetCommand> CommandList { get; }
         bool TryGetCommand(string name, [NotNullWhen(true)] out IPuppetCommand? command);
+        bool ScriptValidateFormat(Script script);
+        bool ScriptValidateFormatPath(string path);
+        public bool RunScriptFromPath(string path);
     }
+
+    public sealed record ScriptProgress(int ActionsDone, int ActionsTotal, string Message);
 }

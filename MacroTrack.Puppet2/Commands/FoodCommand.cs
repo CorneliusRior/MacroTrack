@@ -37,6 +37,19 @@ namespace MacroTrack.Puppet2.Commands
             };
         }
 
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            if (head.Count < 2) PuppetResult.FailHelp(Help[0], FailHelpType.NoSubCommand);
+            return head[1].ToLowerInvariant().Trim() switch
+            {
+                "add"       => TestAdd(head, args),
+                "delete"    => TestDelete(args),
+                "edit"      => TestEdit(args),
+                "list"      => PuppetResult.Ok("No Json in this command."),
+                _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
+            };            
+        }
+
         public PuppetResult Add(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
             FoodEntry entry;
@@ -87,6 +100,30 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Added FoodLog Entry #{entry.Id}");
         }
 
+        private PuppetResult TestAdd(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            bool timeNow = false;
+            if (head.Count > 2) if (head[2].Equals("now", StringComparison.OrdinalIgnoreCase)) timeNow = true;
+            if (!timeNow)
+            {
+                try
+                {
+                    AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                }
+                catch { return PuppetResult.Fail("Invalid JSON payload."); }
+                return PuppetResult.Ok("Parsed.");
+            }
+            else
+            {
+                try
+                {
+                    AddNowPayload pl = JsonSerializer.Deserialize<AddNowPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                }
+                catch { return PuppetResult.Fail("Invalid JSON payload."); }
+                return PuppetResult.Ok("Parsed.");
+            }            
+        }
+
         public PuppetResult Delete(IReadOnlyList<string> args)
         {
             int id;
@@ -98,6 +135,16 @@ namespace MacroTrack.Puppet2.Commands
             else id = args.Int(0, "Id");
             FoodEntry entry = _services.foodLogService.DeleteEntry(id);
             return PuppetResult.Ok($"Deleted FoodLog Entry #{entry.Id}");
+        }
+
+        private PuppetResult TestDelete(IReadOnlyList<string> args)
+        {
+            try
+            {
+                DeletePayload pl = JsonSerializer.Deserialize<DeletePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult Edit(IReadOnlyList<string> args)
@@ -126,6 +173,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.foodLogService.EditEntry(id, time, itemName, amount, calories, protein, carbs, fat, category, notes);
             }
             return PuppetResult.Ok($"Edited FoodLog Entry #{entry.Id}");
+        }
+
+        private PuppetResult TestEdit(IReadOnlyList<string> args)
+        {
+            try
+            {
+                EditPayload pl = JsonSerializer.Deserialize<EditPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult List(IReadOnlyList<string> args)

@@ -54,6 +54,11 @@ namespace MacroTrack.Puppet2.Commands
                 _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
             };
         }
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            return PuppetResult.Ok("No Json in this command.");
+        }
+
 
         private PuppetResult ShortList(IReadOnlyList<string> args, IOrderedEnumerable<CommandHelp> helpList)
         {
@@ -138,4 +143,20 @@ namespace MacroTrack.Puppet2.Commands
             return true;
         }
     }
+
+    /*
+     * Pasting this little TestJson template script here for you:
+     
+private PuppetResult Test(IReadOnlyList<string> args)
+{
+    try
+    {
+        TestPayload pl = JsonSerializer.Deserialize<TestPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+    }
+    catch { return PuppetResult.Fail("Invalid JSON payload."); }
+    return PuppetResult.Ok("Parsed.");
+}
+
+PuppetResult.Ok("No Json in this command."),
+    */
 }

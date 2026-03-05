@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MacroTrack.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,18 +12,19 @@ namespace MacroTrack.Puppet2.Scripting
 {
     public static class ScriptParser
     {
-        public static Script ParseFile(string path)
+        public static Script ParseFile(string path, IProgress<ScriptProgress>? prog = null)
         {
-            p("Got here.");
             string[] lines = File.ReadAllLines(path);
+            int total = lines.Length + 1;
             bool inBlockComment = false;
-            int statementIndex = 0; 
+            int statementIndex = 0;
             List<ScriptStatement> statements = new();
-            p($"Got here, lines.length='{lines.Length}'");
+
+            string fileName = Path.GetFileName(path);
+            prog?.Report(new ScriptProgress(0, total, $"Starting, attempting to parse file '{fileName}' ({lines.Length} lines):"));
 
             for (int i = 0; i < lines.Length; i++)
             {
-                p($"Got here, i='{i}'");
                 // Filter comments & empty:
                 string t = lines[i].Trim();
                 if (t.StartsWith('#'))
@@ -39,7 +41,7 @@ namespace MacroTrack.Puppet2.Scripting
                 string jsonStart = "";
                 int startLine = i + 1;
                 int bindex = lines[i].IndexOf('{');
-                p("Got here.");
+                
                 if (bindex >= 0)
                 {
                     commandHead = lines[i][..bindex].Trim();
@@ -48,27 +50,30 @@ namespace MacroTrack.Puppet2.Scripting
                 else commandHead = lines[i].Trim();
                 if (string.IsNullOrWhiteSpace(commandHead)) throw new Exception($"Missing command head at line ({startLine}).");
 
+                prog?.Report(new ScriptProgress(i, total, $"Found statement #{statementIndex} '{commandHead}': '{lines[i]}'"));
+
                 // Start TryParseJson loop:
                 StringBuilder sb = new();
                 sb.Append(jsonStart);
                 while (true)
                 {
-                    p("Got here.");
+                    prog?.Report(new ScriptProgress(i, total, $"    + line {i}: '{lines[i]}'"));
                     if (sb.ToString().TryParseJson()) break;
                     i++;
-                    if (i >= lines.Length) throw new Exception($"Cannot parse JSON of statement #{statementIndex}, probably failed to close statement (no \"}}\").");
+                    if (i >= lines.Length) throw new Exception($"Cannot parse JSON of statement #{statementIndex} (line {startLine}): Current line exceeds document length, probably failed to close statement (no \"}}\").\n\nCurrently looks like:\n{sb.ToString()}");
                     if (!string.IsNullOrWhiteSpace(lines[i])) sb.AppendLine(lines[i]);
                 }
 
                 statements.Add(new ScriptStatement(statementIndex, startLine, commandHead, sb.ToString().Trim()));
+                prog?.Report(new ScriptProgress(i, total, $"Added statement #{0} '{commandHead}' (lines {startLine}-{i})"));
                 statementIndex++;
             }
-            p($"Got here. Statements.Count='{statements.Count}'");
+
             // Create metadata:
+            prog?.Report(new ScriptProgress(total -1, total, "Done, parsing metadata."));
             if (!statements[0].CommandHead.Equals("ScriptMetadata", StringComparison.OrdinalIgnoreCase)) throw new Exception("First statement is not marked ScriptMetadata");
-            p("Got here.");
             ScriptMetaData metaData = JsonSerializer.Deserialize<ScriptMetaData>(statements[0].JsonPayload) ?? throw new Exception("Could not parse metadata.");
-            p("Got here.");
+            prog?.Report(new ScriptProgress(total, total, "Done"));
             return new Script(metaData, statements.Skip(1).ToList());
         }
 
@@ -122,7 +127,8 @@ namespace MacroTrack.Puppet2.Scripting
         string CommandHead,
         string JsonPayload)
     {
-        public string PrintInfo() => $"Statement #{Index} (line {StartLine}):\n{CommandHead} {JsonPayload.Replace("\n", " ").Replace("\r", " ")}";
+        public string PrintInfo() => $"Statement #{Index} (line {StartLine}):\n{CommandHead} {JsonPayload.Replace("\n", " ").Replace("\r", " ").ToSingleLine().Unindent()}";
+        public string PrintShortInfo() => $"#{Index} (line {StartLine}): {CommandHead} {JsonPayload.ToSingleLine().Unindent()}".Truncate(250);
     }
 
 

@@ -62,6 +62,21 @@ namespace MacroTrack.Puppet2.Commands
             };
         }
 
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            if (head.Count < 2) PuppetResult.FailHelp(Help[0], FailHelpType.NoSubCommand);
+            return head[1].ToLowerInvariant().Trim() switch
+            {
+                "add"       => TestAdd(args),
+                "current"   => TestCurrent(args),
+                "disable"   => TestDisable(args),
+                "list"      => TestList(args),
+                "set"       => TestSet(args),
+                "cheat"     => TestCheat(head, args),
+                _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
+            };            
+        }
+
         public PuppetResult Add(IReadOnlyList<string> args)
         {
             DailyTask entry;
@@ -77,6 +92,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.taskService.AddTask(name, desc);
             }
             return PuppetResult.Ok($"Added Task #{entry.Id}");
+        }
+
+        private PuppetResult TestAdd(IReadOnlyList<string> args)
+        {
+            try
+            {
+                AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult Current(IReadOnlyList<string> args)
@@ -104,6 +129,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok(sb.ToString());
         }
 
+        private PuppetResult TestCurrent(IReadOnlyList<string> args)
+        {
+            try
+            {
+                CurrentPayload pl = JsonSerializer.Deserialize<CurrentPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         public PuppetResult Disable(IReadOnlyList<string> args)
         {
             int id;
@@ -122,6 +157,16 @@ namespace MacroTrack.Puppet2.Commands
             bool r = _services.taskService.GetTask(id).IsActive;
             DailyTask entry = reenable ? _services.taskService.Activate(id) : _services.taskService.Deactivate(id);
             return PuppetResult.Ok($"Set Task #{entry.Id} from '{(r ? "Active" : "Inactive")}' to '{(entry.IsActive ? "Active" : "Inactive")}'.");
+        }
+
+        private PuppetResult TestDisable(IReadOnlyList<string> args)
+        {
+            try
+            {
+                DisablePayload pl = JsonSerializer.Deserialize<DisablePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult List(IReadOnlyList<string> args)
@@ -146,6 +191,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok(sb.ToString());
         }
 
+        private PuppetResult TestList(IReadOnlyList<string> args)
+        {
+            try
+            {
+                ListPayload pl = JsonSerializer.Deserialize<ListPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         public PuppetResult Set(IReadOnlyList<string> args)
         {
             bool complete;
@@ -154,7 +209,7 @@ namespace MacroTrack.Puppet2.Commands
             if (args.IsJson())
             {
                 SetPayload pl = JsonSerializer.Deserialize<SetPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
-                complete = pl.complete;
+                complete = pl.Complete;
                 id = pl.Id;
                 date = pl.Date ?? DateTime.Now;
             }
@@ -169,6 +224,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Set task #{entry.Id} from '{r.Completed.Checked(false, "Complete", "Incomplete")}' to '{entry.Completed.Checked(false, "Complete", "Incomplete")}'.");
         }
 
+        private PuppetResult TestSet(IReadOnlyList<string> args)
+        {
+            try
+            {
+                SetPayload pl = JsonSerializer.Deserialize<SetPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         public PuppetResult Cheat(IReadOnlyList<string> head, IReadOnlyList<string> args)
         {
             if (head.Count < 3) PuppetResult.FailHelp(Help[6], FailHelpType.NoSubCommand);
@@ -176,6 +241,17 @@ namespace MacroTrack.Puppet2.Commands
             {
                 "get" => CheatGet(args),
                 "set" => CheatSet(args),
+                _ => PuppetResult.Fail($"Unknown subcommand '{string.Join('.', head)}'.")
+            };
+        }
+
+        private PuppetResult TestCheat(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            if (head.Count < 3) PuppetResult.FailHelp(Help[6], FailHelpType.NoSubCommand);
+            return head[2].ToLowerInvariant().Trim() switch
+            {
+                "get" => TestCheatGet(args),
+                "set" => TestCheatSet(args),
                 _ => PuppetResult.Fail($"Unknown subcommand '{string.Join('.', head)}'.")
             };
         }
@@ -193,6 +269,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"{date.ToString("yyyy-MM-dd")} IsCheatDay='{isCheatDay}'");
 
             throw new NotImplementedException();
+        }
+
+        private PuppetResult TestCheatGet(IReadOnlyList<string> args)
+        {
+            try
+            {
+                CheatGetPayload pl = JsonSerializer.Deserialize<CheatGetPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult CheatSet(IReadOnlyList<string> args)
@@ -215,10 +301,20 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Set {date.ToString("yyyy-MM-dd")} IsCheatDay from '{r}' to '{isCheatDay}'");
         }
 
+        private PuppetResult TestCheatSet(IReadOnlyList<string> args)
+        {
+            try
+            {
+                CheatSetPayload pl = JsonSerializer.Deserialize<CheatSetPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         private sealed record AddPayload(string Name, string? Description);
         private sealed record CurrentPayload(DateTime? Date, bool? FilterInactive, bool? FilterActive);
         private sealed record DisablePayload(int Id, bool? Reenable);
-        private sealed record SetPayload(bool complete, int Id, DateTime? Date);
+        private sealed record SetPayload(bool Complete, int Id, DateTime? Date);
         private sealed record ListPayload(bool? FilterInactive, bool? FilterActive);
         private sealed record CheatGetPayload(DateTime? Date);
         private sealed record CheatSetPayload(DateTime Date, bool IsCheatDay);        

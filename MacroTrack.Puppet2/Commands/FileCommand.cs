@@ -60,6 +60,23 @@ namespace MacroTrack.Puppet2.Commands
             };
         }
 
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            if (head.Count < 2) return PuppetResult.Fail("Subcommand required (this is not how we decided to do these errors but eh...");
+            return head[1].ToLowerInvariant().Trim() switch
+            {
+                "backup"        => throw new NotImplementedException(),
+                "backupnow"     => throw new NotImplementedException(),
+                "backupmanual"  => throw new NotImplementedException(),
+                "manualbackup"  => throw new NotImplementedException(),
+                "openbackupdir" => throw new NotImplementedException(),
+                "restore"       => throw new NotImplementedException(),
+                "newdb"         => throw new NotImplementedException(),
+                "setdb"         => throw new NotImplementedException(),
+                _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
+            };
+        }
+
         private PuppetResult Backup(IReadOnlyList<string> args)
         {
             string reason;

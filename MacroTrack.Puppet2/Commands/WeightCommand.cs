@@ -38,14 +38,28 @@ namespace MacroTrack.Puppet2.Commands
             };
         }
 
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            return head[1].ToLowerInvariant().Trim() switch
+            {
+                "add"       => TestAdd(args),
+                "+"         => TestAdd(args),
+                "new"       => TestAdd(args),
+                "delete"    => TestDelete(args),
+                "-"         => TestDelete(args),
+                "remove"    => TestDelete(args),
+                _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'")
+            };            
+        }
+
         private PuppetResult Add(IReadOnlyList<string> args)
         {
             WeightEntry entry;
             if (args.IsJson())
             {
-                var payload = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
-                DateTime time = payload.Time ?? DateTime.Now;
-                entry = _services.weightLogService.AddEntry(time, payload.Weight);
+                AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                DateTime time = pl.Time ?? DateTime.Now;
+                entry = _services.weightLogService.AddEntry(time, pl.Weight);
             }
             else
             {
@@ -54,6 +68,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.weightLogService.AddEntry(time, weight);
             }
             return PuppetResult.Ok($"Added WeightLog Entry #{entry.Id}");
+        }
+
+        private PuppetResult TestAdd(IReadOnlyList<string> args)
+        {
+            try 
+            { 
+                AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload."); 
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         private PuppetResult Delete(IReadOnlyList<string> args)
@@ -70,6 +94,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.weightLogService.DeleteEntry(id);
             }
             return PuppetResult.Ok($"Deleted entry #{entry.Id}");
+        }
+
+        private PuppetResult TestDelete(IReadOnlyList<string> args)
+        {
+            try
+            {
+                AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         private sealed record AddPayload(double Weight, DateTime? Time);

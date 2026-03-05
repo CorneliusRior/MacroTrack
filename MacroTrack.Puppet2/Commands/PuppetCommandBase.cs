@@ -28,6 +28,7 @@ namespace MacroTrack.Puppet2.Commands
         public abstract IReadOnlyList<CommandHelp> Help { get; }
 
         public abstract PuppetResult Execute(IReadOnlyList<string> head, IReadOnlyList<string> args);
+        public abstract PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args);
 
         protected string Location([CallerMemberName] string member = "") => $"{GetType().FullName}.{member}()";
 

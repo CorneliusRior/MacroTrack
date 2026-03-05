@@ -11,6 +11,7 @@ namespace MacroTrack.Puppet2
     {
         public static PuppetResult Ok(string output) => new(true, output);
         public static PuppetResult Fail(string output) => new(false, output);
+        public static PuppetResult Bool(bool success, string output = "") => new(success, output);
         public static PuppetResult FailHelp(CommandHelp help, FailHelpType failType = FailHelpType.Default)
         {
             string output;
@@ -32,6 +33,7 @@ namespace MacroTrack.Puppet2
 
         public static PuppetResult RequestRestart(string message = "", string caption = "", string printOutput = "Restart Requested") => new(true, printOutput, RestartArgs.Request(message, caption));
         public static PuppetResult ForceRestart() => new(true, "Restarting...", RestartArgs.Force());
+
     }
 
     public enum FailHelpType

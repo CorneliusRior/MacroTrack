@@ -49,6 +49,27 @@ namespace MacroTrack.Puppet2.Commands
             };
         }
 
+        public override PuppetResult TestJson(IReadOnlyList<string> head, IReadOnlyList<string> args)
+        {
+            if (head.Count < 2) PuppetResult.FailHelp(Help[0], FailHelpType.NoSubCommand);
+            return head[1].ToLowerInvariant().Trim() switch
+            {
+                "add"               => TestAdd(args),
+                "delete"            => TestDelete(args),
+                "edit"              => TestEdit(args),
+                "list"              => PuppetResult.Ok("No Json in this command."),
+                "activate"          => TestActive(args),
+                "setactivation"     => TestActivateGoal(args),
+                "deleteactivation"  => TestDeleteActivation(args),
+                "getactive"         => TestActivateGoal(args),
+                "getcurrent"        => PuppetResult.Ok("No Json in this command."),
+                "getcurrentgoal"    => PuppetResult.Ok("No Json in this command."),
+                "current"           => PuppetResult.Ok("No Json in this command."),
+                "history"           => PuppetResult.Ok("No Json in this command."),
+                _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
+            };            
+        }
+
         public PuppetResult Add(IReadOnlyList<string> args)
         {
             Goal entry;
@@ -81,6 +102,17 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Added Goal #{entry.Id}");
         }
 
+        private PuppetResult TestAdd(IReadOnlyList<string> args)
+        {
+            try
+            {
+                AddPayload pl = JsonSerializer.Deserialize<AddPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+                GoalType type = pl.GoalType.ToGoalType();
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         public PuppetResult Delete(IReadOnlyList<string> args)
         {
             Goal entry;
@@ -95,6 +127,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.goalService.DeleteGoal(id);
             }
             return PuppetResult.Ok($"Deleted Goal #{entry.Id}");            
+        }
+
+        private PuppetResult TestDelete(IReadOnlyList<string> args)
+        {
+            try
+            {
+                DeletePayload pl = JsonSerializer.Deserialize<DeletePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult Edit(IReadOnlyList<string> args)
@@ -131,6 +173,16 @@ namespace MacroTrack.Puppet2.Commands
                 entry = _services.goalService.EditGoal(id, goalName, calories, protein, carbs, fat, goalType, customType, notes, minCal, maxCal, minPro, maxPro, minCar, maxCar, minFat, maxFat);
             }
             return PuppetResult.Ok($"Edited Goal #{entry.Id}");
+        }
+
+        private PuppetResult TestEdit(IReadOnlyList<string> args)
+        {
+            try
+            {
+                EditPayload pl = JsonSerializer.Deserialize<EditPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         public PuppetResult History(IReadOnlyList<string> args)
@@ -201,6 +253,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Activated Goal #{id} for date {time.ToString("yyyy-MM-dd")}, GoalActivation ID = #{entry.Id}");
         }
 
+        private PuppetResult TestActivateGoal(IReadOnlyList<string> args)
+        {
+            try
+            {
+                GoalActivationPayload pl = JsonSerializer.Deserialize<GoalActivationPayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         public PuppetResult DeleteActivation(IReadOnlyList<string> args)
         {
             GoalActivation entry;
@@ -218,6 +280,16 @@ namespace MacroTrack.Puppet2.Commands
             return PuppetResult.Ok($"Deleted GoalActivation #{entry.Id}");
         }
 
+        private PuppetResult TestDeleteActivation(IReadOnlyList<string> args)
+        {
+            try
+            {
+                DeletePayload pl = JsonSerializer.Deserialize<DeletePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
+        }
+
         public PuppetResult GetActive(IReadOnlyList<string> args)
         {
             DateTime time;
@@ -231,6 +303,16 @@ namespace MacroTrack.Puppet2.Commands
             GoalActivation? entry = _services.goalService.GetPresentGoal(date);
             if (entry is null) return PuppetResult.Ok($"No Goals activa as of {date.ToString("yyyy-MM-dd")}");
             return PuppetResult.Ok($"Active Goal as of {time.ToString("yyyy-MM-dd")} is Goal #{entry.GoalId}, set by GoalActivation #{entry.Id}");
+        }
+
+        private PuppetResult TestActive(IReadOnlyList<string> args)
+        {
+            try
+            {
+                GetActivePayload pl = JsonSerializer.Deserialize<GetActivePayload>(args[0]) ?? throw new PuppetUserException("Invalid JSON payload.");
+            }
+            catch { return PuppetResult.Fail("Invalid JSON payload."); }
+            return PuppetResult.Ok("Parsed.");
         }
 
         private sealed record AddPayload(string GoalName, double Calories, double Protein, double Carbs, double Fat, string GoalType, string? CustomType, string? Notes, double? MinCal, double? MaxCal, double? MinPro, double? MaxPro, double? MinCar, double? MaxCar, double? MinFat, double? MaxFat);
