@@ -24,6 +24,9 @@
     <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FFF9F9F9"/>
     <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FFEEEEEE"/>
 
+    <SolidColorBrush x:Key="ScrollHoverBrush" Color="#FFF0F0F0"/>
+    <SolidColorBrush x:Key="ScrollBackGroundBrush" Color="Transparent"/>
+
     <SolidColorBrush x:Key="TextBoxBackgroundBrush" Color="#FFFFFFFF"/>
     <SolidColorBrush x:Key="TextBoxHoverBrush" Color="#FFFFFFFF"/>
 

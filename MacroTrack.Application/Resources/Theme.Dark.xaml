@@ -14,8 +14,10 @@
     
     <!--Control Brushes-->
     <SolidColorBrush x:Key="ButtonBackGroundBrush" Color="#FF000000"/>
-    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FF111111"/>
-    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FF222222"/>
+    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#FF333333"/>
+    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#FF666666"/>
+
+    <SolidColorBrush x:Key="ScrollHoverBrush" Color="#FF222222"/>
 
     <SolidColorBrush x:Key="TextBoxBackgroundBrush" Color="#FF000000"/>
     <SolidColorBrush x:Key="TextBoxHoverBrush" Color="#FF050505"/>

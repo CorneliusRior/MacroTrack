@@ -385,6 +385,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="left"/>
         <Setter Property="Margin" Value="10,5,5,5"/>
+        <Setter Property="Template" Value="{DynamicResource MTCheckBox}"/>
     </Style>
     
     <!--RadioButtons-->
@@ -453,5 +454,8 @@
         <Setter Property="RowHeaderWidth" Value="0"/>
         <Setter Property="RowBackground" Value="{DynamicResource TextBoxBackgroundBrush}"/>
     </Style>
+    
+    <!--ScrollBar-->
+    <Style TargetType="ScrollBar" BasedOn="{StaticResource MTScrollBar}"/>
 
 </ResourceDictionary>

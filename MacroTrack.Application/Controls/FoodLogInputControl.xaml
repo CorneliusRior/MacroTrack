@@ -66,6 +66,7 @@
                           IsTextSearchEnabled="True"
                           ItemsSource="{Binding PresetList}"
                           SelectedItem="{Binding SelectedPreset}"
+                          
                           Text="{Binding ItemName,
                                  UpdateSourceTrigger=PropertyChanged,
                                  ValidatesOnNotifyDataErrors=True}"

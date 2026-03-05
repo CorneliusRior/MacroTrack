@@ -283,7 +283,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             try
             {
-                List<Preset> presetList = Services!.presetService.GetAll();
+                List<Preset> presetList = Services!.presetService.GetAll().OrderBy(p => p.PresetName).ToList();
                 PresetList.Clear();
                 foreach (Preset p in presetList) PresetList.Add(p);
 
