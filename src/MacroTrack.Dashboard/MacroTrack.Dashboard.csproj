@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-	  <ApplicationIcon>..\MacroTrack.Application\Assets\app.ico</ApplicationIcon>
+	  <ApplicationIcon>..\MacroTrack.AppLibrary\Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MacroTrack.Application\MacroTrack.AppLibrary.csproj" />
+    <ProjectReference Include="..\MacroTrack.AppLibrary\MacroTrack.AppLibrary.csproj" />
     <ProjectReference Include="..\MacroTrack.Puppet2\MacroTrack.Puppet2.csproj" />
   </ItemGroup>
 
