@@ -1,6 +1,8 @@
 # MacroTrack
-
 MacroTrack is a Desktop Application used to track Calories and Macronutrients. It contains a Food Log, Weight Log, Diary, Daily Task checklist, and graphing tools. The Core is written in C# and uses SQLite to administer the database.
+
+![MacroTrack Dashboard, auto generated data. Theme: "Dark"](docs/screenshots/dashboard-demo1.png)
+>*(Auto generated data. Theme: ***"Dark"***)*
 
 ## Stucture
 
@@ -20,6 +22,9 @@ Download the latest **Dashboard** release at [https://github.com/CorneliusRior/M
 The first thing to do once MacroTrack is up and running is to create a new **Goal**, which in both BasicApp and DashBoard is done by clicking the **New Goal** button at the top of the screen, and then setting it as the active goal by clicking the **Set Goal** button at the top of the screen. After that it is recommended that you go to **Food Entry > New Preset**, and add a number of food items that you will likely enter regularly. 
 
 New food entries can be made by selecting a **Preset** from the drop-down menu, or by manually entering data in **Food Entry**.
+
+![New Goal, Set Goal, and Add New Preset windows, auto generated data. Theme: "Dark"](docs/screenshots/dashboard-demo2.png)
+>*(***New Goal***, ***Set Goal***, and ***Add New Preset*** windows, auto generated data. Theme: ***"Dark"***)*
 
 ## Project Status
 
