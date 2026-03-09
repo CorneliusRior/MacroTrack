@@ -17,13 +17,13 @@ public sealed class CoreServices
 
     public SettingsService SettingsService { get; }
 
-    public DiaryRepo diaryRepo { get; }
-    public FileRepo fileRepo { get; }
-    public FoodLogRepo foodLogRepo { get; }
-    public GoalRepo goalRepo { get; }
-    public PresetRepo presetRepo { get; }
-    public TaskRepo taskRepo { get; }
-    public WeightLogRepo weightLogRepo { get; }
+    private DiaryRepo diaryRepo { get; }
+    private FileRepo fileRepo { get; }
+    private FoodLogRepo foodLogRepo { get; }
+    private GoalRepo goalRepo { get; }
+    private PresetRepo presetRepo { get; }
+    private TaskRepo taskRepo { get; }
+    private WeightLogRepo weightLogRepo { get; }
 
     public DataService dataService { get; }
     public DiaryService diaryService { get; }

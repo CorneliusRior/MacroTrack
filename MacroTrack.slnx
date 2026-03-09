@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/docs/">
+    <File Path="Core.md" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="src/MacroTrack.AppLibrary/MacroTrack.AppLibrary.csproj" Id="b301ec53-1bd5-41ff-bf75-a85d474a754c" />
   <Project Path="src/MacroTrack.BasicApp/MacroTrack.BasicApp.csproj" Id="67400bd8-9a69-40f0-8fe7-ea745482388a" />
   <Project Path="src/MacroTrack.Cli/MacroTrack.Cli.csproj" />

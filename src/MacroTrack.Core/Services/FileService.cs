@@ -75,6 +75,10 @@ namespace MacroTrack.Core.Services
             Backup(destPath);
         }        
 
+        /// <summary>
+        /// Ensure that we only keep 3 auto daily backups (or more if we change the settings).
+        /// </summary>
+        /// <param name="dir"></param>
         private void EnforceAutoRetention(string dir)
         {
             // If you want to make other kinds of autobackup, like monthly or yearly, add an argument string prefix, equal to the start (e.g. "AutoBackupDaily"), and add files.StartsWith(prefix); If you want differing retention amounts, add that in settings, and add that as an amount as well.
@@ -95,6 +99,12 @@ namespace MacroTrack.Core.Services
             }
         }
 
+        /// <summary>
+        /// Backup a destination file and replace it with a different file. Used to restore backups.
+        /// </summary>
+        /// <param name="sourcePath">Backup file path</param>
+        /// <param name="destinationPath">Database path to be overridden after backup.</param>
+        /// <exception cref="FileNotFoundException"></exception>
         public void RestoreDB(string sourcePath, string destinationPath)
         {
             // Ensure source exists:
