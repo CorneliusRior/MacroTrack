@@ -288,8 +288,17 @@ namespace MacroTrack.AppLibrary.Controls
         private void TbValue_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             base.OnPreviewMouseWheel(e);
-            if (e.Delta > 0) ChangeValueMaintainCaret(SmallStep);
-            if (e.Delta < 0) ChangeValueMaintainCaret(-SmallStep);
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                if (e.Delta > 0) ChangeValueMaintainCaret(0.01);
+                if (e.Delta < 0) ChangeValueMaintainCaret(-0.01);
+            }
+            else
+            {
+                if (e.Delta > 0) ChangeValueMaintainCaret(SmallStep);
+                if (e.Delta < 0) ChangeValueMaintainCaret(-SmallStep);
+            }
+            
             e.Handled = true;
         }
 

@@ -1,8 +1,9 @@
-﻿using MacroTrack.AppLibrary.Services;
+﻿using DocumentFormat.OpenXml.Office2013.Excel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,126 +19,92 @@ using System.Windows.Shapes;
 namespace MacroTrack.AppLibrary.Controls
 {
     /// <summary>
-    /// Interaction logic for DateTimePicker.xaml
+    /// Interaction logic for DateTimePicker2.xaml
     /// </summary>
-    public partial class DateTimePicker : UserControl
+    public partial class DateTimePicker : UserControl, INotifyPropertyChanged
     {
-        //private readonly string format = "d MMMM yyyy hh:mm tt";
+        public event PropertyChangedEventHandler? PropertyChanged;
         public DateTimePicker()
         {
             InitializeComponent();
+            Value = DateTime.Now;
         }
 
-        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register(
-            nameof(Format),
-            typeof(string), 
-            typeof(DateTimePicker), 
-            new PropertyMetadata(null)
-        );
-        public string Format
-        {
-            get => (string)GetValue(FormatProperty);
-            set
-            {
-                Debug.WriteLine($"Format={Format}");
-                SetValue(FormatProperty, value);
-            }
-        }
-
-        public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register(
-                nameof(Value),
-                typeof(DateTime?),
-                typeof(DateTimePicker),
-                new FrameworkPropertyMetadata(
-                    null,
-                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                    OnValueChanged
-                )
-        );
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
+            nameof(Value), typeof(DateTime?), typeof(DateTimePicker),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
         public DateTime? Value
         {
             get => (DateTime?)GetValue(ValueProperty);
             set => SetValue(ValueProperty, value);
         }
-
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var c = (DateTimePicker)d;
-            c.PrintValue();
+            c.RefreshDisplayString();
         }
 
-        public void UpdateFormat()
+        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register(
+            nameof(Format), typeof(string), typeof(DateTimePicker),
+            new PropertyMetadata("d MMMM yyyy hh:mm tt", OnFormatChanged));
+        public string Format
         {
-            PrintValue();
+            get => (string)GetValue(FormatProperty);
+            set => SetValue(FormatProperty, value);
+        }
+        private static void OnFormatChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var c = (DateTimePicker)d;
+            c.RefreshDisplayString();
         }
 
-        private void PrintValue()
+        private string _displayString = "";
+        public string DisplayString
         {
-            if (Value is null)
+            get => _displayString;
+            set
             {
-                return;
+                if (_displayString == value) return;
+                _displayString = value;
+                OnPropertyChanged();
             }
-            Debug.WriteLine($"Printing, format: {Format}");
-            var time = Value.Value;
-            PART_tb.Text = time.ToString(Format);
-            PART_Calendar.SelectedDate = time.Date;
-        }
-
-        private void PART_buttonCalendar_Click(object sender, RoutedEventArgs e)
+        }        
+        private void OnPropertyChanged([CallerMemberName] string? name = null)
         {
-            PART_Popup.IsOpen = !PART_Popup.IsOpen;
-        }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }        
 
-        private void SetToCurrent()
+        private void RefreshDisplayString()
         {
-            Value = DateTime.Now;
-        }
-
-        private void PART_Calendar_SelectedDatesChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyCalendarDate();
-        }
-
-        private void ApplyCalendarDate()
-        {
-            DateTime date = PART_Calendar.SelectedDate ?? Value?.Date ?? DateTime.Now;
-            int hour = Value?.Hour ?? 0;
-            int minute = Value?.Minute ?? 0;
-            Value = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+            //if (Value is not null) DisplayString = Value.Value.ToString(Format);
+            DisplayString = Value?.ToString(Format) ?? "";
         }
 
         private void Commit()
         {
-            var text = PART_tb.Text?.Trim();
-
+            string? text = DisplayString?.Trim();
             if (string.IsNullOrWhiteSpace(text))
             {
                 Value = null;
                 return;
             }
-            if (!DateTime.TryParse(text, out DateTime dateTime))
-            {
-                string t = text.ToLowerInvariant();
-                if (t == "yesterday" || t == "y" || t == "yesterdat")
-                {
-                    Value = DateTime.Now.Date.AddMinutes(-1);
-                    return;
-                }
-                if (t == "tomorrow" || t == "t" || t == "tommorrow")
-                {
-                    Value = DateTime.Now.Date.AddDays(1);
-                    return;
-                }
 
+            string t = text.ToLowerInvariant();
 
-                Value = null;
-                return;
-            }
-            else
+            if (DateTime.TryParse(DisplayString, out DateTime dt)) Value = dt;
+            else Value = DisplayString switch
             {
-                Value = dateTime;
-            }
+                "t"         => DateTime.Today.AddDays(1),
+                "tomorrow"  => DateTime.Today.AddDays(1),
+                "tommorrow" => DateTime.Today.AddDays(1),
+                "y"         => DateTime.Today.AddMinutes(-1),
+                "yesterday" => DateTime.Today.AddMinutes(-1),
+                "yesterdat" => DateTime.Today.AddMinutes(-1),
+                "now"       => DateTime.Now,
+                _ => null
+            };
+            RefreshDisplayString();
+            return;
         }
 
         private void PART_tb_KeyDown(object sender, KeyEventArgs e)
@@ -147,15 +114,52 @@ namespace MacroTrack.AppLibrary.Controls
                 Commit();
                 e.Handled = true;
             }
-            if (e.Key == Key.Tab)
-            {
-                Commit(); // We don't say handled = true;
-            }
+            if (e.Key == Key.Tab) Commit(); // We don't say handled = true;
         }
 
         private void PART_tb_LostFocus(object sender, RoutedEventArgs e)
         {
             Commit();
         }
+
+        private void PART_btCalendar_Click(object sender, RoutedEventArgs e)
+        {
+            PART_Popup.IsOpen = !PART_Popup.IsOpen;
+        }
+
+        private void PART_Calendar_SelectedDatesChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PART_Calendar.SelectedDate is DateTime date)
+            {
+                int hour = Value?.Hour ?? 0;
+                int minute = Value?.Minute ?? 0;
+                Value = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+                PART_Popup.IsOpen = false;
+            }
+        }
+
+        private void PART_tb_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Up) Value = Value?.AddHours(1);
+            if (e.Key == Key.Down) Value = Value?.AddHours(-1);
+        }
+
+        private void PART_tb_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            base.OnPreviewMouseWheel(e);
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control)) 
+            {
+                if (e.Delta > 0) Value = Value?.AddMinutes(1);
+                if (e.Delta < 0) Value = Value?.AddMinutes(-1);
+            }
+            else
+            {
+                if (e.Delta > 0) Value = Value?.AddMinutes(10);
+                if (e.Delta < 0) Value = Value?.AddMinutes(-10);
+            }
+            
+            e.Handled = true;
+        }
+
     }
 }
