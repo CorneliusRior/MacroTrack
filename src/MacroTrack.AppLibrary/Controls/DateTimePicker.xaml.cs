@@ -152,6 +152,11 @@ namespace MacroTrack.AppLibrary.Controls
                 if (e.Delta > 0) Value = Value?.AddMinutes(1);
                 if (e.Delta < 0) Value = Value?.AddMinutes(-1);
             }
+            else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            {
+                if (e.Delta > 0) Value = Value?.AddMinutes(5);
+                if (e.Delta < 0) Value = Value?.AddMinutes(-5);
+            }
             else
             {
                 if (e.Delta > 0) Value = Value?.AddMinutes(10);

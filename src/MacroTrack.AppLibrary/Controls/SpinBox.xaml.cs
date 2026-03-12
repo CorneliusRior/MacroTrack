@@ -191,6 +191,11 @@ namespace MacroTrack.AppLibrary.Controls
                 if (e.Delta > 0) Value += 0.01;
                 if (e.Delta < 0) Value -= 0.01;
             }
+            else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            {
+                if (e.Delta > 0) Value += 0.05;
+                if (e.Delta < 0) Value -= 0.05;
+            }
             else
             {
                 if (e.Delta > 0) Value += SmallStep;
