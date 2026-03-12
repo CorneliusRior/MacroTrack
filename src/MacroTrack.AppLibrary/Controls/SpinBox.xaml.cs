@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,8 +21,192 @@ namespace MacroTrack.AppLibrary.Controls
     /// <summary>
     /// Interaction logic for SpinBox.xaml
     /// </summary>
-    public partial class SpinBox : UserControl
+    public partial class SpinBox : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public SpinBox()
+        {
+            InitializeComponent();
+            Value = DefaultValue;
+        }
+
+        // Value:
+        public static DependencyProperty ValueProperty = DependencyProperty.Register(
+            nameof(Value), typeof(double?), typeof(SpinBox),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
+        public double? Value
+        {
+            get => (double?)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
+        }
+        private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var c = (SpinBox)d;
+            c.RefreshDisplayString();
+        }
+
+        // Display String:
+
+        private string _displayString = "";
+        public string DisplayString
+        {
+            get => _displayString;
+            set
+            {
+                if (_displayString == value) return;
+                _displayString = value;
+                OnPropertyChanged();
+            }
+        }
+        private void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        // Default Value:
+        public static DependencyProperty DefaultValueProperty = DependencyProperty.Register(
+            nameof(DefaultValue), typeof(double?), typeof(SpinBox),
+            new PropertyMetadata(1.00));
+        public double? DefaultValue
+        {
+            get => (double?)GetValue(DefaultValueProperty);
+            set => SetValue(DefaultValueProperty, value);
+        }
+
+        // Step (big step):
+        public static DependencyProperty StepProperty = DependencyProperty.Register(
+            nameof(Step), typeof(double?), typeof(SpinBox),
+            new PropertyMetadata(1.00));
+        public double? Step
+        {
+            get => (double?)GetValue(StepProperty);
+            set => SetValue(StepProperty, value);
+        }
+
+        // Small Step:
+        public static DependencyProperty SmallStepProperty = DependencyProperty.Register(
+            nameof(SmallStep), typeof(double?), typeof(SpinBox),
+            new PropertyMetadata(0.10));
+        public double? SmallStep
+        {
+            get => (double?)GetValue(SmallStepProperty);
+            set => SetValue(SmallStepProperty, value);
+        }
+
+        // Format string:
+        public static DependencyProperty FormatStringProperty = DependencyProperty.Register(
+            nameof(FormatString), typeof(string), typeof(SpinBox),
+            new PropertyMetadata("0.00"));
+        public string FormatString
+        {
+            get => (string)GetValue(FormatStringProperty);
+            set => SetValue(FormatStringProperty, value);
+        }
+
+        // Formatting values:
+
+        // Outer Border Thickness:
+        public static DependencyProperty OuterBorderThicknessProperty = DependencyProperty.Register(
+            nameof(OuterBorderThickness), typeof(Thickness), typeof(SpinBox), 
+            new PropertyMetadata(new Thickness(1)));
+        public Thickness OuterBorderThickness
+        {
+            get => (Thickness)GetValue(OuterBorderThicknessProperty);
+            set => SetValue(OuterBorderThicknessProperty, value);
+        }
+
+        // Outer Border Brush:
+        public static DependencyProperty OuterBorderBrushProperty = DependencyProperty.Register(
+            nameof(OuterBorderBrush), typeof(Brush), typeof(SpinBox), 
+            new PropertyMetadata(Brushes.Transparent));
+        public Brush OuterBorderBrush
+        {
+            get => (Brush)GetValue(OuterBorderBrushProperty);
+            set => SetValue(OuterBorderBrushProperty, value);
+        }
+
+        // Hover Outer Border Brush:
+        public static DependencyProperty HoverOuterBorderBrushProperty = DependencyProperty.Register(
+            nameof(HoverOuterBorderBrush), typeof(Brush), typeof(SpinBox),
+            new PropertyMetadata(Brushes.Transparent));
+        public Brush HoverOuterBorderBrush
+        {
+            get => (Brush)GetValue(HoverOuterBorderBrushProperty);
+            set => SetValue(HoverOuterBorderBrushProperty, value);
+        }
+
+        // Selected Outer Border Brush:
+        public static DependencyProperty SelectedOuterBorderBrushProperty = DependencyProperty.Register(
+            nameof(SelectedOuterBorderBrush), typeof(Brush), typeof(SpinBox),
+            new PropertyMetadata(Brushes.Transparent));
+        public Brush SelectedOuterBorderBrush
+        {
+            get => (Brush)GetValue(SelectedOuterBorderBrushProperty);
+            set => SetValue(SelectedOuterBorderBrushProperty, value);
+        }
+
+        // Button Width:
+        public static DependencyProperty ButtonWidthProperty = DependencyProperty.Register(
+            nameof(ButtonWidth), typeof(int), typeof(SpinBox),
+            new PropertyMetadata(20));
+        public int ButtonWidth
+        {
+            get => (int)GetValue(ButtonWidthProperty);
+            set => SetValue(ButtonWidthProperty, value);
+        }
+
+
+        // Function:
+
+        private void RefreshDisplayString()
+        {
+            DisplayString = Value?.ToString(FormatString) ?? "";
+        }
+
+        private void Commit()
+        {
+            string? text = DisplayString?.Trim();
+            if (double.TryParse(text, out double v))
+            {
+                Value = Math.Round(v, 2);
+            }
+            RefreshDisplayString();
+        }
+
+        private void ButtonUp_Click(object sender, RoutedEventArgs e) => Value += Step;
+        private void ButtonDown_Click(object sender, RoutedEventArgs e) => Value -= Step;
+
+        private void tbValue_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Up) Value += Step;
+            if (e.Key == Key.Down) Value -= Step;
+            if (e.Key == Key.Enter || e.Key == Key.Escape || e.Key == Key.Tab) Commit();
+        }
+
+        private void tbValue_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            base.OnPreviewMouseWheel(e);
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                if (e.Delta > 0) Value += 0.01;
+                if (e.Delta < 0) Value -= 0.01;
+            }
+            else
+            {
+                if (e.Delta > 0) Value += SmallStep;
+                if (e.Delta < 0) Value -= SmallStep;
+            }
+
+            e.Handled = true;
+        }
+
+        private void tbValue_LostFocus(object sender, RoutedEventArgs e)
+        {
+            Commit();
+        }
+
+        // Old code: can get rid of this if you like in a bit:
+        /*
         private bool _updating = false;
         public SpinBox()
         {
@@ -306,5 +493,6 @@ namespace MacroTrack.AppLibrary.Controls
         {
             OnExitFormat();
         }
+        */
     }
 }

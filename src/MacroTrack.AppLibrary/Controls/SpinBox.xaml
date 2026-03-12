@@ -37,7 +37,11 @@
             </Grid.ColumnDefinitions>
 
             <TextBox x:Name="tbValue"  
+                     Text="{Binding DisplayString, ElementName=Root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource TextBox.SpinBox}"
+                     PreviewKeyDown="tbValue_PreviewKeyDown"
+                     PreviewMouseWheel="tbValue_PreviewMouseWheel"
+                     LostFocus="tbValue_LostFocus"
                      Grid.Column="0"/>
 
             <Grid Grid.Column="1">

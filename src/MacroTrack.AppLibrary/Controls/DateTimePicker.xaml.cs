@@ -91,8 +91,8 @@ namespace MacroTrack.AppLibrary.Controls
 
             string t = text.ToLowerInvariant();
 
-            if (DateTime.TryParse(DisplayString, out DateTime dt)) Value = dt;
-            else Value = DisplayString switch
+            if (DateTime.TryParse(t, out DateTime dt)) Value = dt;
+            else Value = t switch
             {
                 "t"         => DateTime.Today.AddDays(1),
                 "tomorrow"  => DateTime.Today.AddDays(1),
