@@ -15,8 +15,9 @@ namespace MacroTrack.AppLibrary.Services
         FoodLogEdit,
         GoalNew,
         GoalSet,
+        PresetManage,
         PreviousPeriod,
         PreviousPeriodSelect,
-        TaskView
+        TaskManage
     }
 }

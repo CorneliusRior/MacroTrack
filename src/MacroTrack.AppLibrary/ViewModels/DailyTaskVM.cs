@@ -19,9 +19,10 @@ namespace MacroTrack.AppLibrary.ViewModels
     {
         public ObservableCollection<DailyTask> Tasks { get; } = new ObservableCollection<DailyTask>();
         
-        // Make these DP:
+        // Make these DP/Settings:
         private bool _filterActive = false;
         private bool _filterInactive = true;
+
 
         private DateTime? _date;
         public DateTime? Date
@@ -39,10 +40,12 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         // Commands:
         public ICommand ToggleCompleteCommand { get; }
+        public ICommand OpenTaskManage { get; set; }
 
         public DailyTaskVM()
         {
             ToggleCompleteCommand = new RelayCommand<DailyTask>(ToggleComplete);
+            OpenTaskManage = new RelayCommand<bool?>(_ => AppServices!.WindowService.Show(WindowType.TaskManage));
         }
 
         public override void Init(CoreServices services, AppServices appServices)

@@ -74,6 +74,7 @@
                         Grid.Row="3">
                 <Button x:Name="btManageTasks"
                         Content="Manage Tasks"
+                        Command="{Binding DataContext.OpenTaskManage, RelativeSource={RelativeSource AncestorType=local:DailyTaskControl}}"
                         Click="btManageTasks_Click"/>
 
             </StackPanel>

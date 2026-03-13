@@ -99,9 +99,10 @@ namespace MacroTrack.AppLibrary.Services
                 WindowType.FoodLogEdit => CreateFoodLogEditWindow(o, parameter),
                 WindowType.GoalNew => CreateGoalNewWindow(o),
                 WindowType.GoalSet => CreateGoalSetWindow(o),
+                WindowType.PresetManage => CreatePresetManageWindow(o),
                 WindowType.PreviousPeriod => CreatePreviousPeriodWindow(o, parameter),
                 WindowType.PreviousPeriodSelect => CreatePreviousPeriodSelectWindow(o, parameter),
-                WindowType.TaskView => CreateTaskViewWindow(o),
+                WindowType.TaskManage => CreateTaskManageWindow(o),
                 _ => throw new NotSupportedException($"Unknown window type '{type}'")
             };
         }        
@@ -172,6 +173,11 @@ namespace MacroTrack.AppLibrary.Services
             return new GoalSetWindow(_services, _appServices);
         }
 
+        private Window CreatePresetManageWindow(Window? owner)
+        {
+            return new PresetManageWindow(_services, _appServices);
+        }
+
         private Window CreatePreviousPeriodWindow(Window? owner, object? parameter)
         {
             if (parameter is TimePeriod timePeriod)
@@ -190,6 +196,9 @@ namespace MacroTrack.AppLibrary.Services
             else throw new InvalidOperationException();
         }
 
-        private Window CreateTaskViewWindow(Window? owner) { throw new NotImplementedException(); }
+        private Window CreateTaskManageWindow(Window? owner) 
+        {
+            return new TaskManageWindow(_services, _appServices);
+        }
     }
 }
