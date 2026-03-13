@@ -24,6 +24,8 @@ namespace MacroTrack.AppLibrary.Windows
         public TaskManageWindow(CoreServices services, AppServices appServices) : base(services, appServices)
         {
             InitializeComponent();
+            ControlDailyTaskManage.Init(services, appServices);
+            ControlDailyTaskManage.RequestClose += r => Close();
         }
     }
 }

@@ -111,7 +111,8 @@
 
                 <GridSplitter Grid.Column="1"/>
 
-                <DataGrid RowHeaderStyle="{DynamicResource MTDataGridRowHeaderStyle}" Template="{DynamicResource MTDataGrid}" ItemsSource="{Binding GoalList}" 
+                <DataGrid RowHeaderStyle="{DynamicResource MTDataGridRowHeaderStyle}" Template="{DynamicResource MTDataGrid}" 
+                          ItemsSource="{Binding GoalList}" 
                           SelectedItem="{Binding SelectedGoal}" 
                           IsReadOnly="True"
                           CanUserResizeColumns="True"
