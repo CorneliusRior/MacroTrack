@@ -171,4 +171,18 @@ public class TaskService : ServiceBase
         Log($"Activated Task #{id}");
         return entry;
     }
+
+    // Edit:
+    public DailyTask Edit(int id, DailyTask task)
+    {
+        if (_repo.GetTask(id, DateTime.Now) is null)
+        {
+            var ex = new Exception($"Returned as null.");
+            Log($"Error Editing Task #{id}, probably doesn't exist, no edits made.", LogLevel.Warning, ex);
+            throw ex;
+        }
+        _repo.Edit(id, task);
+        Log($"Edited Task #{id}");
+        return _repo.GetTask(id, DateTime.Now)!;
+    }
 }

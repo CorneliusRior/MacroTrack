@@ -324,4 +324,18 @@ public class TaskRepo : RepoBase
         cmd.ExecuteNonQuery();
     }
 
+    // Edit (For general editing, changing names & descriptions)
+    public void Edit(int id, DailyTask task)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        string sql = "UPDATE TaskRegistry SET Name = $name, Description = $description, IsActive = $isActive WHERE Id = $id";
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue("$id", id);
+        cmd.Parameters.AddWithValue("$name", task.Name);
+        cmd.Parameters.AddWithValue("$description", task.Description);
+        cmd.Parameters.AddWithValue("$isActive", task.IsActive ? 1 : 0);
+        cmd.ExecuteNonQuery();
+    }
+
 }

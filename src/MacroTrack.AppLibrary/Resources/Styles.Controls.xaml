@@ -381,6 +381,40 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
     
+    <!--Edit Button-->
+    <Style x:Key="Button.EditButton" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackGroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppForeGroundBrush}"/>
+        <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+        <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThickness}"/>
+        <Setter Property="Margin" Value="5"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                            Padding="{TemplateBinding Padding}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter x:Name="bx"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ButtonHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ButtonPressedBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--CheckBoxes-->
     <Style TargetType="CheckBox">
         <Setter Property="VerticalAlignment" Value="Center"/>

@@ -57,6 +57,9 @@ public class DailyTask
         Streak = streak;
     }
 
+    // Clone:
+    public DailyTask Clone() => new DailyTask(Id, Name, Description, IsActive, Completed, Streak);    
+
     // Print:
     const int PrintCheckSpace = -8;
     const int PrintNameSpace = -20;
