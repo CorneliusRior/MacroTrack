@@ -11,9 +11,11 @@ namespace MacroTrack.Puppet2
     public sealed class ReplService
     {
         private readonly PuppetEngine _engine;
+        public event Action<string>? RequestOpenWindow;
         public ReplService(CoreServices services, IProgress<ScriptProgress>? prog)
         {
             _engine = new PuppetEngine(services, prog);
+            _engine.RequestOpenWindow += type => RequestOpenWindow?.Invoke(type);
         }
         public PuppetResult Execute(string input)
         {

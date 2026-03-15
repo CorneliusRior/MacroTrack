@@ -14,6 +14,7 @@ namespace MacroTrack.Puppet2
     {
         private readonly Dictionary<string, IPuppetCommand> _map;
         private readonly IProgress<ScriptProgress>? _prog;
+        public event Action<string>? RequestOpenWindow;
         public PuppetEngine(CoreServices services, IProgress<ScriptProgress>? prog)
         {
             var commands = DiscoverCommands(services);
@@ -261,6 +262,12 @@ namespace MacroTrack.Puppet2
         {
             Debug.WriteLine($"{Path.GetFileName(file)} line {line} {member}(): {message}");
         }
+
+        public void OpenWindow(string type)
+        {
+            //_prog?.Report(new ScriptProgress(1, 1, $"OpenWindow: '{type}'"));
+            RequestOpenWindow?.Invoke(type);
+        }
     }
     
     public interface IPuppetContext
@@ -270,6 +277,7 @@ namespace MacroTrack.Puppet2
         bool ScriptValidateFormat(Script script);
         bool ScriptValidateFormatPath(string path);
         public bool RunScriptFromPath(string path);
+        public void OpenWindow(string type);
     }
 
     public sealed record ScriptProgress(int ActionsDone, int ActionsTotal, string Message);

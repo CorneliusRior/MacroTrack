@@ -52,6 +52,17 @@ namespace MacroTrack.Dashboard
                 Print($"({p.ActionsDone}/{p.ActionsTotal}): {p.Message}");
             });
             _repl = new ReplService(services, replProgress);
+            _repl.RequestOpenWindow += type =>
+            {
+                if (!Enum.TryParse<WindowType>(type, out WindowType win))
+                {
+                    MessageBox.Show($"Could not parse type '{type}'");
+                }
+                else
+                {
+                    AppServices.WindowService.Show(win);
+                }
+            };
 
 
             _vm = new MainWindowVM(Services, AppServices);
