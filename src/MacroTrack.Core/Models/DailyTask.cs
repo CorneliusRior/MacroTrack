@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace MacroTrack.Core.Models;
 
 public class DailyTask
@@ -78,4 +80,54 @@ public class DailyTask
         $"{(showStreak ? $"{Streak.ToStringTruncate(PrintCheckSpace), PrintCheckSpace}" : "")}" +
         $"{Name.Truncate(PrintNameSpace), PrintNameSpace}" +
         $"{Description.Truncate(PrintDescriptionSpace),PrintDescriptionSpace}";
+    public string PrintRef() => $"#{Id} `{Name}`";
+}
+
+// History classes:
+public sealed class TaskHistoryRow
+{
+    public DateTime Date { get; init; }
+    public Dictionary<int, bool> Completed { get; init; } = new();
+
+    public TaskHistoryRow(DateTime date, Dictionary <int, bool> completed)
+    {
+        Date = date;
+        Completed = completed;
+    }
+
+    public string PrintRow()
+    {
+        StringBuilder sb = new();
+        sb.Append(Date.ToString("yyyy-MM-dd |"));
+        foreach (var task in Completed) sb.Append($" {task.Value.Checked()} |");
+        return sb.ToString();
+    }
+}
+
+public sealed class TaskHistoryMatrix
+{
+    public List<DailyTask> Tasks { get; init; } = new();
+    public List<TaskHistoryRow> Rows { get; init; } = new();
+
+    public TaskHistoryMatrix(Dictionary<DateTime, Dictionary<int, bool>> hist, List<DailyTask> registry)
+    {
+        List<TaskHistoryRow> rows = new();
+        foreach (var row in hist) rows.Add(new TaskHistoryRow(row.Key, row.Value));
+        Tasks = registry;
+        Rows = rows;
+    }
+
+    public string Print(int max = 300)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("Printing History\n");
+        sb.AppendLine("Task index:");
+        foreach (DailyTask task in Tasks) sb.AppendLine(task.PrintRef());
+        sb.AppendLine("");
+        sb.Append("           |");
+        foreach (DailyTask task in Tasks) sb.Append(task.Id.ToStringTruncate(5, "#").PadRight(5) + '|');
+        sb.AppendLine("");
+        foreach (TaskHistoryRow row in Rows) sb.AppendLine(row.PrintRow().Truncate(max));
+        return sb.ToString();
+    }
 }

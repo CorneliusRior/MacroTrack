@@ -75,6 +75,14 @@
         <Setter Property="FontSize" Value="{DynamicResource UISmallTitleSize}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
+    
+    <!--TaskHistory Check Cell style (textblock):-->
+    <Style x:Key="TextBlock.TaskHistory" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="Green"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
 
     <!--Button-->
     <Style x:Key="Button.Base" TargetType="Button">

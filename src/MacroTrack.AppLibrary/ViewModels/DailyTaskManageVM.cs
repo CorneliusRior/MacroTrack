@@ -16,7 +16,7 @@ namespace MacroTrack.AppLibrary.ViewModels
     internal class DailyTaskManageVM : ViewModelBase
     {
         public event Action<bool>? RequestClose;
-        public ObservableCollection<DailyTask> TaskList { get; } = new();
+        public ObservableCollection<DailyTask> TaskList { get; } = new();        
 
         private bool _isEditing = false;
         public bool IsEditing
@@ -92,6 +92,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             {
                 SelectedTask = TaskList.FirstOrDefault(t => t.Id == id);
             }
+
         }
 
         public void OpenEdit()

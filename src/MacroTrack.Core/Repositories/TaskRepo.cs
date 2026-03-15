@@ -338,4 +338,73 @@ public class TaskRepo : RepoBase
         cmd.ExecuteNonQuery();
     }
 
+    // History functions:
+    public Dictionary<DateTime, Dictionary<int, bool>> GetHistory(DateTime? startDate = null, DateTime? endDate = null)
+    {
+        // Create Dictionary & connection:
+        Dictionary<DateTime, Dictionary<int, bool>> History = new();
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+
+        // Get start date and end date:
+        DateTime StartDate, EndDate;
+
+        if (startDate is not null) StartDate = startDate.Value;
+        else
+        {
+            string sql1 = "SELECT LogDate FROM TaskCompletion ORDER BY LogDate LIMIT 1";
+            using var cmd1 = new SqliteCommand(sql1, connection);
+            using var reader1 = cmd1.ExecuteReader();
+            if (!reader1.Read()) return History; // Blank dictionary.
+            StartDate = reader1.GetDateTime(0);
+        }
+
+        if (endDate is not null) EndDate = endDate.Value;
+        else
+        {
+            string sql1 = "SELECT LogDate FROM TaskCompletion ORDER BY LogDate DESC LIMIT 1";
+            using var cmd1 = new SqliteCommand(sql1, connection);
+            using var reader1 = cmd1.ExecuteReader();
+            if (!reader1.Read()) return History; // Blank dictionary.
+            EndDate = reader1.GetDateTime(0);
+        }
+
+        StartDate = StartDate.Date;
+        EndDate = EndDate.Date;
+        if (StartDate > EndDate) (StartDate, EndDate) = (EndDate, StartDate);
+
+
+        // Get all of the data:
+        List<TaskHistoryItem> raw = new();
+        string sql2 = "SELECT * FROM TaskCompletion WHERE LogDate >= $start AND LogDate <= $end";
+        using var cmd2 = new SqliteCommand(sql2, connection);
+        cmd2.Parameters.AddWithValue("$start", StartDate);
+        cmd2.Parameters.AddWithValue("$end", EndDate);
+        using var reader2 = cmd2.ExecuteReader();
+        while (reader2.Read()) raw.Add(new TaskHistoryItem(reader2.GetInt32(0), reader2.GetDateTime(1).Date, reader2.GetInt32(2) == 1));
+
+        // Get ID list:
+        List<int> ids = new();
+        string sql3 = "SELECT Id FROM TaskRegistry";
+        using var cmd3 = new SqliteCommand(sql3, connection);
+        using var reader3 = cmd3.ExecuteReader();
+        while (reader3.Read()) ids.Add(reader3.GetInt32(0));
+
+        // Build lookup:
+        Dictionary<(DateTime, int), bool> completionLookup = raw
+            .GroupBy(t => (t.LogDate.Date, t.TaskId))
+            .ToDictionary(g => g.Key, g => g.Last().Completed);
+        
+        // Iterate through dates:
+        for (DateTime date = StartDate; date <= EndDate; date = date.AddDays(1))
+        {
+            Dictionary<int, bool> row = new();
+            foreach (int id in ids) row[id] = completionLookup.TryGetValue((date, id), out bool value) && value;
+            History[date] = row;
+        }
+
+        return History;
+    }
+
+    public sealed record TaskHistoryItem(int TaskId, DateTime LogDate, bool Completed);
 }

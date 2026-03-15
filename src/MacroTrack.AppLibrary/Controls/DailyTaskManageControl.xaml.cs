@@ -1,5 +1,7 @@
-﻿using MacroTrack.AppLibrary.Services;
+﻿using MacroTrack.AppLibrary.Converters;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.AppLibrary.ViewModels;
+using MacroTrack.Core.Models;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -36,12 +38,45 @@ namespace MacroTrack.AppLibrary.Controls
         {
             base.Init(services, appServices);
             _vm.Init(services, appServices);
+
+            TaskHistoryMatrix History = Services!.taskService.GetHistory();
+            LoadHistoryMatrix(History);
         }
 
         protected override void OnUnloaded(object sender, RoutedEventArgs e)
         {
             _vm.OnClose();
             base.OnUnloaded(sender, e);
+        }
+
+        private void LoadHistoryMatrix(TaskHistoryMatrix matrix)
+        {
+            dgHistory.Columns.Clear();
+            dgHistory.ItemsSource = matrix.Rows;
+
+            dgHistory.Columns.Add(new DataGridTextColumn
+            {
+                Header = "Date",
+                Binding = new Binding(nameof(TaskHistoryRow.Date))
+                {
+                    StringFormat = "yyyy-MM-dd"
+                },
+                Width = new DataGridLength(140)
+            });
+
+            foreach (DailyTask task in matrix.Tasks)
+            {
+                dgHistory.Columns.Add(new DataGridTextColumn
+                {
+                    Header = task.Name,
+                    Binding = new Binding($"Completed[{task.Id}]")
+                    {
+                        Converter = (IValueConverter)FindResource("BoolToX")
+                    },
+                    Width = new DataGridLength(50),
+                    ElementStyle = (Style)FindResource("TextBlock.TaskHistory")
+                });
+            }
         }
     }
 }

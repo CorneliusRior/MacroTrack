@@ -34,6 +34,9 @@ namespace MacroTrack.Puppet2.Commands
             new(["Task", "Set"],
                 "Task.Set <bool Complete> <int Id> (DateTime Date)",
                 "Sets specified task as complete or incomplete for specified date, or todat if not specified."),
+            new(["Task", "History"],
+                "Task.History (DateTime StartDate) (DateTime EndDate)",
+                "Prints history for tasks (matrix)"),
             new(["Task", "Cheat"],
                 "Task.Cheat.<subcommand Get/Set",
                 "Commands for interacting with TaskLog (cheat)",
@@ -57,6 +60,7 @@ namespace MacroTrack.Puppet2.Commands
                 "disable"   => Disable(args),
                 "list"      => List(args),
                 "set"       => Set(args),
+                "history"   => History(args),
                 "cheat"     => Cheat(head, args),
                 _ => PuppetResult.Fail($"Unknown subcommand '{Name}.{head[1]}'.")
             };
@@ -232,6 +236,14 @@ namespace MacroTrack.Puppet2.Commands
             }
             catch { return PuppetResult.Fail("Invalid JSON payload."); }
             return PuppetResult.Ok("Parsed.");
+        }
+
+        private PuppetResult History(IReadOnlyList<string> args)
+        {
+            DateTime? start = args.dateTimeOrNull(0, "Start Time");
+            DateTime? end = args.dateTimeOrNull(1, "End Time");
+            return PuppetResult.Ok(_services.taskService.GetHistory(start, end).Print());
+            throw new NotImplementedException();
         }
 
         public PuppetResult Cheat(IReadOnlyList<string> head, IReadOnlyList<string> args)

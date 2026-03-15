@@ -185,4 +185,7 @@ public class TaskService : ServiceBase
         Log($"Edited Task #{id}");
         return _repo.GetTask(id, DateTime.Now)!;
     }
+
+    // History:
+    public TaskHistoryMatrix GetHistory(DateTime? startDate = null, DateTime? endDate = null) => new TaskHistoryMatrix(_repo.GetHistory(startDate, endDate), _repo.GetRegistry());    
 }
