@@ -1,4 +1,5 @@
-﻿using MacroTrack.AppLibrary.Services;
+﻿using DocumentFormat.OpenXml.Office.ActiveX;
+using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,8 @@ namespace MacroTrack.AppLibrary.Windows
         public PresetManageWindow(CoreServices services, AppServices appServices) : base(services, appServices)
         {
             InitializeComponent();
+            ControlPresetManage.Init(services, appServices);
+            ControlPresetManage.RequestClose += r => Close();
         }
     }
 }
