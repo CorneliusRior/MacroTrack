@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Services;
+using System.Windows.Input;
+using MacroTrack.AppLibrary.Commands;
 
 namespace MacroTrack.AppLibrary.ViewModels
 {
@@ -143,7 +145,13 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
-        // Functions:
+        // Commands & init:
+        public ICommand OpenManageCommand { get; }
+        public AddPresetVM()
+        {
+            OpenManageCommand = new RelayCommand(() => AppServices?.WindowService.Show(WindowType.PresetManage));
+        }
+
 
         public override void Init(CoreServices services, AppServices appServices)
         {
@@ -152,6 +160,8 @@ namespace MacroTrack.AppLibrary.ViewModels
             UnitGram = true; UnitMl = false;
             Populate();            
         }
+
+        // Functions:
 
         public void Populate()
         {

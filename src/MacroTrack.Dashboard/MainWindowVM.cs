@@ -34,6 +34,7 @@ namespace MacroTrack.Dashboard
         public ICommand PrintCommand { get; }
         public event Action<string>? RequestPrint;
         public ICommand OpenPreviousPeriodCommand { get; }
+        public ICommand OpenManagePresetCommand { get; }
 
         // Event Subscriptions:
         private List<IDisposable> _subscriptions = new List<IDisposable>();
@@ -156,6 +157,7 @@ namespace MacroTrack.Dashboard
             GeneralRefreshCommand = new RelayCommand(() => AppServices.AppEvents.Publish(new GeneralRefresh()));
             PrintCommand = new RelayCommand(() => RequestPrint?.Invoke(""));
             OpenPreviousPeriodCommand = new RelayCommand<TimePeriod>(OpenPreviousPeriod);
+            OpenManagePresetCommand = new RelayCommand(() => AppServices.WindowService.Show(WindowType.PresetManage));
 
             // Event Subscriptions:
             IDisposable _subSettingsChanged = AppServices.AppEvents.Subscribe<SettingsChanged>(_ =>

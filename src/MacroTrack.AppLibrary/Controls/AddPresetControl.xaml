@@ -19,9 +19,20 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Label Content="Add New Preset"
-                   Style="{DynamicResource Label.Title}"
-                   Grid.Row="0"/>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Add New Preset"
+                       Style="{DynamicResource Label.Title}"
+                       Grid.Column="0"/>
+                <Button x:Name="buttonManage" Content="Manage Presets" 
+                        Command="{Binding OpenManageCommand}"
+                        Grid.Column="1"/>
+            </Grid>
+            
+            
             
             <!--Content Grid-->
             <Border Margin="5" Grid.Row="1"> <!--This is here for padding or margin &c.-->

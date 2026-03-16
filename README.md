@@ -38,13 +38,10 @@ This is a personal project. It is mostly complete, and it is unlikely that any a
 - More applications of AppLibrary.
 	- TabControl.
 	- Light (Food entry only).
-- "Manage Tasks" view.
 - More themes and customisation options.
 
 ## Current Issues/Limitations
 ### AppLibrary:
-- Custom DateTimePicker control behaves strangely and requires a rewrite.
-- Custom SpinBox controls sometimes behaves strangely and requires review.
 - Pressing "up" in WPF REPL before any commands have been run will crash the program.
 - REPL Start-up banner, "MACROTRACK" banner crawl, appears strange perhaps due to it being designed in a different font.
 - In settings, "Revert" and "Default" buttons do not work.

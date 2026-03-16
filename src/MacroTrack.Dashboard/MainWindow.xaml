@@ -74,6 +74,9 @@
                         <Button Content="{Binding DeclareCheatString}"                                
                                 Name="BannerButtonCheatDay"
                                 Click="BannerButtonCheatDay_Click"/>
+                        <Button Content="Manage Presets"
+                                Name="ButtonManagePresets"
+                                Command="{Binding OpenManagePresetCommand}"/>
 
                     </StackPanel>
 
