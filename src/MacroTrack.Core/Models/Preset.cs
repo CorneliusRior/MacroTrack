@@ -52,4 +52,7 @@ public class Preset
     const int PrintNotesSpace = -100;
     public static string PrintHeader() => $"{"ID:", PrintIdSpace}{"Preset Name:", PrintNameSpace}{"Cal.:", PrintCalSpace}{"Pro.:", PrintMacroSpace}{"Car.:",PrintMacroSpace}{"Fat:",PrintMacroSpace}{"Weight:", PrintWeightSpace}  {"Category:", PrintCategorySpace}{"Notes:", PrintNotesSpace}";
     public string Print() => $"{$"#{Id}", PrintIdSpace}{PresetName.Truncate(PrintNameSpace), PrintNameSpace}{Calories.ToStringTruncate(PrintCalSpace), PrintCalSpace}{Protein.ToStringTruncate(PrintMacroSpace), PrintMacroSpace}{Carbs.ToStringTruncate(PrintMacroSpace),PrintMacroSpace}{Fat, PrintMacroSpace}{(Weight is null ? "-" : Weight.Value.ToStringTruncate(PrintWeightSpace, suffix: Unit ?? string.Empty)), PrintWeightSpace}  {Category.TruncateNullable(PrintCategorySpace) ?? "-", PrintCategorySpace}{Notes.TruncateNullable(PrintNotesSpace) ?? "-", PrintNotesSpace}";
+
+    // Clone:
+    public Preset Clone() => new Preset(Id, PresetName, Calories, Protein, Carbs, Fat, Weight, Unit, Category, Notes);
 }

@@ -2,10 +2,14 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:conv="clr-namespace:MacroTrack.AppLibrary.Converters"
              xmlns:local="clr-namespace:MacroTrack.AppLibrary.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
     <Border Background="{DynamicResource PanelBackGroundBrush}">
         <Grid>
             <Grid.RowDefinitions>
@@ -24,12 +28,30 @@
 
                 <DataGrid RowHeaderStyle="{DynamicResource MTDataGridRowHeaderStyle}"
                           Template="{DynamicResource MTDataGrid}"
+                          ItemsSource="{Binding PresetList}"
+                          SelectedItem="{Binding SelectedPreset}"
                           IsReadOnly="True"
                           CanUserSortColumns="True"
                           AutoGenerateColumns="False"
                           Margin="5,5,0,5"
                           Grid.Column="0">
-                    
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id, StringFormat={}#{0:N0}}" SortMemberPath="Id"/>
+                        <DataGridTextColumn Header="Preset" Binding="{Binding PresetName}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Calories" Binding="{Binding Calories, StringFormat={}{0:N0}}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
                 </DataGrid>
                 
                 <GridSplitter Grid.Column="1"/>
@@ -40,21 +62,154 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="8"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="*Preset Name*" Style="{DynamicResource TextBlock.MidTitle}" Grid.Row="0" Grid.Column="0"/>
+                                <TextBlock Text="{Binding SelectedPreset.Id, StringFormat=#\{0\}}" Style="{DynamicResource TextBlock.MidTitle}" Grid.Row="0" Grid.Column="0"/>
+                                <TextBlock Text="{Binding SelectedPreset.PresetName}" Style="{DynamicResource TextBlock.MidTitle}" Grid.Row="0" Grid.Column="1"/>
+                                <WrapPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
+                                    <TextBlock Style="{DynamicResource TextBlock.Base}" Text="{Binding SelectedPreset.Category, TargetNullValue=(No Category) }"/>
+                                    <TextBlock Style="{DynamicResource TextBlock.Base}">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}{1}">
+                                                <Binding Path="SelectedPreset.Weight"/>
+                                                <Binding Path="SelectedPreset.Unit"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </WrapPanel>
+                                
+                                <WrapPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+                                    <TextBlock Text="{Binding SelectedPreset.Calories, StringFormat=Calories: \{0:N1\} kcal}" Style="{DynamicResource TextBlock.Base}"/>
+                                    <TextBlock Text="{Binding SelectedPreset.Protein, StringFormat=Protein: \{0:N1\} g}" Style="{DynamicResource TextBlock.Base}"/>
+                                    <TextBlock Text="{Binding SelectedPreset.Carbs, StringFormat=Carbs: \{0:N1\} g}" Style="{DynamicResource TextBlock.Base}"/>
+                                    <TextBlock Text="{Binding SelectedPreset.Fat, StringFormat=Fat: \{0:N1\} g}" Style="{DynamicResource TextBlock.Base}"/>
+                                </WrapPanel>
+
+                                <TextBlock Style="{DynamicResource TextBlock.Base}" Text="{Binding SelectedPreset.Notes}" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"/>
 
                                 <Button Content="✍️" Style="{DynamicResource Button.EditButton}"
-                                        Grid.Row="0" Grid.Column="1"/>
+                                        Visibility="{Binding HasSelected, Converter={StaticResource BoolToVis}}"
+                                        Command="{Binding OpenEditCommand}"
+                                        Grid.Row="0" Grid.Column="2"/>
 
                             </Grid>
                         </DataTemplate>
                         <DataTemplate x:Key="TemplatePresetEdit">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBox FontSize="{DynamicResource UITitleSize}"
+                                         Text="{Binding SelectedEditable.PresetName}" 
+                                         Grid.Row="0"/>
+
+                                <WrapPanel Orientation="Horizontal" Grid.Row="1">
+                                    <TextBlock Text="Category:" Style="{DynamicResource TextBlock.SingleLine}"/>
+                                    <ComboBox Template="{DynamicResource MTComboBoxTemplate}" 
+                                              IsEditable="True"
+                                              IsTextSearchEnabled="True"
+                                              ItemsSource="{Binding CatList}"
+                                              Text="{Binding SelectedEditable.Category}"
+                                              Width="100"/>
+
+                                    <CheckBox Content="Store weight" IsChecked="{Binding SelectedStoreWeight, Mode=TwoWay}"/>
+                                    
+                                    <local:SpinBox Value="{Binding SelectedWeight, UpdateSourceTrigger=PropertyChanged}" 
+                                                   IsEnabled="{Binding SelectedStoreWeight}"
+                                                   FormatString="0.#" Step="10" SmallStep="1"
+                                                   MinWidth="60" Margin="2"/>
+                                    <RadioButton GroupName="rbgUnit" IsChecked="{Binding SelectedUnitGram, Mode=TwoWay}" 
+                                                 Content="g" VerticalContentAlignment="Center"/>
+                                    <RadioButton GroupName="rbgUnit" IsChecked="{Binding SelectedUnitMl, Mode=TwoWay}" 
+                                                 Content="ml" VerticalContentAlignment="Center"/>
+                                </WrapPanel>
+
+                                <WrapPanel Orientation="Horizontal" Grid.Row="2">
+                                    <Grid>
+                                        <!--Cal input-->
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Content="Cal:" Grid.Column="0"/>
+                                        <TextBox x:Name="tbCal"
+                                                 Text="{Binding SelectedPreset.Calories,
+                                                        UpdateSourceTrigger=PropertyChanged,
+                                                        ValidatesOnNotifyDataErrors=True}"                                 
+                                                 Style="{DynamicResource TextBox.Numeric}"
+                                                 Grid.Column="1"/>
+                                    </Grid>
+
+                                    <Grid>
+                                        <!--Cal input-->
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Content="Pro:" Grid.Column="0"/>
+                                        <TextBox x:Name="tbPro"
+                                                 Text="{Binding SelectedPreset.Protein,
+                                                        UpdateSourceTrigger=PropertyChanged,
+                                                        ValidatesOnNotifyDataErrors=True}"                                 
+                                                 Style="{DynamicResource TextBox.Numeric}"
+                                                 Grid.Column="1"/>
+                                    </Grid>
+
+                                    <Grid>
+                                        <!--Cal input-->
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Content="Car:" Grid.Column="0"/>
+                                        <TextBox x:Name="tbCar"
+                                                 Text="{Binding SelectedPreset.Carbs,
+                                                        UpdateSourceTrigger=PropertyChanged,
+                                                        ValidatesOnNotifyDataErrors=True}"                                 
+                                                 Style="{DynamicResource TextBox.Numeric}"
+                                                 Grid.Column="1"/>
+                                    </Grid>
+
+                                    <Grid>
+                                        <!--Cal input-->
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Content="Fat:" Grid.Column="0"/>
+                                        <TextBox x:Name="tbFat"
+                                                 Text="{Binding SelectedPreset.Fat,
+                                                        UpdateSourceTrigger=PropertyChanged,
+                                                        ValidatesOnNotifyDataErrors=True}"                                 
+                                                 Style="{DynamicResource TextBox.Numeric}"
+                                                 Grid.Column="1"/>
+                                    </Grid>
+                                </WrapPanel>
+
+                                <TextBox Style="{DynamicResource TextBox.MultiLine}" Text="{Binding SelectedEditable.Notes}" Grid.Row="3"/>
+
+                                <StackPanel Style="{DynamicResource StackPanel.Footer}" Grid.Row="4">
+                                    <Button Content="Cancel" Command="{Binding OpenViewCommand}"/>
+                                    <Button Content="Edit" Command="{Binding EditCommand}"/>
+                                </StackPanel>
+                            </Grid>
                             
                         </DataTemplate>
                     </Border.Resources>
@@ -64,7 +219,9 @@
                             <Style TargetType="ContentControl">
                                 <Setter Property="ContentTemplate" Value="{StaticResource TemplatePresetView}"/>
                                 <Style.Triggers>
-                                    
+                                    <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource TemplatePresetEdit}"/>
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </ContentControl.Style>

@@ -88,11 +88,7 @@ namespace MacroTrack.AppLibrary.ViewModels
             List<DailyTask> taskList = Services.taskService.RegistryList();
             TaskList.Clear();
             foreach (DailyTask t in taskList) TaskList.Add(t);
-            if (id is not null)
-            {
-                SelectedTask = TaskList.FirstOrDefault(t => t.Id == id);
-            }
-
+            if (id is not null) SelectedTask = TaskList.FirstOrDefault(t => t.Id == id);
         }
 
         public void OpenEdit()

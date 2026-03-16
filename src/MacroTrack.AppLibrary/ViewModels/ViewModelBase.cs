@@ -5,6 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -63,6 +65,15 @@ namespace MacroTrack.AppLibrary.ViewModels
         protected void LogVars(object vars, string? prefix = null, [CallerMemberName] string caller = "")
         {
             Logger?.LogVars(this, vars, caller, prefix);
+        }
+
+        /// <summary>
+        /// Better debugging printer. Ignore all parameters except "Message", the rest fill in automatically.
+        /// </summary>
+        /// <param name="message"></param>
+        public static void p(string message = "", [CallerMemberName] string member = "", [CallerFilePath] string file = "", [CallerLineNumber] int line = 0)
+        {
+            Debug.WriteLine($"{Path.GetFileName(file)} line {line} {member}(): {message}");
         }
 
         // Error handling:
