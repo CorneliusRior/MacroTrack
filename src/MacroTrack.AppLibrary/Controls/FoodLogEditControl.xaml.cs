@@ -44,7 +44,6 @@ namespace MacroTrack.AppLibrary.Controls
 
         protected override void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            Log("This is to affirm that 'OnUnLoaded is being called'");
             _vm.OnClose();
             base.OnUnloaded(sender, e);
         }

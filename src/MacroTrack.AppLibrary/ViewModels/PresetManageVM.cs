@@ -53,7 +53,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             get => _selectedStoreWeight;
             set
             {
-                p($"Updating from {_selectedStoreWeight} to {value}");
                 if (_selectedStoreWeight == value) return;
                 _selectedStoreWeight = value;
                 OnPropertyChanged();
@@ -68,7 +67,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             get => _selectedWeight;
             set
             {
-                p($"Updating from {_selectedWeight} to {value}");
                 if (_selectedWeight == value) return;
                 _selectedWeight = value;
                 OnPropertyChanged();
@@ -81,7 +79,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             get => _selectedUnitGram;
             set
             {
-                p($"Updating from {_selectedUnitGram} to {value}");
                 if (_selectedUnitGram == value) return;
                 _selectedUnitGram = value;
                 OnPropertyChanged();
@@ -95,7 +92,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             get => _selectedUnitMl;
             set
             {
-                p($"Updating from {_selectedUnitMl} to {value}");
                 if (_selectedUnitMl == value) return;
                 _selectedUnitMl = value;
                 OnPropertyChanged();
@@ -155,7 +151,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             get => _isEditing;
             set
             {
-                p($"IsEditing updating from {_isEditing} to {value}");
                 if (_isEditing == value) return;
                 _isEditing = value;
                 OnPropertyChanged();
@@ -203,9 +198,8 @@ namespace MacroTrack.AppLibrary.ViewModels
             if (SelectedEditable is null) return;
             if (Services is null) throw new Exception("Null Services");
 
-            p($"selectededitable.id = {SelectedEditable.Id}, cal: '{SelectedEditable.Calories}', pro = '{SelectedEditable.Protein}', carbs: '{SelectedEditable.Carbs}', fat = '{SelectedEditable.Fat}");
-
             Services.presetService.EditEntry(SelectedEditable.Id, SelectedEditable.PresetName, SelectedCal, SelectedEditable.Protein, SelectedEditable.Carbs, SelectedEditable.Fat, SelectedStoreWeight ? SelectedWeight : null, SelectedStoreWeight ? SelectedUnitGram ? "g" : "ml" : null, SelectedEditable.Category, SelectedEditable.Notes);
+
             Populate(SelectedEditable.Id);
             OpenView();
             if (AppServices is not null) AppServices.AppEvents.Publish(new PresetListChanged());
@@ -213,10 +207,8 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         private void OpenEdit()
         {
-            p("In edit");
             if (SelectedPreset is null) return;
             SelectedEditable = SelectedPreset.Clone();
-            p("Affirming we get to isEditing");
             IsEditing = true;
         }
 
@@ -231,16 +223,13 @@ namespace MacroTrack.AppLibrary.ViewModels
             if (SelectedPreset is null) return;
             if (SelectedPreset.Weight is not null && SelectedPreset.Unit is not null)
             {
-                p("Neither null");
                 SelectedStoreWeight = true;
                 SelectedWeight = SelectedPreset.Weight.Value;
-                p($"SelectedPreset.Weight={SelectedPreset.Weight}, SelectedWeight={SelectedWeight}");
                 SelectedUnitGram = SelectedPreset.Unit == "g";
                 SelectedUnitMl = SelectedPreset.Unit == "ml";
             }
             else
             {
-                p("One or both null");
                 SelectedStoreWeight = false;
                 SelectedWeight = 100.0;
                 SelectedUnitGram = true;
