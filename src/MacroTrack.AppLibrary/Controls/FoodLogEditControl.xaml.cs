@@ -51,7 +51,7 @@ namespace MacroTrack.AppLibrary.Controls
 
         private void buttonDelete_Click(object sender, RoutedEventArgs e)
         {
-
+            _vm.DeleteEntry();
         }
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
@@ -62,6 +62,11 @@ namespace MacroTrack.AppLibrary.Controls
         private void buttonEdit_Click(object sender, RoutedEventArgs e)
         {
             _vm.Edit();
+        }
+
+        private void buttonNow_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.TimeNow();
         }
     }
 }

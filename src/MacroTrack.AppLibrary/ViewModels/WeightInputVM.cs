@@ -85,8 +85,8 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
-        private double? _weightInput;
-        public double? WeightInput
+        private string _weightInput = "";
+        public string WeightInput
         {
             get => _weightInput;
             set
@@ -161,7 +161,7 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             Log();
             if (Time ==  null) Time = DateTime.Now;            
-            WeightInput = null;
+            WeightInput = "";
             ClearAllErrors();
         }
 
@@ -173,7 +173,7 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         private void Convert()
         {
-            if ( WeightInput == null)
+            if (!double.TryParse(WeightInput, out double w))
             {
                 WeightKg = 0;
                 WeightLbs = 0;
@@ -181,7 +181,6 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
             else
             {
-                double w = WeightInput.Value; 
                 WeightKg = Format.ConvertTo(WeightFormat.Kg, w);
                 WeightLbs = Format.ConvertTo(WeightFormat.Lbs, w);
                 WeightSt = Format.ConvertTo(WeightFormat.St, w);
@@ -203,11 +202,11 @@ namespace MacroTrack.AppLibrary.ViewModels
             Log();
             bool ok = true;
             ok &= DateTimeRequire(nameof(Time), Time);
-            ok &= NumericRequire(nameof(WeightInput), WeightInput);
+            ok &= StringToDoubleRequire(nameof(WeightInput), WeightInput);
             if (!ok) return;
 
             DateTime time = Time!.Value;
-            double weight = Format.ConvertTo(WeightFormat.Kg, WeightInput!.Value);
+            double weight = Format.ConvertTo(WeightFormat.Kg, double.Parse(WeightInput));
 
             try
             {

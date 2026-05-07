@@ -116,7 +116,6 @@
                                Grid.Column="0"/>
                         <TextBox x:Name="tbCal"
                                  Text="{Binding Cal, 
-                                        Converter={StaticResource NullDouble},
                                         UpdateSourceTrigger=PropertyChanged,
                                         ValidatesOnNotifyDataErrors=True}"                                 
                                  Style="{DynamicResource TextBox.Numeric}"
@@ -134,7 +133,6 @@
                                Grid.Column="0"/>
                         <TextBox x:Name="tbPro"
                                  Text="{Binding Pro, 
-                                        Converter={StaticResource NullDouble},
                                         UpdateSourceTrigger=PropertyChanged,
                                         ValidatesOnNotifyDataErrors=True}"  
                                  Style="{DynamicResource TextBox.Numeric}"
@@ -151,8 +149,7 @@
                         <Label Content="Car:"
                                Grid.Column="0"/>
                         <TextBox x:Name="tbCar"
-                                 Text="{Binding Car, 
-                                        Converter={StaticResource NullDouble},
+                                 Text="{Binding Car,                                         
                                         UpdateSourceTrigger=PropertyChanged,
                                         ValidatesOnNotifyDataErrors=True}"  
                                  Style="{DynamicResource TextBox.Numeric}"
@@ -170,7 +167,6 @@
                                Grid.Column="0"/>
                         <TextBox x:Name="tbFat"
                                  Text="{Binding Fat, 
-                                         Converter={StaticResource NullDouble},
                                          UpdateSourceTrigger=PropertyChanged,
                                          ValidatesOnNotifyDataErrors=True}"  
                                  Style="{DynamicResource TextBox.Numeric}"

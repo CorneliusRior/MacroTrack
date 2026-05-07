@@ -1,4 +1,5 @@
-﻿using MacroTrack.AppLibrary.Commands;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using MacroTrack.AppLibrary.Commands;
 using MacroTrack.AppLibrary.Models;
 using MacroTrack.AppLibrary.Services;
 using MacroTrack.Core.Logging;
@@ -82,52 +83,52 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         // ScaledValues:
         private readonly ScaledValue _cal = new();
-        public double? Cal
+        public string Cal
         {
-            get => _cal.GetDisplayed(Mult);
+            get => _cal.GetDisplayed(Mult, _multUpdating);
             set
             {
                 if (_multUpdating) return;
-                _cal.SetFromDisplayed(value, Mult);
+                _cal.SetFromString(value, Mult);
                 OnPropertyChanged();
                 ClearError(nameof(Cal));
             }
         }
 
         private readonly ScaledValue _pro = new();
-        public double? Pro
+        public string Pro
         {
-            get => _pro.GetDisplayed(Mult);
+            get => _pro.GetDisplayed(Mult, _multUpdating);
             set
             {
                 if (_multUpdating) return;
-                _pro.SetFromDisplayed(value, Mult);
+                _pro.SetFromString(value, Mult);
                 OnPropertyChanged();
                 ClearError(nameof(Pro));
             }
         }
 
         private readonly ScaledValue _car = new();
-        public double? Car
+        public string Car
         {
-            get => _car.GetDisplayed(Mult);
+            get => _car.GetDisplayed(Mult, _multUpdating);
             set
             {
                 if (_multUpdating) return;
-                _car.SetFromDisplayed(value, Mult);
+                _car.SetFromString(value, Mult);
                 OnPropertyChanged();
                 ClearError(nameof(Car));
             }
         }
 
         private readonly ScaledValue _fat = new();
-        public double? Fat
+        public string Fat
         {
-            get => _fat.GetDisplayed(Mult);
+            get => _fat.GetDisplayed(Mult, _multUpdating);
             set
             {
                 if (_multUpdating) return;
-                _fat.SetFromDisplayed(value, Mult);
+                _fat.SetFromString(value, Mult);
                 OnPropertyChanged();
                 ClearError(nameof(Fat));
             }
@@ -143,7 +144,7 @@ namespace MacroTrack.AppLibrary.ViewModels
                 _notes = value;
                 OnPropertyChanged();
             }
-        }        
+        }
 
         public void Populate(FoodEntry e)
         {
@@ -164,17 +165,22 @@ namespace MacroTrack.AppLibrary.ViewModels
             else Mult = e.Amount;
             if (Mult == 0) // Don't actually think this is possible but you never know. Input doesn't seem to allow it.
             {
-                Cal = 0;
-                Pro = 0;
-                Car = 0;
-                Fat = 0;
+                Cal = "0";
+                Pro = "0";
+                Car = "0";
+                Fat = "0";
             }
             else
             {
-                Cal = e.Calories;
-                Pro = e.Protein;
-                Car = e.Carbs;
-                Fat = e.Fat;
+                _cal.SetFromDisplayed(e.Calories, Mult);
+                _pro.SetFromDisplayed(e.Protein, Mult);
+                _car.SetFromDisplayed(e.Carbs, Mult);
+                _fat.SetFromDisplayed(e.Fat, Mult);
+
+                Cal = _cal.GetDisplayed(Mult, true);
+                Pro = _pro.GetDisplayed(Mult, true);
+                Car = _car.GetDisplayed(Mult, true);
+                Fat = _fat.GetDisplayed(Mult, true);
             }
         }
 
@@ -183,17 +189,17 @@ namespace MacroTrack.AppLibrary.ViewModels
             bool ok = true;
             ok &= DateTimeRequire(nameof(Time), Time);
             ok &= StringRequire(nameof(ItemName), ItemName);
-            ok &= NumericRequire(nameof(Cal), Cal);
-            ok &= NumericRequire(nameof(Pro), Pro);
-            ok &= NumericRequire(nameof(Car), Car);
-            ok &= NumericRequire(nameof(Fat), Fat);
+            ok &= StringToDoubleRequire(nameof(Cal), Cal);
+            ok &= StringToDoubleRequire(nameof(Pro), Pro);
+            ok &= StringToDoubleRequire(nameof(Car), Car);
+            ok &= StringToDoubleRequire(nameof(Fat), Fat);
             if (!ok) return;
             DateTime time = Time!.Value;
             double mult = Mult!.Value;
-            double cal = Cal!.Value;
-            double pro = Pro!.Value;
-            double car = Car!.Value;
-            double fat = Fat!.Value;
+            double cal = _cal.GetValue(mult)!.Value;
+            double pro = _pro.GetValue(mult)!.Value;
+            double car = _car.GetValue(mult)!.Value;
+            double fat = _fat.GetValue(mult)!.Value;
 
             try
             {
@@ -211,12 +217,44 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        public void TimeNow()
+        {
+            Time = DateTime.Now;
+        }
+
         private void RefreshScaledValues()
         {
             OnPropertyChanged(nameof(Cal));
             OnPropertyChanged(nameof(Pro));
             OnPropertyChanged(nameof(Car));
             OnPropertyChanged(nameof(Fat));
+        }
+
+        public void DeleteEntry()
+        {
+            if (Services == null) return;
+            if (AppServices == null) return;
+            FoodEntry? entry = Services.foodLogService.GetEntry(_id);
+            if (entry == null)
+            {
+                Log($"Null entry, returning.", LogLevel.Warning);
+                return;
+            }
+            try
+            {
+                MessageBoxResult response = MessageBox.Show($"Delete Food Log Entry #{entry.Id} '{entry.ItemName}'?\nThis cannot be undone.", "Delete Food Log Entry", MessageBoxButton.YesNo);
+                if (response == MessageBoxResult.Yes)
+                {
+                    Services.foodLogService.DeleteEntry(entry.Id);
+                    AppServices.AppEvents.Publish(new FoodLogChanged());
+                    RequestClose?.Invoke(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Error deleting entry #{entry.Id}, returning.", LogLevel.Warning, ex);
+                return;
+            }
         }
     }
 }

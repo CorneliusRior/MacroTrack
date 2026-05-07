@@ -9,7 +9,7 @@ MacroTrack is a Desktop Application used to track Calories and Macronutrients. I
 MacroTrack consists of `MacroTrack.Core` and different applications of it. These are:
 
 - `MarcoTrack.Puppet` A set of commands used to interact with Core, used by `MacroTrack.Cli`.
-- `MacroTrack.Puppet2` A more advanced command system used to interact with Core, with scripting abilities, used by `MacroTrack.DashBoard`.
+- `MacroTrack.Puppet2` A more advanced command system used to interact with Core, with scripting abilities, used by `MacroTrack.Dashboard`.
 - `MacroTrack.BasicApp` A WinForms application of Core.
 - `MacroTrack.AppLibrary` A WPF Library with UI Elements and logic necessary to make a WPF application of Core.
 - `MacroTrack.Dashboard` An application of AppLibrary and Core.

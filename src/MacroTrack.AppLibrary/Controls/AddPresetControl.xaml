@@ -113,10 +113,7 @@
                             </Grid.ColumnDefinitions>
                             <Label Content="Calories (Kcal):" Grid.Column="0"/>
                             <TextBox x:Name="tbCal" 
-                                     Text="{Binding Cal, 
-                                            Converter={StaticResource NullDouble},
-                                            UpdateSourceTrigger=PropertyChanged,
-                                            ValidatesOnDataErrors=True}"
+                                     Text="{Binding Cal}"
                                      Style="{DynamicResource TextBox.Numeric}" 
                                      Grid.Column="1"/>
                         </Grid>
@@ -128,10 +125,7 @@
                             <Label Content="Protein (g):" 
                                    Grid.Column="0"/>
                             <TextBox x:Name="tbPro" 
-                                     Text="{Binding Pro, 
-                                            Converter={StaticResource NullDouble},
-                                            UpdateSourceTrigger=PropertyChanged,
-                                            ValidatesOnDataErrors=True}"
+                                     Text="{Binding Pro}"
                                      Style="{DynamicResource TextBox.Numeric}" 
                                      Grid.Column="1"/>
                         </Grid>
@@ -142,10 +136,7 @@
                             </Grid.ColumnDefinitions>
                             <Label Content="Carbs (g):" Grid.Column="0"/>
                             <TextBox x:Name="tbCar" 
-                                     Text="{Binding Car, 
-                                            Converter={StaticResource NullDouble},
-                                            UpdateSourceTrigger=PropertyChanged,
-                                            ValidatesOnDataErrors=True}"
+                                     Text="{Binding Car}"
                                      Style="{DynamicResource TextBox.Numeric}" 
                                      Grid.Column="1"/>
                         </Grid>
@@ -156,10 +147,7 @@
                             </Grid.ColumnDefinitions>
                             <Label Content="Fat (g):" Grid.Column="0"/>
                             <TextBox x:Name="tbFat" 
-                                     Text="{Binding Fat, 
-                                            Converter={StaticResource NullDouble},
-                                            UpdateSourceTrigger=PropertyChanged,
-                                            ValidatesOnDataErrors=True}"
+                                     Text="{Binding Fat}"
                                      Style="{DynamicResource TextBox.Numeric}" 
                                      Grid.Column="1"/>
                         </Grid>

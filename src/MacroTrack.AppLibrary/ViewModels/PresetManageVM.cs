@@ -156,6 +156,9 @@ namespace MacroTrack.AppLibrary.ViewModels
         {
             if (SelectedEditable is null) return;
             if (Services is null) throw new Exception("Null Services");
+
+            p($"selectededitable.id = {SelectedEditable.Id}, cal: '{SelectedEditable.Calories}', pro = '{SelectedEditable.Protein}', carbs: '{SelectedEditable.Carbs}', fat = '{SelectedEditable.Fat}");
+
             Services.presetService.EditEntry(SelectedEditable.Id, SelectedEditable.PresetName, SelectedEditable.Calories, SelectedEditable.Protein, SelectedEditable.Carbs, SelectedEditable.Fat, SelectedStoreWeight ? SelectedWeight : null, SelectedStoreWeight ? SelectedUnitGram ? "g" : "ml" : null, SelectedEditable.Category, SelectedEditable.Notes);
             Populate(SelectedEditable.Id);
             OpenView();

@@ -120,6 +120,22 @@ namespace MacroTrack.AppLibrary.ViewModels
             return true;
         }
 
+        public bool StringToDoubleRequire(string propName, string str)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                SetError(propName, "Required");
+                return false;
+            }
+            if (!double.TryParse(str, out double v))
+            {
+                SetError(propName, $"Cannot parse '{str}' as double: Required.");
+                return false;
+            }
+            ClearError(propName);
+            return true;
+        }
+
         public bool DateTimeRequire(string propName, DateTime? value, string message = "Required")
         {
             if (value is null)

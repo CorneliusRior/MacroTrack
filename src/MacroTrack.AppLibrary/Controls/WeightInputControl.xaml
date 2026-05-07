@@ -69,7 +69,6 @@
 
                         <TextBox Name="tb_Entry"
                                  Text="{Binding WeightInput,
-                                        Converter={StaticResource NullDouble},
                                         UpdateSourceTrigger=PropertyChanged,
                                         ValidatesOnDataErrors=True}"
                                  Style="{DynamicResource TextBox.Numeric}"

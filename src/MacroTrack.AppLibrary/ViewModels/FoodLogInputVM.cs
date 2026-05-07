@@ -119,52 +119,54 @@ namespace MacroTrack.AppLibrary.ViewModels
         }
 
         private readonly ScaledValue _cal = new();
-        public double? Cal
+        public string Cal
         {
-            get => _cal.GetDisplayed(Mult);
+            get => _cal.GetDisplayed(Mult, _multUpdating);
             set
             {
                 if (_multUpdating) return;
-                _cal.SetFromDisplayed(value, Mult);
+                _cal.SetFromString(value, Mult);
                 OnPropertyChanged();
                 ClearError(nameof(Cal));
             }
         }
 
         private readonly ScaledValue _pro = new();
-        public double? Pro
+        public string Pro
         {
-            get => _pro.GetDisplayed(Mult);
+            get => _pro.GetDisplayed(Mult, _multUpdating);
             set
             {
                 if (_multUpdating) return;
-                _pro.SetFromDisplayed(value, Mult);
+                _pro.SetFromString(value, Mult);
                 OnPropertyChanged();
                 ClearError(nameof(Pro));
             }
         }
 
         private readonly ScaledValue _car = new();
-        public double? Car
+        public string Car
         {
-            get => _car.GetDisplayed(Mult);
+            get => _car.GetDisplayed(Mult, _multUpdating);
             set
             {
+                // What is happening here is that "5." is being converted into a double, which will just be "5". So we will need to change this into being a string instead.
+                // Try to make edits to ScaledValue when possible.
                 if (_multUpdating) return;
-                _car.SetFromDisplayed(value, Mult);
+                _car.SetFromString(value, Mult);
                 OnPropertyChanged();
                 ClearError(nameof(Car));
             }
         }
 
         private readonly ScaledValue _fat = new();
-        public double? Fat
+        public string Fat
         {
-            get => _fat.GetDisplayed(Mult);
+            get => _fat.GetDisplayed(Mult, _multUpdating);
             set
             {
                 if (_multUpdating) return;
-                _fat.SetFromDisplayed(value, Mult);
+                _fat.SetFromString(value, Mult);
                 OnPropertyChanged();
                 ClearError(nameof(Fat));
             }
@@ -179,6 +181,7 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         private void RefreshScaledValues()
         {
+            p("RefreshScaledValues() called");
             OnPropertyChanged(nameof(Cal));
             OnPropertyChanged(nameof(Pro));
             OnPropertyChanged(nameof(Car));
@@ -187,6 +190,7 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public void Clear()
         {
+            p("Clear() called");
             ItemName = null;
             Mult = 1;
             _cal.SetBase(null);
@@ -201,6 +205,7 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public void ClearAllErrors()
         {
+            p("ClearAllErrors() called.");
             ClearError(nameof(Time));
             ClearError(nameof(ItemName));
             ClearError(nameof(Cal));
@@ -211,25 +216,25 @@ namespace MacroTrack.AppLibrary.ViewModels
 
         public void Add()
         {
-            //MessageBox.Show($"This is what we have right now:\nTime: '{(Time == null ? "No time" : Time)}'\nItemName: '{(ItemName == null ? "null" : ItemName)}\nMult: x{Mult}\nCar: {(Cal == null ? "Null" : Cal)} / Car: {(Pro == null ? "Null" : Pro)} / Car: {(Car == null ? "Null" : Car)} / Car: {(Fat == null ? "Null" : Fat)}\nNotes: '{Notes}'");
+            p("Add() called.");
 
             bool ok = true;
             ok &= DateTimeRequire(nameof(Time), Time);
             ok &= StringRequire(nameof(ItemName), ItemName);
-            ok &= NumericRequire(nameof(Cal), Cal);
-            ok &= NumericRequire(nameof(Pro), Pro);
-            ok &= NumericRequire(nameof(Car), Car);
-            ok &= NumericRequire(nameof(Fat), Fat);
+            ok &= StringToDoubleRequire(nameof(Cal), Cal);
+            ok &= StringToDoubleRequire(nameof(Pro), Pro);
+            ok &= StringToDoubleRequire(nameof(Car), Car);
+            ok &= StringToDoubleRequire(nameof(Fat), Fat);
 
             if (!ok) return;
 
             // Should be a more elegant way of doing this: Could like, plug it into the require ones or something maybe? Could do that some other time, this should work for now thoughL
             DateTime time = Time!.Value;
             double mult = Mult!.Value;
-            double cal = Cal!.Value;
-            double pro = Pro!.Value;
-            double car = Car!.Value;
-            double fat = Fat!.Value;
+            double cal = _cal.GetValue(mult)!.Value;
+            double pro = _pro.GetValue(mult)!.Value;
+            double car = _car.GetValue(mult)!.Value;
+            double fat = _fat.GetValue(mult)!.Value;
 
             try 
             {
