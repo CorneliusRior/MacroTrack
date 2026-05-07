@@ -103,6 +103,52 @@ namespace MacroTrack.AppLibrary.ViewModels
             }
         }
 
+        // Seems like a subtly unstable way to do it, but for the time being, we can assume SelectedEditable is never null, as we never call upon this unless SelectedEditable is being edited. If we change the code to do something else, this could become a problem.
+        // Could also just make this nullable in that case I guess.
+        public double SelectedCal
+        {
+            get => SelectedEditable!.Calories;
+            set
+            {
+                if (SelectedEditable!.Calories == value) return;
+                SelectedEditable.Calories = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double SelectedPro
+        {
+            get => SelectedEditable!.Protein;
+            set
+            {
+                if (SelectedEditable!.Protein == value) return;
+                SelectedEditable.Protein = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double SelectedCar
+        {
+            get => SelectedEditable!.Carbs;
+            set
+            {
+                if (SelectedEditable!.Carbs == value) return;
+                SelectedEditable.Carbs = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double SelectedFat
+        {
+            get => SelectedEditable!.Fat;
+            set
+            {
+                if (SelectedEditable!.Fat == value) return;
+                SelectedEditable.Fat = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _isEditing;
         public bool IsEditing
         {
@@ -159,7 +205,7 @@ namespace MacroTrack.AppLibrary.ViewModels
 
             p($"selectededitable.id = {SelectedEditable.Id}, cal: '{SelectedEditable.Calories}', pro = '{SelectedEditable.Protein}', carbs: '{SelectedEditable.Carbs}', fat = '{SelectedEditable.Fat}");
 
-            Services.presetService.EditEntry(SelectedEditable.Id, SelectedEditable.PresetName, SelectedEditable.Calories, SelectedEditable.Protein, SelectedEditable.Carbs, SelectedEditable.Fat, SelectedStoreWeight ? SelectedWeight : null, SelectedStoreWeight ? SelectedUnitGram ? "g" : "ml" : null, SelectedEditable.Category, SelectedEditable.Notes);
+            Services.presetService.EditEntry(SelectedEditable.Id, SelectedEditable.PresetName, SelectedCal, SelectedEditable.Protein, SelectedEditable.Carbs, SelectedEditable.Fat, SelectedStoreWeight ? SelectedWeight : null, SelectedStoreWeight ? SelectedUnitGram ? "g" : "ml" : null, SelectedEditable.Category, SelectedEditable.Notes);
             Populate(SelectedEditable.Id);
             OpenView();
             if (AppServices is not null) AppServices.AppEvents.Publish(new PresetListChanged());

@@ -147,7 +147,7 @@
 
                                         <Label Content="Cal:" Grid.Column="0"/>
                                         <TextBox x:Name="tbCal"
-                                                 Text="{Binding SelectedPreset.Calories}"                                 
+                                                 Text="{Binding SelectedCal}"                                 
                                                  Style="{DynamicResource TextBox.Numeric}"
                                                  Grid.Column="1"/>
                                     </Grid>
@@ -161,7 +161,7 @@
 
                                         <Label Content="Pro:" Grid.Column="0"/>
                                         <TextBox x:Name="tbPro"
-                                                 Text="{Binding SelectedPreset.Protein}"                                 
+                                                 Text="{Binding SelectedPro}"                                 
                                                  Style="{DynamicResource TextBox.Numeric}"
                                                  Grid.Column="1"/>
                                     </Grid>
@@ -175,7 +175,7 @@
 
                                         <Label Content="Car:" Grid.Column="0"/>
                                         <TextBox x:Name="tbCar"
-                                                 Text="{Binding SelectedPreset.Carbs}"                                 
+                                                 Text="{Binding SelectedCar}"                                 
                                                  Style="{DynamicResource TextBox.Numeric}"
                                                  Grid.Column="1"/>
                                     </Grid>
@@ -189,7 +189,7 @@
 
                                         <Label Content="Fat:" Grid.Column="0"/>
                                         <TextBox x:Name="tbFat"
-                                                 Text="{Binding SelectedPreset.Fat}"                                 
+                                                 Text="{Binding SelectedFat}"                                 
                                                  Style="{DynamicResource TextBox.Numeric}"
                                                  Grid.Column="1"/>
                                     </Grid>
